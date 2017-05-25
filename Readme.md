@@ -1,0 +1,3 @@
+# Tome
+
+A simple wiki.

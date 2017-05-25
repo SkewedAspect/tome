@@ -1,0 +1,12 @@
+# OS X artifacts
+.DS_Store
+
+# Webstorm artifacts
+.idea
+
+# Node artifacts
+node_modules
+tmp
+
+# Application artifacts
+dist
