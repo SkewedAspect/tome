@@ -4,7 +4,7 @@
   "description": "A simple manager for pokemon in pokemon go.",
   "main": "server.js",
   "scripts": {
-    "test": "LOG_LEVEL=WARN mocha tests/ --recursive",
+    "test": "LOG_LEVEL=ERROR mocha tests/ --recursive",
     "start": "DEBUG=TRUE node server.js"
   },
   "author": "Christopher S. Case <chris.case@g33xnexus.com>",
