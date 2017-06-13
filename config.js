@@ -4,9 +4,14 @@
 // @module
 //----------------------------------------------------------------------------------------------------------------------
 
+const DEBUG = ((process.env.DEBUG || '').toLowerCase() === 'true') || false;
+
+//----------------------------------------------------------------------------------------------------------------------
+
 module.exports = {
-    debug: true,
-    debugStream: true,
+    debug: DEBUG,
+    debugStream: DEBUG,
+    overrideAuth: DEBUG,
     secret: process.env.SESSION_SECRET || "copula ## main beat pen 21 jjg226dh",
     key: "tome-session",
     google: {
@@ -21,14 +26,6 @@ module.exports = {
         host: process.env.RETHINK_DB_HOST || 'localhost',
         port: process.env.RETHINK_DB_PORT || 28015,
         db: 'tome'
-    },
-    logging: {
-        streams: [
-            {
-                stream: process.stdout,
-                level: "info"
-            }
-        ]
     }
 }; // end exports
 

@@ -83,6 +83,19 @@ app.use(passport.session());
 
 GoogleAuth.initialize(app);
 
+// Auth override
+if(config.overrideAuth)
+{
+    // Middleware to skip authentication, for unit testing. We only allow this if we're in debug mode /and/ we've set
+    // the user on `app`, something that can't be done externally.
+    app.use((req, resp, next) =>
+    {
+        const user = app.get('user');
+        req.user = !!user ? user : req.user;
+        next();
+    });
+} // end if
+
 // Setup static serving
 app.use(express.static(path.resolve('./dist')));
 
@@ -109,5 +122,10 @@ const server = app.listen(config.http.port, () =>
 
     logger.info('Tome v%s listening at http://%s:%s', require('./package').version, host, port);
 });
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+module.exports = { app, server };
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -64,16 +64,16 @@ db.Comments = thinky.createModel('comments', {
     title: type.string().required(),
     pageID: type.string().required(),
     content: type.string().required(),
-    replies: [{
+    replies: type.array().schema({
         id: type.string().default(shortID),
         content: type.string().required(),
         created: type.date().default(() => new Date()),
         edited: type.date(),
         user: type.string().required()
-    }],
-    actions: {
+    }).default([]),
+    actions: type.object().schema({
         reply: type.string().default('inherit')
-    },
+    }).default({}),
     created: type.date().default(() => new Date()),
     edited: type.date(),
     user: type.string().required()
@@ -88,19 +88,19 @@ db.Page = thinky.createModel('pages', {
     id: type.string().default(shortID),
     title: type.string().required(),
     path: type.string().required(),
-    revisions: [{
+    revisions: type.array().schema({
         id: type.string().default(shortID),
         content: type.string(),
         user: type.string().required(),
         created: type.date().default(() => new Date())
-    }],
-    actions: {
+    }).default([]),
+    actions: type.object().schema({
         create: type.string().default('inherit'),
         view: type.string().default('inherit'),
         update: type.string().default('inherit'),
         delete: type.string().default('inherit'),
         comment: type.string().default('inherit')
-    },
+    }).default({}),
     created: type.date().default(() => new Date())
 }, { enforce_extra: "remove" });
 

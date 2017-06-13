@@ -76,7 +76,7 @@ function ensureAuthenticated(request, response, next)
     else
     {
         response.status(401).json({
-            name: 'NotAuthorized',
+            name: 'Not Authorized',
             message: `Not authorized.`
         });
     } // end if

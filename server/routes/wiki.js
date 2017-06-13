@@ -49,6 +49,8 @@ function findInheritedPerm(path, action)
                 } // end if
             });
     } // end if
+
+    return Promise.resolve();
 } // end findInheritedPerm
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -137,20 +139,31 @@ router.post('*', ensureAuthenticated, hasPerm('wiki/update'), promisify((req, re
                         {
                             const page = pages[0];
 
-                            // Update main page properties
-                            _.assign(page, {
-                                path,
-                                title: req.body.title,
-                                actions: req.body.actions || {}
-                            });
+                            if(page.revisions[0].id === req.body.lastRevision)
+                            {
+                                // Update main page properties
+                                _.assign(page, {
+                                    path,
+                                    title: req.body.title,
+                                    actions: req.body.actions || {}
+                                });
 
-                            // Insert new revision
-                            page.revisions.unshift({
-                                content: req.body.title,
-                                user: req.user.email
-                            });
+                                // Insert new revision
+                                page.revisions.unshift({
+                                    content: req.body.content,
+                                    user: req.user.email
+                                });
 
-                            return page.save();
+                                return page.save();
+                            }
+                            else
+                            {
+                                // Page has been updated since
+                                resp.status(409).json({
+                                    name: 'Last Revision Mismatch',
+                                    message: `The last revision submitted was '${ req.lastRevision }', however, the current last revision is '${ page.revisions[0].id }'.`
+                                });
+                            } // end if
                         } // end if
                     });
             }
@@ -193,7 +206,7 @@ router.put('*', ensureAuthenticated, hasPerm('wiki/create'), promisify((req, res
                                 path,
                                 title: req.body.title,
                                 revisions: [{
-                                    content: req.body.title,
+                                    content: req.body.content,
                                     user: req.user.email
                                 }],
                                 actions: req.body.actions || {}
@@ -248,7 +261,7 @@ router.delete('*', ensureAuthenticated, hasPerm('wiki/delete'), promisify((req, 
                             else
                             {
                                 const page = pages[0];
-                                return page.delete();
+                                return page.delete().then(() => {});
                             } // end if
                         });
                 }
