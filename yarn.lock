@@ -4000,9 +4000,9 @@ trivial-logging@^1.2.0:
     bunyan-debug-stream "^1.0.8"
     lodash "^4.15.0"
 
-trivialperms@^1.0.0-rc.2:
-  version "1.0.0-rc.2"
-  resolved "https://registry.yarnpkg.com/trivialperms/-/trivialperms-1.0.0-rc.2.tgz#0a854bfe33978ca2b217ab97086c1580058fd604"
+trivialperms@^1.0.0-rc.3:
+  version "1.0.0-rc.3"
+  resolved "https://registry.yarnpkg.com/trivialperms/-/trivialperms-1.0.0-rc.3.tgz#fe2407c84e09fe056126a6f378fd8d68e5908554"
   dependencies:
     bluebird "^3.3.1"
     lodash "^4.5.1"

@@ -27,7 +27,7 @@
     "passport-google-web": "^1.0.0",
     "thinky": "^2.3.6",
     "trivial-logging": "^1.2.0",
-    "trivialperms": "^1.0.0-rc.2",
+    "trivialperms": "^1.0.0-rc.3",
     "uuid": "^3.0.1"
   },
   "devDependencies": {
