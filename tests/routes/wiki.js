@@ -121,12 +121,49 @@ describe("Wiki API ('/wiki')", () =>
 
         describe('Permissions', () =>
         {
-            xit('should do something', () =>
+            it('can be made viewable by a specific permission', () =>
+            {
+                function normalUserTest()
+                {
+                    app.set('user', modelMan.get('normalUser'));
+                    
+                    return request.get('/wiki/normal/sub/perm')
+                        .set('Accept', 'application/json')
+                        .catch(({ response }) => response)
+                        .then((response) =>
+                        {
+                            expect(response).to.have.status(403);
+                        });
+                } // end normalUserTest
+                
+                function specialUserTest()
+                {
+                    const page = modelMan.get('permSubPage');
+                    app.set('user', modelMan.get('specialUser'));
+                    
+                    return request.get(`/wiki${ page.path }`)
+                        .set('Accept', 'application/json')
+                        .then((response) =>
+                        {
+                            expect(response).to.be.json;
+        
+                            const json = response.body;
+                            expect(json).to.be.an('object');
+                            expect(json).to.have.property('title', page.title);
+                            expect(json).to.have.property('path', page.path);
+                            expect(json).to.have.property('revisions');
+                        });
+                } // end specialUserTest
+                
+                return normalUserTest().then(() => specialUserTest());    
+            });
+
+            xit('can inherit their permissions from their parent page', () =>
             {
                 expect(false).to.equal(true);
             });
 
-            xit('should do something', () =>
+            xit('always allows `/` to be viewable', () =>
             {
                 expect(false).to.equal(true);
             });

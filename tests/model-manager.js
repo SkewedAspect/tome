@@ -130,6 +130,42 @@ const normalSubPage = {
     }
 };
 
+const permSubPage = {
+    id: 'permSubPage',
+    title: 'Perm Sub Wiki Page',
+    path: '/normal/sub/perm',
+    revisions: [{
+        id: 'rev1',
+        content: "This is a _perm_ wiki sub page.",
+        user: globalAdmin.email
+    }],
+    actions: {
+        create: 'wiki/special',
+        view: 'wiki/special',
+        update: 'wiki/special',
+        delete: 'wiki/special',
+        comment: 'wiki/special'
+    }
+};
+
+const inheritedPermSubPage = {
+    id: 'inheritedPermSubPage',
+    title: 'Inherited Perm Sub Wiki Page',
+    path: '/normal/sub/perm/inherited',
+    revisions: [{
+        id: 'rev1',
+        content: "This is an inherited _perm_ wiki sub page.",
+        user: globalAdmin.email
+    }],
+    actions: {
+        create: 'inherit',
+        view: 'inherit',
+        update: 'inherit',
+        delete: 'inherit',
+        comment: 'inherit'
+    }
+};
+
 //----------------------------------------------------------------------------------------------------------------------
 
 class ModelManager
@@ -164,7 +200,9 @@ class ModelManager
     {
         return Promise.join(
             this.buildModel(models.Page, normalPage),
-            this.buildModel(models.Page, normalSubPage)
+            this.buildModel(models.Page, normalSubPage),
+            this.buildModel(models.Page, permSubPage),
+            this.buildModel(models.Page, inheritedPermSubPage)
         );
     } // end $buildPages
 
