@@ -125,9 +125,10 @@ describe("Wiki API ('/wiki')", () =>
             {
                 function normalUserTest()
                 {
+                    const page = modelMan.get('permSubPage');
                     app.set('user', modelMan.get('normalUser'));
                     
-                    return request.get('/wiki/normal/sub/perm')
+                    return request.get(`/wiki${ page.path }`)
                         .set('Accept', 'application/json')
                         .catch(({ response }) => response)
                         .then((response) =>
@@ -158,14 +159,42 @@ describe("Wiki API ('/wiki')", () =>
                 return normalUserTest().then(() => specialUserTest());    
             });
 
-            xit('can inherit their permissions from their parent page', () =>
+            it('can inherit their permissions from their parent page', () =>
             {
-                expect(false).to.equal(true);
-            });
-
-            xit('always allows `/` to be viewable', () =>
-            {
-                expect(false).to.equal(true);
+                function normalUserTest()
+                {
+                    const page = modelMan.get('inheritedPermSubPage');
+                    app.set('user', modelMan.get('normalUser'));
+                    
+                    return request.get(`/wiki${ page.path }`)
+                        .set('Accept', 'application/json')
+                        .catch(({ response }) => response)
+                        .then((response) =>
+                        {
+                            expect(response).to.have.status(403);
+                        });
+                } // end normalUserTest
+                
+                function specialUserTest()
+                {
+                    const page = modelMan.get('inheritedPermSubPage');
+                    app.set('user', modelMan.get('specialUser'));
+                    
+                    return request.get(`/wiki${ page.path }`)
+                        .set('Accept', 'application/json')
+                        .then((response) =>
+                        {
+                            expect(response).to.be.json;
+        
+                            const json = response.body;
+                            expect(json).to.be.an('object');
+                            expect(json).to.have.property('title', page.title);
+                            expect(json).to.have.property('path', page.path);
+                            expect(json).to.have.property('revisions');
+                        });
+                } // end specialUserTest
+                
+                return normalUserTest().then(() => specialUserTest());    
             });
         });
     });
