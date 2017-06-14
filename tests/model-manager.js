@@ -46,7 +46,7 @@ const normalUser = {
     id:  "normalUser",
     settings: { },
     displayName:  "normalUser",
-    permissions: [ ],
+    permissions: [ 'wiki/create'  ],
     groups: [ ]
 };
 
@@ -72,7 +72,7 @@ const specialUser = {
     id:  "specialUser",
     settings: { },
     displayName:  "specialUser",
-    permissions: [ 'wiki/special' ],
+    permissions: [ 'wiki/create', 'wiki/special' ],
     groups: [ ]
 };
 
@@ -89,7 +89,7 @@ const specialGroup = {
     id: 'specialGroup',
     name: 'specials',
     description: 'Special group for special people.',
-    permissions: [ 'wiki/special' ]
+    permissions: [ 'wiki/create', 'wiki/special' ]
 };
 
 //----------------------------------------------------------------------------------------------------------------------

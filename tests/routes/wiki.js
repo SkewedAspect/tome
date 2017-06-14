@@ -297,14 +297,154 @@ describe("Wiki API ('/wiki')", () =>
 
         describe('Permissions', () =>
         {
-            xit('should do something', () =>
+            it('allows creation to be restricted to a specific permission on the parent', () =>
             {
-                expect(false).to.equal(true);
+                function normalUserTest()
+                {
+                    app.set('user', modelMan.get('normalUser'));
+                    
+                    const newPage = {
+                        title: "New Page",
+                        content: "Welcome to my new page"
+                    };
+                    
+                    return request.put('/wiki/normal/sub/perm/new')
+                        .set('Accept', 'application/json')
+                        .send(newPage)
+                        .catch(({ response }) => response)
+                        .then((response) =>
+                        {
+                            expect(response).to.have.status(403);
+                        });
+                } // end normalUserTest
+                
+                function specialUserTest()
+                {
+                    app.set('user', modelMan.get('specialUser'));
+                    const user = modelMan.get('specialUser');
+                    
+                    const newPage = {
+                        title: "New Page",
+                        content: "Welcome to my new page"
+                    };
+        
+                    return request.put('/wiki/normal/sub/perm/new')
+                        .set('Accept', 'application/json')
+                        .send(newPage)
+                        .then((response) =>
+                        {
+                            expect(response).to.be.json;
+        
+                            const page = response.body;
+                            expect(page).to.be.an('object');
+                            expect(page).to.have.property('title', newPage.title);
+                            expect(page).to.have.property('path', '/normal/sub/perm/new');
+                            expect(page).to.have.property('revisions');
+        
+                            // Revisions
+                            const revisions = page.revisions;
+                            expect(revisions).to.be.an('array');
+                            expect(revisions).to.have.length.of(1);
+        
+                            // Revision
+                            const revision = page.revisions[0];
+                            expect(revision).to.be.an('object');
+                            expect(revision).to.have.property('content', newPage.content);
+                            expect(revision).to.have.property('user', user.email);
+        
+                            // Delete the page
+                            return models.Page.get(page.id).then((p) => p.delete());
+                        })
+                        .catch((error) =>
+                        {
+                            // Delete the page
+                            return models.Page.getAll('/normal/sub/perm/new', { index: 'path' }).then((pages) =>
+                                {
+                                    return Promise.map(pages, (p) => p.delete());
+                                })
+                                .then(() =>
+                                {
+                                    throw error;
+                                });
+                        });
+                } // end specialUserTest
+                
+                return normalUserTest().then(() => specialUserTest());    
             });
 
-            xit('should do something', () =>
+            it('can inherit from grandparent pages', () =>
             {
-                expect(false).to.equal(true);
+                function normalUserTest()
+                {
+                    app.set('user', modelMan.get('normalUser'));
+                    
+                    const newPage = {
+                        title: "New Page",
+                        content: "Welcome to my new page"
+                    };
+                    
+                    return request.put('/wiki/normal/sub/perm/inherited/new')
+                        .set('Accept', 'application/json')
+                        .send(newPage)
+                        .catch(({ response }) => response)
+                        .then((response) =>
+                        {
+                            expect(response).to.have.status(403);
+                        });
+                } // end normalUserTest
+                
+                function specialUserTest()
+                {
+                    app.set('user', modelMan.get('specialUser'));
+                    const user = modelMan.get('specialUser');
+                    
+                    const newPage = {
+                        title: "New Page",
+                        content: "Welcome to my new page"
+                    };
+        
+                    return request.put('/wiki/normal/sub/perm/inherited/new')
+                        .set('Accept', 'application/json')
+                        .send(newPage)
+                        .then((response) =>
+                        {
+                            expect(response).to.be.json;
+        
+                            const page = response.body;
+                            expect(page).to.be.an('object');
+                            expect(page).to.have.property('title', newPage.title);
+                            expect(page).to.have.property('path', '/normal/sub/perm/inherited/new');
+                            expect(page).to.have.property('revisions');
+        
+                            // Revisions
+                            const revisions = page.revisions;
+                            expect(revisions).to.be.an('array');
+                            expect(revisions).to.have.length.of(1);
+        
+                            // Revision
+                            const revision = page.revisions[0];
+                            expect(revision).to.be.an('object');
+                            expect(revision).to.have.property('content', newPage.content);
+                            expect(revision).to.have.property('user', user.email);
+        
+                            // Delete the page
+                            return models.Page.get(page.id).then((p) => p.delete());
+                        })
+                        .catch((error) =>
+                        {
+                            // Delete the page
+                            return models.Page.getAll('/wiki/normal/sub/perm/inherited/new', { index: 'path' }).then((pages) =>
+                                {
+                                    return Promise.map(pages, (p) => p.delete());
+                                })
+                                .then(() =>
+                                {
+                                    throw error;
+                                });
+                        });
+                } // end specialUserTest
+                
+                return normalUserTest().then(() => specialUserTest());    
             });
         });
     });
