@@ -20,7 +20,7 @@ import pkg from '../package.json';
 import AppComponent from './app.vue';
 
 // Pages
-import WikiPage from './pages/wiki.vue';
+import WikiPage from './pages/wiki/wiki.vue';
 import SettingsPage from './pages/settings.vue';
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -31,8 +31,18 @@ Vue.use(VueMaterial);
 
 Vue.material.registerTheme({
     default: {
-        primary: 'blue-grey',
-        accent: 'orange'
+        primary: {
+            color: 'light-blue',
+            hue: 800
+        },
+        accent: 'purple'
+    },
+    secondary: {
+        primary: {
+            color: 'light-blue',
+            hue: 500
+        },
+        accent: 'purple'
     },
     settings: {
         primary: 'grey',
