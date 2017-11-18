@@ -178,7 +178,7 @@ if(oldDBPath)
 
         _.each(allRevs, (rev, idx) =>
         {
-            rev.edited = dates[idx].unix();
+            rev.edited = rev.created ? (new Date(rev.created).getTime() / 1000) : dates[idx].unix();
         });
     });
 
@@ -195,7 +195,7 @@ if(oldDBPath)
 }
 else
 {
-    console.log('<dbPath> is required.');
+    console.error('<dbPath> is required.');
     program.outputHelp();
     process.exit(1);
 } // end if
