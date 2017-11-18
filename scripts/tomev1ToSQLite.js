@@ -14,14 +14,20 @@ const program = require('commander');
 
 //----------------------------------------------------------------------------------------------------------------------
 
-function migrateDB(db, users, pages, revisions)
+const pageMap = {};
+const accountMap = {};
+
+//----------------------------------------------------------------------------------------------------------------------
+
+function migrateDB(db, users, pages, revisions, comments)
 {
-    console.log('Begining migration...');
+    console.log('Beginning migration...');
 
     return Promise.all([
             db('account').truncate(),
             db('page').truncate(),
-            db('revision').truncate()
+            db('revision').truncate(),
+            db('comment').truncate()
         ])
         .then(() =>
         {
@@ -29,13 +35,18 @@ function migrateDB(db, users, pages, revisions)
 
             return Promise.map(users, (user) =>
             {
-                return db('account').insert({
-                    username: (user.nickname || user.email.split('@')[0]).toLowerCase(),
-                    email: user.email,
-                    full_name: user.displayName,
-                    google_id: user.gPlusID,
-                    avatar: user.avatar
-                });
+                return db('account')
+                    .insert({
+                        username: (user.nickname || user.email.split('@')[0]).toLowerCase(),
+                        email: user.email,
+                        full_name: user.displayName,
+                        google_id: user.gPlusID,
+                        avatar: user.avatar
+                    })
+                    .then(([ accountID ]) =>
+                    {
+                        accountMap[user.email] = accountID;
+                    });
             });
         })
         .then(() =>
@@ -50,10 +61,20 @@ function migrateDB(db, users, pages, revisions)
                 } // end if
 
                 const revision = _.find(revisions, { id: page.revisionID });
-                return db('page').insert({
-                        path: `/${ page.url }`,
-                        title: revision.title
-                    })
+
+                const pageObj = {
+                    path: `/${ page.url }`,
+                    title: revision.title
+                };
+
+                if(page.private)
+                {
+                    pageObj.action_view = 'private';
+                    pageObj.action_modify = 'private';
+                } // end if
+
+                return db('page')
+                    .insert(pageObj)
                     .then(([ pageID ]) =>
                     {
                         pageMap[page.id] = pageID;
@@ -75,6 +96,26 @@ function migrateDB(db, users, pages, revisions)
         })
         .then(() =>
         {
+            console.log(`Processing comments(${ comments.length })...`);
+
+            return Promise.map(comments, (comment) =>
+            {
+                const createdTS = (new Date(comment.created)).getTime();
+                const editedTS = (new Date(comment.updated)).getTime();
+
+                return db('comment')
+                    .insert({
+                        account_id: accountMap[comment.userID],
+                        page_id: pageMap[comment.pageID],
+                        title: comment.title,
+                        body: comment.body,
+                        created: db.raw("datetime(?, 'unixepoch')", [createdTS]),
+                        edited: db.raw("datetime(?, 'unixepoch')", [editedTS])
+                    });
+            });
+        })
+        .then(() =>
+        {
             console.log('Done.');
             process.exit(0);
         });
@@ -83,9 +124,6 @@ function migrateDB(db, users, pages, revisions)
 //----------------------------------------------------------------------------------------------------------------------
 
 let oldDBPath;
-const pageMap = {};
-
-//----------------------------------------------------------------------------------------------------------------------
 
 program
     .version('0.1.0')
@@ -103,6 +141,7 @@ if(oldDBPath)
     let users = [];
     let pages = [];
     let revisions = [];
+    let comments = [];
 
     try
     {
@@ -114,6 +153,9 @@ if(oldDBPath)
     {
         console.error('Error: <dbPath> is not valid:', error.message);
     } // end catch
+
+    // There might not be a comments db
+    try { comments = _.values(require(path.resolve(path.join(oldDBPath, 'comments.json')))); } catch(_){}
 
     // Fake dates on the revisions
     _.each(pages, (page) =>
@@ -149,7 +191,7 @@ if(oldDBPath)
         useNullAsDefault: true
     });
 
-    return migrateDB(db, users, pages, revisions);
+    return migrateDB(db, users, pages, revisions, comments);
 }
 else
 {
