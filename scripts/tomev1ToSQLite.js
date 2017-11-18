@@ -68,7 +68,7 @@ function migrateDB(db, users, pages, revisions)
             {
                 return db('revision').insert({
                         page_id: pageMap[revision.pageID],
-                        content: revision.body,
+                        body: revision.body,
                         edited: db.raw("datetime(?, 'unixepoch')", [revision.edited])
                     });
             });
@@ -119,8 +119,8 @@ if(oldDBPath)
     _.each(pages, (page) =>
     {
         const allRevs = _.filter(revisions, { pageID: page.id });
-        const endDate = moment(page.updated);
-        const startDate = moment(page.created || endDate.clone().subtract(allRevs.length, 'days'));
+        const endDate = moment(new Date(page.updated));
+        const startDate = moment(new Date(page.created || endDate.clone().subtract(allRevs.length, 'days')));
 
         const dates = [startDate];
         if(allRevs.length > 1)
