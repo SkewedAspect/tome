@@ -19,14 +19,12 @@ module.exports = {
         clientSecret: "ZsjeJtlyB2H3XxUvD4V2JW4Q"
     },
     http: {
-        domain: process.env.WEB_DOMAIN || 'http://localhost:4000',
+        domain: process.env.WEB_DOMAIN || 'http://localhost',
         port: process.env.SERVER_PORT || 4321
     },
-    rethink: {
-        host: process.env.RETHINK_DB_HOST || 'localhost',
-        port: process.env.RETHINK_DB_PORT || 28015,
-        db: 'tome'
-    }
+
+    // TOME Options
+    allowRegistration: true
 }; // end exports
 
 //----------------------------------------------------------------------------------------------------------------------
