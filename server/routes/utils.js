@@ -4,6 +4,7 @@
 // @module utils.js
 //----------------------------------------------------------------------------------------------------------------------
 
+const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 
@@ -59,8 +60,9 @@ function interceptHTML(response, jsonHandler, authenticated)
             else
             {
                 response.status(401).json({
-                    name: 'NotAuthorized',
-                    message: `Not authorized.`
+                    name: 'Not Authorized',
+                    message: `Not authorized.`,
+                    code: 'ERR_NOT_AUTHORIZED'
                 });
             } // end if
         }
@@ -77,7 +79,8 @@ function ensureAuthenticated(request, response, next)
     {
         response.status(401).json({
             name: 'Not Authorized',
-            message: `Not authorized.`
+            message: `Not authorized.`,
+            code: 'ERR_NOT_AUTHORIZED'
         });
     } // end if
 } // end ensureAuthenticated
@@ -98,11 +101,22 @@ function promisify(handler)
             {
                 console.error(error.stack || error.message);
 
-                response.status(500).json({
-                    name: error.constructor.name,
-                    message: error.message,
-                    error: error
-                });
+                let errorJSON = {};
+                if(_.isFunction(error.toJSON))
+                {
+                    errorJSON = error.toJSON();
+                }
+                else
+                {
+                    errorJSON = {
+                        name: error.constructor.name,
+                        message: error.message,
+                        code: error.code,
+                        error: error
+                    };
+                } // end if
+
+                response.status(500).json(errorJSON);
             });
     };
 } // end promisify
