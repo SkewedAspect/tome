@@ -55,6 +55,7 @@ function migrateDB(db, users, pages, revisions, comments)
 
             return Promise.map(pages, (page) =>
             {
+                //TODO: Read this from the site's config.
                 if(page.url === 'welcome')
                 {
                     page.url = '';
@@ -67,7 +68,12 @@ function migrateDB(db, users, pages, revisions, comments)
                     title: revision.title
                 };
 
-                if(page.private)
+                if(pageObj.path === '/')
+                {
+                    pageObj.action_view = '*';
+                    pageObj.action_modify = '*';
+                }
+                else if(page.private)
                 {
                     pageObj.action_view = 'private';
                     pageObj.action_modify = 'private';
