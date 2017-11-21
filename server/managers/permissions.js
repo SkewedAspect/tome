@@ -1,22 +1,22 @@
 //----------------------------------------------------------------------------------------------------------------------
-// PermissionsService
+// PermissionsManager
 //
 // @module
 //----------------------------------------------------------------------------------------------------------------------
 
 const trivialPerms = require('trivialperms');
 
-const models = require('../models');
+const rolesRA = require('../resource-access/roles');
 
 //----------------------------------------------------------------------------------------------------------------------
 
-class PermissionsService
+class PermissionsManager
 {
     constructor()
     {
         trivialPerms.loadGroups(() =>
         {
-            return models.Group.run();
+            return rolesRA.getRoles();
         });
     } // end constructor
 
@@ -29,10 +29,10 @@ class PermissionsService
     {
         return trivialPerms.hasGroup(...args);
     } // end hasGroup
-} // end PermissionsService
+} // end PermissionsManager
 
 //----------------------------------------------------------------------------------------------------------------------
 
-module.exports = new PermissionsService();
+module.exports = new PermissionsManager();
 
 //----------------------------------------------------------------------------------------------------------------------

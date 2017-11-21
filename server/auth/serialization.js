@@ -5,17 +5,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 const passport = require('passport');
-const models = require('../models');
+const dbMan = require('../database');
 
 //----------------------------------------------------------------------------------------------------------------------
 
-passport.serializeUser(function(account, done) {
-    done(null, account.id);
+const db = dbMan.getDB();
+
+//----------------------------------------------------------------------------------------------------------------------
+
+passport.serializeUser((account, done) =>
+{
+    done(null, account.account_id);
 });
 
-passport.deserializeUser(function(id, done) {
-    models.Account.get(id)
-        .then((account) =>
+passport.deserializeUser((account_id, done) =>
+{
+    db('account')
+        .select()
+        .where({ account_id })
+        .then(([ account ]) =>
         {
             done(null, account);
         })

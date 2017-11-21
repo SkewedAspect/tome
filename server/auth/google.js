@@ -9,8 +9,9 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-web');
 const serialization = require('./serialization');
 
-const config = require('../../config');
-const models = require('../models');
+// Managers
+const accountMan = require('../managers/account');
+const configMan = require('../managers/config');
 
 const logging = require('trivial-logging');
 const logger = logging.loggerFor(module);
@@ -19,39 +20,34 @@ const logger = logging.loggerFor(module);
 
 passport.use(new GoogleStrategy((token, profile, done) =>
     {
-        models.Account.getAll(profile.id, { index: 'googleID' })
-            .then(function(accounts)
+        return accountMan.getAccountByGoogleID(profile.id)
+            .then((account) =>
             {
-                if(accounts[0])
+                if(account)
                 {
-                    return accounts[0];
+                    return account;
                 }
                 else
                 {
-                    // Create a new user
-                    return new models.Account({
-                        googleID: profile.id,
-                        avatar: profile.picture,
-                        email: profile.email,
-                        name: profile.name,
-                        givenName: profile.givenName
-                    }).save();
+                    if(configMan.get('allowRegistration', true))
+                    {
+                        return accountMan.createAccount({
+                                google_id: profile.id,
+                                avatar: profile.picture,
+                                email: profile.email,
+                                username: profile.name,
+                                full_name: profile.givenName
+                            });
+                    }
+                    else
+                    {
+                        throw new Error('User not found.');
+                    } // end if
                 } // end if
             })
-            .then(function(account)
+            .then((account) =>
             {
-                if(!account.inactive)
-                {
-                    done(null, account);
-                }
-                else
-                {
-                    // For now, we have to deny the login, however, we might want some sort of account recovery
-                    // process in the future.
-
-                    //TODO: Use a custom error
-                    done(`Account '${ account.displayName || account.email || account.id }' is inactive! Please contact a site admin to have it reinstated.`);
-                } // end if
+                done(null, account);
             })
             .catch(function(error)
             {
@@ -63,7 +59,7 @@ passport.use(new GoogleStrategy((token, profile, done) =>
 //----------------------------------------------------------------------------------------------------------------------
 
 module.exports = {
-    initialize: function(app)
+    initialize(app)
     {
         // Authenticate
         app.post('/auth/google', passport.authenticate('google-signin'), (req, resp) =>
@@ -72,7 +68,7 @@ module.exports = {
             });
 
         // Logout endpoint
-        app.post('/auth/logout', function(req, res)
+        app.post('/auth/logout', (req, res) =>
         {
             req.logout();
             res.end();
