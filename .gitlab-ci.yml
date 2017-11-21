@@ -1,10 +1,10 @@
-Build Latest:
+Build Docker:
    image: docker:latest
    services:
    - docker:dind
    stage: build
    script:
      - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-     - docker build -t registry.gitlab.com/morgul/pogo-pc:latest -t registry.gitlab.com/morgul/pogo-pc:$CI_BUILD_REF_NAME .
-     - docker push registry.gitlab.com/morgul/pogo-pc:latest
-     - docker push registry.gitlab.com/morgul/pogo-pc:$CI_BUILD_REF_NAME
+     - docker build -t registry.gitlab.com/skewed-aspect/tome:latest -t registry.gitlab.com/skewed-aspect/tome:$CI_BUILD_REF_NAME .
+     - docker push registry.gitlab.com/skewed-aspect/tome:latest
+     - docker push registry.gitlab.com/skewed-aspect/tome:$CI_BUILD_REF_NAME
