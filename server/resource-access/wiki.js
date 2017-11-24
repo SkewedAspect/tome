@@ -6,7 +6,9 @@
 
 const _ = require('lodash');
 const Promise = require('bluebird');
+
 const dbMan = require('../database');
+const { AppError, NotFoundError, MultipleResultsError, ValidationError } = require('../errors');
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -59,6 +61,34 @@ class WikiResourceAccess
     // Public API
     //------------------------------------------------------------------------------------------------------------------
 
+    createPage(page)
+    {
+        return db.transaction((trans) =>
+        {
+            return db('page')
+                .transacting(trans)
+                .insert(_.pick(page, 'title', 'path', 'action_view', 'action_modify'))
+                .then(([ newPageID ]) =>
+                {
+                    return db('revision')
+                        .transacting(trans)
+                        .insert(_.pick({ page_id: newPageID, body: page.body }));
+                })
+                .then(() => trans.commit())
+                .catch((error) =>
+                {
+                    console.error(`Failed to create page '${ page.path }':`, error.stack);
+
+                    // Rollback the transaction
+                    trans.rollback();
+
+                    // Throw a generic error, because we want the outside code to know this didn't work,
+                    // but we don't want to expose the details.
+                    throw AppError(`Failed to create page '${ page.path }'.`);
+                });
+        });
+    } // end createPage
+
     getPage(path)
     {
         return db('current_revision')
@@ -68,11 +98,11 @@ class WikiResourceAccess
             {
                 if(pages.length > 1)
                 {
-                    return new Error('More than one page returned. This should not be possible.');
+                    throw new MultipleResultsError('page');
                 }
                 else if(pages.length === 0)
                 {
-                    return new Error(`No page found for url '${ path }'.`);
+                    throw new NotFoundError(`No page found for url '${ path }'.`);
                 }
                 else
                 {
@@ -81,39 +111,65 @@ class WikiResourceAccess
             });
     } // end getPage
 
-    setPageTitle(path, title)
+    updatePage(newPage)
     {
-        if(!path)
-        {
-            throw new Error('Cannot update a wiki page without `path`.');
-        } // end if
+        return db('current_revision')
+            .select('page_id', 'path', 'title', 'revision_id')
+            .where({ page_id: newPage.page_id })
+            .then(([ currentPage ]) =>
+            {
+                if(!currentPage)
+                {
+                    throw new NotFoundError(`No page found for id '${ newPage.page_id }'.`);
+                }
+                else if(newPage.path !== currentPage.path)
+                {
+                    throw new ValidationError('path', "Updating 'path' must be done as it's own operation.");
+                }
+                else
+                {
+                    return db.transaction((trans) =>
+                    {
+                        return db('page')
+                            .transacting(trans)
+                            .where({ page_id: currentPage.page_id })
+                            .update(_.pick(newPage, 'title', 'action_view', 'action_modify'))
+                            .then(() =>
+                            {
+                                if(newPage.body && currentPage.body !== newPage.body)
+                                {
+                                    if(!_.isUndefined(newPage.revision_id) && currentPage.revision_id !== newPage.revision_id)
+                                    {
+                                        throw new ValidationError(
+                                            'revision_id',
+                                            "this revision is not the current 'revision_id'. Your chances may be against an outdated version."
+                                        );
+                                    }
+                                    else
+                                    {
+                                        return this.addRevision(newPage.page_id, newPage.body, trans);
+                                    } // end if
+                                } // end if
+                            })
+                            .then(() => trans.commit())
+                            .catch((error) =>
+                            {
+                                console.error(`Failed to update page '${ newPage.path }':`, error.stack);
 
-        return db('page')
-            .where({ path: path })
-            .update({ title })
-            .then((rows) => ({ rowsAffected: rows }));
-    } // end setPageTitle
+                                // Rollback the transaction
+                                trans.rollback();
 
-    setPagePermissions(path, action_view, action_modify)
-    {
-        if(!path)
-        {
-            throw new Error('Cannot update a wiki page without `path`.');
-        } // end if
-
-        return db('page')
-            .where({ path: path })
-            .update({ action_view, action_modify })
-            .then((rows) => ({ rowsAffected: rows }));
-    } // end setPagePermissions
+                                // Throw a generic error, because we want the outside code to know this didn't work,
+                                // but we don't want to expose the details.
+                                throw AppError(`Failed to update page '${ newPage.path }'.`);
+                            });
+                    });
+                } // end if
+            });
+    } // end updatePage
 
     movePage(oldPath, newPath)
     {
-        if(!oldPath)
-        {
-            throw new Error('Cannot update a wiki page without `oldPath`.');
-        } // end if
-
         return db('page')
             .where({ path: oldPath })
             .update({ path: newPath })
@@ -122,11 +178,6 @@ class WikiResourceAccess
 
     deletePage(path)
     {
-        if(!path)
-        {
-            throw new Error('Cannot update a wiki page without `path`.');
-        } // end if
-
         return db('page')
             .select('page_id')
             .where({ path })
@@ -134,11 +185,11 @@ class WikiResourceAccess
             {
                 if(pages.length > 1)
                 {
-                    return new Error('More than one page returned. This should not be possible.');
+                    throw new MultipleResultsError('page');
                 }
                 else if(pages.length === 0)
                 {
-                    return new Error(`No page found for url '${ path }'.`);
+                    throw new NotFoundError(`No page found for url '${ path }'.`);
                 }
                 else
                 {
@@ -152,11 +203,6 @@ class WikiResourceAccess
 
     fullDeletePage(path)
     {
-        if(!path)
-        {
-            throw new Error('Cannot delete a wiki page without `path`.');
-        } // end if
-
         // This will delete all revisions and comments.
         return db('page')
             .where({ path })
@@ -164,23 +210,32 @@ class WikiResourceAccess
             .then((rows) => ({ rowsAffected: rows }));
     } //end fullDeletePage
 
-    addRevision(page_id, content)
+    addRevision(page_id, content, transObj)
     {
-        if(!page_id)
-        {
-            throw new Error('Cannot update a wiki page without `page_id`.');
-        } // end if
-
         if(_.isUndefined(content))
         {
             // We coerce `undefined` to empty string, so that `null` can explicitly mean 'I deleted this page.'
             content = '';
         } // end if
 
-        return db('revision')
-            .insert({ content, page_id })
+        const query = db('revision')
+            .insert({ content, page_id });
+
+        if(transObj)
+        {
+            query.transacting(transObj);
+        } // end if
+
+        return query
             .then(([ id ]) => ({ id }));
     } // end addRevision
+
+    getRevisions(page_id)
+    {
+        return db('revision')
+            .select()
+            .where({ page_id });
+    } // end getRevisions
 } // end WikiResourceAccess.js
 
 //----------------------------------------------------------------------------------------------------------------------

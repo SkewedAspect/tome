@@ -33,11 +33,6 @@ class CommentResourceAccess
 
     getComments(path)
     {
-        if(!path)
-        {
-            throw new Error('Cannot get comments for a wiki page without `path`.');
-        } // end if
-
         return db('comment')
             .select(
                 'comment.comment_id',
@@ -53,27 +48,18 @@ class CommentResourceAccess
             .map(this._mungeComment);
     } // end getComments
 
-    addComment(page_id, title, body, account_id)
+    addComment(comment)
     {
-        if(!page_id)
-        {
-            throw new Error('Cannot add a comment for a wiki page without `page_id`.');
-        } // end if
-
         return db('comment')
-            .insert({ page_id, title, body, account_id })
+            .insert(_.pick(comment, 'page_id', 'title', 'body', 'account_id'))
             .then(([ id ]) => ({ id }));
     } // end addComment
 
     updateComment(comment)
     {
-        if(!comment.comment_id)
-        {
-            throw new Error('Cannot update a comment  without `comment_id`.');
-        } // end if
-
         const comment_id = comment.comment_id;
-        comment = _.omit(comment, 'comment_id', 'account_id', 'created', 'page_id');
+        comment = _.pick(comment, 'page_id', 'title', 'body', 'account_id');
+        comment.edited = new Date();
 
         return db('comment')
             .update(comment)
@@ -82,11 +68,6 @@ class CommentResourceAccess
 
     deleteComment(comment_id)
     {
-        if(!comment_id)
-        {
-            throw new Error('Cannot update a comment  without `comment_id`.');
-        } // end if
-
         return db('comment')
             .where({ comment_id })
             .delete();
