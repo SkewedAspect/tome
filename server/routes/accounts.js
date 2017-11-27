@@ -13,6 +13,8 @@ const { ensureAuthenticated, promisify } = require('./utils');
 const accountMan = require('../managers/account');
 const permsMan = require('../managers/permissions');
 
+const { NotFoundError } = require('../errors');
+
 //----------------------------------------------------------------------------------------------------------------------
 
 const router = express.Router();
@@ -21,7 +23,12 @@ const router = express.Router();
 
 router.get('/', ensureAuthenticated, promisify((req, resp) =>
 {
-    return accountMan.getAllAccounts();
+    const accountAdmin = permsMan.hasPerm(req.user, 'Accounts/addAccount');
+    return accountMan.getAllAccounts()
+        .map((account) =>
+        {
+            return accountAdmin ? account : _.omit(account, 'settings', 'permissions', 'google_id');
+        });
 }));
 
 router.post('/', ensureAuthenticated, promisify((req, resp) =>
@@ -31,38 +38,57 @@ router.post('/', ensureAuthenticated, promisify((req, resp) =>
     {
         // We never allow you to pick your id.
         let newAccount = _.omit(req.body, 'account_id');
-        return accountMan.createAccount(newAccount);
+        return accountMan.createAccount(newAccount)
+            .catch({ code: 'SQLITE_CONSTRAINT' }, (error) =>
+            {
+                resp.status(409).json({
+                    name: 'Duplicate Account',
+                    code: 'ERR_DUPLICATE',
+                    message: "One or more of this account's properties duplicate an existing account's."
+                })
+            });
     }
     else
     {
         resp.status(403).json({
             name: 'Permission Denied',
-            message: `User '${ req.user.email }' does not have required permission.`
+            code: 'ERR_PERMISSION',
+            message: `User '${ req.user.username }' does not have required permission.`
         });
     } // end if
 }));
 
 router.get('/:accountID', promisify((req, resp) =>
 {
+    const sameAccount = `${ req.params.accountID }` === `${ req.user.account_id }`;
+    const accountAdmin = permsMan.hasPerm(req.user, 'Accounts/addAccount');
     return accountMan.getAccountByID(req.params.accountID)
         .then((account) =>
         {
-            if(!req.isAuthenticated())
-            {
-                return _.omit(account, 'settings', 'permissions', 'google_id');
-            } // end if
+            return (accountAdmin || sameAccount) ? account : _.omit(account, 'settings', 'permissions', 'google_id');
+        })
+        .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+        {
+            resp.status(404).json({
+                name: 'Account not found',
+                code: 'ERR_NOT_FOUND',
+                message: `Account with id '${ req.params.accountID }' not found.`
+            });
         });
 }));
 
-router.put('/:accountID', ensureAuthenticated, promisify((req, resp) =>
+router.patch('/:accountID', ensureAuthenticated, promisify((req, resp) =>
 {
-    const sameAccount = req.params.accountID !== req.user.account_id;
+    const sameAccount = `${ req.params.accountID }` === `${ req.user.account_id }`;
     const accountAdmin = permsMan.hasPerm(req.user, 'Accounts/changePerms');
 
     if(accountAdmin || sameAccount)
     {
-        // We never allow changes to id.
-        let newAccount = _.omit(req.body, 'account_id');
+        // Copy the update
+        let newAccount = _.cloneDeep(req.body);
+
+        // Set the account id to be the one in the request parameter.
+        newAccount.account_id = req.params.accountID;
 
         // If we're not an account admin, we don't allow changes to permissions.
         if(!accountAdmin)
@@ -70,42 +96,58 @@ router.put('/:accountID', ensureAuthenticated, promisify((req, resp) =>
             newAccount = _.omit(newAccount, 'permissions', 'groups');
 
             // We also only allow setting of google_id, not changes.
-            if(!_.isUndefined(req.user.google_id))
+            if(!!req.user.google_id || req.user.google_id === 0)
             {
                 newAccount = _.omit(newAccount, 'google_id');
             } // end if
         } // end if
 
         // Merge settings
-        newAccount.settings = _.merge(req.user.settings);
-
-        // Set the account id to be the one in the request parameter.
-        newAccount.account_id = req.params.accountID;
+        newAccount.settings = _.merge(req.user.settings, newAccount.settings);
 
         // Update the account
-        return accountMan.updateAccount(newAccount);
+        return accountMan.updateAccount(newAccount)
+            .tap((user) => _.assign(req.user, user));
     }
     else
     {
         resp.status(403).json({
             name: 'Permission Denied',
-            message: `User '${ req.user.email }' does not have required permission.`
+            code: 'ERR_PERMISSION',
+            message: `User '${ req.user.username }' does not have required permission.`
         });
     } // end if
 }));
 
-router.get('/:accountID', ensureAuthenticated, promisify((req, resp) =>
+router.delete('/:accountID', ensureAuthenticated, promisify((req, resp) =>
 {
     const accountAdmin = permsMan.hasPerm(req.user, 'Accounts/delAccount');
     if(accountAdmin)
     {
-        return accountMan.deleteAccount(req.params.accountID);
+        return accountMan
+            .deleteAccount(req.params.accountID)
+            .then((rows) =>
+            {
+                if(rows === 0)
+                {
+                    throw new NotFoundError(`Account with id '${ req.params.accountID }' not found.`);
+                } // end if
+            })
+            .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+            {
+                resp.status(404).json({
+                    name: error.name,
+                    code: 'ERR_NOT_FOUND',
+                    message: error.message
+                });
+            });
     }
     else
     {
         resp.status(403).json({
             name: 'Permission Denied',
-            message: `User '${ req.user.email }' does not have required permission.`
+            code: 'ERR_PERMISSION',
+            message: `User '${ req.user.username }' does not have required permission.`
         });
     } // end if
 }));

@@ -10,12 +10,13 @@ const { AppError, MultipleResultsError, NotFoundError } = require('../errors');
 
 //----------------------------------------------------------------------------------------------------------------------
 
-const db = dbMan.getDB();
-
-//----------------------------------------------------------------------------------------------------------------------
-
 class AccountResourceAccess
 {
+    constructor()
+    {
+        this.loading = dbMan.getDB();
+    } // end constructor
+
     //------------------------------------------------------------------------------------------------------------------
     // Utility Functions
     //------------------------------------------------------------------------------------------------------------------
@@ -34,7 +35,8 @@ class AccountResourceAccess
 
     $getAccount(filter)
     {
-        return db('account')
+        return this.loading
+            .then((db) => db('account')
             .select()
             .where(filter)
             .then((accounts) =>
@@ -51,7 +53,7 @@ class AccountResourceAccess
                 {
                     return this._parseAccount(accounts[0]);
                 } // end if
-            });
+            }));
     } // end $getAccount
 
     //------------------------------------------------------------------------------------------------------------------
@@ -60,17 +62,19 @@ class AccountResourceAccess
 
     getAccounts()
     {
-        return db('account')
+        return this.loading
+            .then((db) => db('account')
             .select()
-            .map(this._parseAccount);
+            .map(this._parseAccount));
     } // end getAccounts
 
     getAccountsByUsername(username)
     {
-        return db('account')
+        return this.loading
+            .then((db) => db('account')
             .select()
             .where({ username })
-            .map(this._parseAccount);
+            .map(this._parseAccount));
     } // end getAccountsByUsername
 
     getAccount({ account_id, google_id, email })
@@ -119,28 +123,31 @@ class AccountResourceAccess
 
     addAccount(account)
     {
-        return db('account')
+        return this.loading
+            .then((db) => db('account')
             .insert(account)
-            .then(([ id ]) => ({ id }));
+            .then(([ id ]) => ({ id })));
     } // end addAccount
 
     updateAccount(account)
     {
         const account_id = account.account_id;
         account = _.omit(account, 'account_id', 'googleID');
-        account.permissions = JSON.stringify(_.get(account, 'permissions', []));
-        account.settings = JSON.stringify(_.get(account, 'settings', {}));
+        account.permissions = JSON.stringify(_.get(account, 'permissions'));
+        account.settings = JSON.stringify(_.get(account, 'settings'));
 
-        return db('account')
+        return this.loading
+            .then((db) => db('account')
             .update(account)
-            .where({ account_id });
+            .where({ account_id }));
     } // end updateAccount
 
     deleteAccount(account_id)
     {
-        return db('account')
+        return this.loading
+            .then((db) => db('account')
             .where({ account_id })
-            .delete();
+            .delete());
     } // end deleteAccount
 } // end AccountResourceAccess
 

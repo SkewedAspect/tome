@@ -1,26 +1,19 @@
 //----------------------------------------------------------------------------------------------------------------------
-// Handles user serialization/deserialization
+// A simple development server for Tome.
 //
-// @module serialization.js
+// @module
 //----------------------------------------------------------------------------------------------------------------------
 
-const passport = require('passport');
-
-// Managers
-const accountMan = require('../managers/account');
+//TODO: This needs to happen in the main script, not this file.
+const appMan = require('./server/managers/app');
+appMan.setRootDir(__dirname);
 
 //----------------------------------------------------------------------------------------------------------------------
 
-passport.serializeUser((account, done) =>
-{
-    done(null, account.account_id);
-});
+const { listen } = require('./server');
 
-passport.deserializeUser((accountID, done) =>
-{
-    accountMan.getAccountByID(accountID)
-        .then((account) => done(null, account))
-        .catch((error) => done(error));
-});
+//----------------------------------------------------------------------------------------------------------------------
+
+listen();
 
 //----------------------------------------------------------------------------------------------------------------------

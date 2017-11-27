@@ -9,12 +9,13 @@ const dbMan = require('../database');
 
 //----------------------------------------------------------------------------------------------------------------------
 
-const db = dbMan.getDB();
-
-//----------------------------------------------------------------------------------------------------------------------
-
 class CommentResourceAccess
 {
+    constructor()
+    {
+        this.loading = dbMan.getDB();
+    } // end constructor
+
     //------------------------------------------------------------------------------------------------------------------
     // Utility Functions
     //------------------------------------------------------------------------------------------------------------------
@@ -33,7 +34,8 @@ class CommentResourceAccess
 
     getComments(path)
     {
-        return db('comment')
+        return this.loading
+            .then((db) => db('comment')
             .select(
                 'comment.comment_id',
                 'comment.title',
@@ -45,14 +47,15 @@ class CommentResourceAccess
             .innerJoin('page', 'comment.page_id', 'page.page_id')
             .where('page.path', '=', path)
             .orderBy('comment.created')
-            .map(this._mungeComment);
+            .map(this._mungeComment));
     } // end getComments
 
     addComment(comment)
     {
-        return db('comment')
+        return this.loading
+            .then((db) => db('comment')
             .insert(_.pick(comment, 'page_id', 'title', 'body', 'account_id'))
-            .then(([ id ]) => ({ id }));
+            .then(([ id ]) => ({ id })));
     } // end addComment
 
     updateComment(comment)
@@ -61,16 +64,18 @@ class CommentResourceAccess
         comment = _.pick(comment, 'page_id', 'title', 'body', 'account_id');
         comment.edited = new Date();
 
-        return db('comment')
+        return this.loading
+            .then((db) => db('comment')
             .update(comment)
-            .where({ comment_id });
+            .where({ comment_id }));
     } // end updateComment
 
     deleteComment(comment_id)
     {
-        return db('comment')
+        return this.loading
+            .then((db) => db('comment')
             .where({ comment_id })
-            .delete();
+            .delete());
     } // end deleteComment
 } // end CommentResourceAccess
 

@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 const _ = require('lodash');
+const Promise = require('bluebird');
 const fs = require('fs');
 const path = require('path');
 
@@ -89,7 +90,7 @@ function promisify(handler)
 {
     return (request, response) =>
     {
-        handler(request, response)
+        Promise.resolve(handler(request, response))
             .then((results) =>
             {
                 if(!response.finished)

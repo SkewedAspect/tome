@@ -21,12 +21,7 @@ class AccountManager
     getAccountByID(accountID)
     {
         return accountRE.validateGetAccountBy('account_id', accountID)
-            .then(() => accountRA.$getAccount({ account_id: accountID }))
-            .catch((error) =>
-            {
-                console.log('??!!!!');
-                throw new NotFoundError(`Account not found for id '${ accountID }'.`);
-            });
+            .then(() => accountRA.$getAccount({ account_id: accountID }));
     } // getAccountByID
 
     getAccountByGoogleID(googleID)
@@ -41,6 +36,12 @@ class AccountManager
             .then(() => accountRA.$getAccount({ email }));
     } // getAccountByEmail
 
+    getAccountByUsername(username)
+    {
+        return accountRE.validateGetAccountBy('username', username)
+            .then(() => accountRA.$getAccount({ username }));
+    } // getAccountByUsername
+
     createAccount(account)
     {
         return accountRE.validateCreate(account)
@@ -51,7 +52,8 @@ class AccountManager
     updateAccount(account)
     {
         return accountRE.validateUpdate(account)
-            .then(() => accountRA.updateAccount(account));
+            .then(() => accountRA.updateAccount(account))
+            .then(() => this.getAccountByID(account.account_id));
     } // end updateAccount
 
     deleteAccount(accountID)

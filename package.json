@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "LOG_LEVEL=ERROR mocha tests/ --recursive",
-    "start": "DEBUG=TRUE node server.js"
+    "start": "DEBUG=TRUE node devServer.js"
   },
   "author": "Christopher S. Case <chris.case@g33xnexus.com>",
   "license": "MIT",
@@ -21,7 +21,7 @@
     "dtrace-provider": "^0.8.3",
     "express": "^4.14.0",
     "express-session": "^1.14.1",
-    "knex": "^0.14.0",
+    "knex": "^0.14.2",
     "lodash": "^4.15.0",
     "lru-cache": "^4.1.1",
     "mocha": "^3.4.2",
@@ -31,7 +31,7 @@
     "passport-google-web": "^1.0.0",
     "sqlite3": "^3.1.13",
     "trivial-logging": "^1.2.0",
-    "trivialperms": "^1.0.0-rc.3"
+    "trivialperms": "^1.0.0-rc.4"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.1",

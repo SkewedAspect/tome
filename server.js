@@ -5,7 +5,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 // Config
-const config = require('./config');
+const { config } = require('./server/managers/config');
 
 // Logging
 const logging = require('trivial-logging');
@@ -16,6 +16,7 @@ const logger = logging.loggerFor(module);
 
 //----------------------------------------------------------------------------------------------------------------------
 
+const _ = require('lodash');
 const path = require('path');
 
 const express = require('express');
@@ -25,6 +26,7 @@ const session = require('express-session');
 const KnexSessionStore = require('connect-session-knex')(session);
 const passport = require('passport');
 
+// Managers
 const dbMan  = require('./server/database');
 
 // Auth
@@ -37,11 +39,7 @@ const routeUtils = require('./server/routes/utils');
 
 //----------------------------------------------------------------------------------------------------------------------
 
-const store = new KnexSessionStore({
-    sidfieldname: config.key || 'sid',
-    knex: dbMan.getDB(),
-    createTable: true
-});
+let server;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -58,71 +56,89 @@ app.use(routeUtils.errorLogger(logger));
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-app.use(session({
-    secret: config.secret || 'nosecret',
-    key: config.key || 'sid',
-    resave: false,
-    store,
-
-    // maxAge = 7 days
-    cookie: { maxAge: 7 * 24 * 60 * 60 * 1000, secure: !config.debug },
-    saveUninitialized: false
-}));
-
-// Passport support
-app.use(passport.initialize());
-app.use(passport.session());
-
-GoogleAuth.initialize(app);
-
-// Auth override
-if(config.overrideAuth)
-{
-    // Middleware to skip authentication, for unit testing. We only allow this if we're in debug mode /and/ we've set
-    // the user on `app`, something that can't be done externally.
-    app.use((req, resp, next) =>
+// Let the database get setup first
+const loading = dbMan.getDB()
+    .then((db) =>
     {
-        const user = app.get('user');
-        req.user = !!user ? user : req.user;
-        next();
-    });
-} // end if
+        const store = new KnexSessionStore({
+            sidfieldname: config.key || 'sid',
+            knex: db,
+            createTable: true
+        });
 
-// Setup static serving
-app.use(express.static(path.resolve('./dist')));
+        app.use(session({
+            secret: config.secret || 'nosecret',
+            key: config.key || 'sid',
+            resave: false,
+            store,
 
-// Set up our application routes
-app.use('/account', accountsRoute);
-// app.use('/wiki', wikiRoute);
+            // maxAge = 7 days
+            cookie: { maxAge: 7 * 24 * 60 * 60 * 1000, secure: !config.debug },
+            saveUninitialized: false
+        }));
 
-// Serve index.html for any html requests, but 404 everything else.
-app.get('*', (request, response) => {
-    response.format({
-        html: routeUtils.serveIndex,
-        json: (request, response) =>
+        // Passport support
+        app.use(passport.initialize());
+        app.use(passport.session());
+
+        GoogleAuth.initialize(app);
+
+        // Auth override
+        if(config.overrideAuth)
         {
-            response.status(404)
-                .json({
-                    name: "NotFoundError",
-                    message: `Requested url '${ request.url }' not found`,
-                    code: "ERR_NOT_FOUND"
-                });
-        }
-    })
-});
+            // Middleware to skip authentication, for unit testing. We only allow this if we're in debug mode /and/ we've set
+            // the user on `app`, something that can't be done externally.
+            app.use((req, resp, next) => {
+                const user = app.get('user');
+                req.user = _.isUndefined(user) ? req.user : user;
+                next();
+            });
+        } // end if
 
-// Start the server
-const server = app.listen(config.http.port, () =>
-{
-    const host = server.address().address;
-    const port = server.address().port;
+        // Setup static serving
+        app.use(express.static(path.resolve('./dist')));
 
-    logger.info('Tome v%s listening at http://%s:%s', require('./package').version, host, port);
-});
+        // Set up our application routes
+        app.use('/account', accountsRoute);
+        // app.use('/wiki', wikiRoute);
 
+        // Serve index.html for any html requests, but 404 everything else.
+        app.get('*', (request, response) => {
+            response.format({
+                html: routeUtils.serveIndex,
+                json: (request, response) => {
+                    response.status(404)
+                        .json({
+                            name: "NotFoundError",
+                            message: `Requested url '${ request.url }' not found`,
+                            code: "ERR_NOT_FOUND"
+                        });
+                }
+            })
+        });
+    });
 
 //----------------------------------------------------------------------------------------------------------------------
 
-module.exports = { app, server };
+function listen()
+{
+    if(!server)
+    {
+        // Start the server
+        server = app.listen(config.http.port, () =>
+        {
+            const host = server.address().address;
+            const port = server.address().port;
+
+            logger.info('Tome v%s listening at http://%s:%s', require('./package').version, host, port);
+        });
+    } // end if
+
+    return server;
+} // end listen
+
+//----------------------------------------------------------------------------------------------------------------------
+
+module.exports = { app, loading, listen };
 
 //----------------------------------------------------------------------------------------------------------------------

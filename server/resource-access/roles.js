@@ -9,15 +9,21 @@ const dbMan = require('../database');
 
 //----------------------------------------------------------------------------------------------------------------------
 
-const db = dbMan.getDB();
-
-//----------------------------------------------------------------------------------------------------------------------
-
 class RoleResourceAccess
 {
+    constructor()
+    {
+        this.loading = dbMan.getDB();
+    } // end constructor
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Public API
+    //------------------------------------------------------------------------------------------------------------------
+
     getRoles()
     {
-        return db('role')
+        return this.loading
+            .then((db) => db('role')
             .select()
             .map((role) =>
             {
@@ -25,7 +31,7 @@ class RoleResourceAccess
                 // And this doesn't add much overhead at all.
                 role.permissions = JSON.parse(role.permissions);
                 return role;
-            });
+            }));
     } // end getRoles
 
     addRole(role)
@@ -37,9 +43,10 @@ class RoleResourceAccess
         role.permissions = JSON.stringify(_.get(role, 'permissions', []));
 
         // Insert the role, and then unwrap the new id
-        return db('role')
+        return this.loading
+            .then((db) => db('role')
             .insert(role)
-            .then(([ id ]) => ({ id }));
+            .then(([ id ]) => ({ id })));
     } // end addRole
 
     deleteRole(role_id)
@@ -49,10 +56,11 @@ class RoleResourceAccess
             throw new Error('Cannot delete a role without `role_id`.');
         } // end if
 
-        return db('role')
+        return this.loading
+            .then((db) => db('role')
             .where({ role_id })
             .delete()
-            .then((rows) => ({ rowsAffected: rows }));
+            .then((rows) => ({ rowsAffected: rows })));
     } // end deleteRole
 } // end RoleResourceAccess
 

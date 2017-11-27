@@ -45,7 +45,8 @@ class WikiResourceAccess
 
     _getPermission(path, action)
     {
-        return db
+        return this.loading
+            .then((db) => db
             .with('page_ancestors',
                 db.raw('select * from page where instr(?, path) order by length(path) desc', [path])
             )
@@ -54,7 +55,7 @@ class WikiResourceAccess
             .select(`action_${ action } as ${ action }`)
             .whereNot(`action_${ action }`, 'inherit')
             .limit(1)
-            .then(([ permObj ]) => permObj[action]);
+            .then(([ permObj ]) => permObj[action]));
     } // end _getPermission
 
     //------------------------------------------------------------------------------------------------------------------
@@ -63,35 +64,38 @@ class WikiResourceAccess
 
     createPage(page)
     {
-        return db.transaction((trans) =>
-        {
-            return db('page')
-                .transacting(trans)
-                .insert(_.pick(page, 'title', 'path', 'action_view', 'action_modify'))
-                .then(([ newPageID ]) =>
+        return this.loading
+            .then((db) => db.transaction((trans) =>
                 {
-                    return db('revision')
+                    return db('page')
                         .transacting(trans)
-                        .insert(_.pick({ page_id: newPageID, body: page.body }));
+                        .insert(_.pick(page, 'title', 'path', 'action_view', 'action_modify'))
+                        .then(([ newPageID ]) =>
+                        {
+                            return db('revision')
+                                .transacting(trans)
+                                .insert(_.pick({ page_id: newPageID, body: page.body }));
+                        })
+                        .then(() => trans.commit())
+                        .catch((error) =>
+                        {
+                            console.error(`Failed to create page '${ page.path }':`, error.stack);
+
+                            // Rollback the transaction
+                            trans.rollback();
+
+                            // Throw a generic error, because we want the outside code to know this didn't work,
+                            // but we don't want to expose the details.
+                            throw AppError(`Failed to create page '${ page.path }'.`);
+                        });
                 })
-                .then(() => trans.commit())
-                .catch((error) =>
-                {
-                    console.error(`Failed to create page '${ page.path }':`, error.stack);
-
-                    // Rollback the transaction
-                    trans.rollback();
-
-                    // Throw a generic error, because we want the outside code to know this didn't work,
-                    // but we don't want to expose the details.
-                    throw AppError(`Failed to create page '${ page.path }'.`);
-                });
-        });
+            );
     } // end createPage
 
     getPage(path)
     {
-        return db('current_revision')
+        return this.loading
+            .then((db) => db('current_revision')
             .select()
             .where({ path })
             .then((pages) =>
@@ -108,12 +112,13 @@ class WikiResourceAccess
                 {
                     return this._mungeWikiPage(pages[0]);
                 } // end if
-            });
+            }));
     } // end getPage
 
     updatePage(newPage)
     {
-        return db('current_revision')
+        return this.loading
+            .then((db) => db('current_revision')
             .select('page_id', 'path', 'title', 'revision_id')
             .where({ page_id: newPage.page_id })
             .then(([ currentPage ]) =>
@@ -165,20 +170,22 @@ class WikiResourceAccess
                             });
                     });
                 } // end if
-            });
+            }));
     } // end updatePage
 
     movePage(oldPath, newPath)
     {
-        return db('page')
+        return this.loading
+            .then((db) => db('page')
             .where({ path: oldPath })
             .update({ path: newPath })
-            .then((rows) => ({ rowsAffected: rows }));
+            .then((rows) => ({ rowsAffected: rows })));
     } // end movePage
 
     deletePage(path)
     {
-        return db('page')
+        return this.loading
+            .then((db) => db('page')
             .select('page_id')
             .where({ path })
             .then((pages) =>
@@ -198,16 +205,17 @@ class WikiResourceAccess
                     // We will consider `null` as the text for `body` to mean the page was deleted.
                     return this.addRevision(page.page_id, null);
                 } // end if
-            });
+            }));
     } // end movePage
 
     fullDeletePage(path)
     {
         // This will delete all revisions and comments.
-        return db('page')
+        return this.loading
+            .then((db) => db('page')
             .where({ path })
             .delete()
-            .then((rows) => ({ rowsAffected: rows }));
+            .then((rows) => ({ rowsAffected: rows })));
     } //end fullDeletePage
 
     addRevision(page_id, content, transObj)
@@ -218,23 +226,28 @@ class WikiResourceAccess
             content = '';
         } // end if
 
-        const query = db('revision')
-            .insert({ content, page_id });
+        return this.loading
+            .then((db) =>
+            {
+                const query = db('revision')
+                    .insert({ content, page_id });
 
-        if(transObj)
-        {
-            query.transacting(transObj);
-        } // end if
+                if(transObj)
+                {
+                    query.transacting(transObj);
+                } // end if
 
-        return query
-            .then(([ id ]) => ({ id }));
+                return query
+                    .then(([ id ]) => ({ id }));
+            });
     } // end addRevision
 
     getRevisions(page_id)
     {
-        return db('revision')
+        return this.loading
+            .then((db) => db('revision')
             .select()
-            .where({ page_id });
+            .where({ page_id }));
     } // end getRevisions
 } // end WikiResourceAccess.js
 

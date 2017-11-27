@@ -5,7 +5,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 const _ = require('lodash');
-const config = require('../../config');
+
+// Managers
+const appMan = require('./app');
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -13,7 +15,7 @@ class ConfigManager
 {
     constructor()
     {
-        this._config = config;
+        this._config = require(appMan.getRootPath('./config'));
     } // end constructor
 
     //------------------------------------------------------------------------------------------------------------------
@@ -28,8 +30,13 @@ class ConfigManager
 
     get(...args)
     {
-        return _.get(config, ...args);
+        return _.get(this._config, ...args);
     } // end get
+
+    set(...args)
+    {
+        _.set(this._config, ...args);
+    } // end set
 } // end ConfigManager
 
 //----------------------------------------------------------------------------------------------------------------------

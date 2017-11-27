@@ -24,7 +24,12 @@ module.exports = {
     },
 
     // TOME Options
-    allowRegistration: true
+    allowRegistration: true,
+
+    database:
+    {
+        connection: { filename: './server/db/tome.db' }
+    }
 }; // end exports
 
 //----------------------------------------------------------------------------------------------------------------------
