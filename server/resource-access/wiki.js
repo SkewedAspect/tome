@@ -12,12 +12,13 @@ const { AppError, NotFoundError, MultipleResultsError, ValidationError } = requi
 
 //----------------------------------------------------------------------------------------------------------------------
 
-const db = dbMan.getDB();
-
-//----------------------------------------------------------------------------------------------------------------------
-
 class WikiResourceAccess
 {
+    constructor()
+    {
+        this.loading = dbMan.getDB();
+    } // end constructor
+
     //------------------------------------------------------------------------------------------------------------------
     // Utility Functions
     //------------------------------------------------------------------------------------------------------------------
@@ -218,19 +219,19 @@ class WikiResourceAccess
             .then((rows) => ({ rowsAffected: rows })));
     } //end fullDeletePage
 
-    addRevision(page_id, content, transObj)
+    addRevision(page_id, body, transObj)
     {
-        if(_.isUndefined(content))
+        if(_.isUndefined(body))
         {
             // We coerce `undefined` to empty string, so that `null` can explicitly mean 'I deleted this page.'
-            content = '';
+            body = '';
         } // end if
 
         return this.loading
             .then((db) =>
             {
                 const query = db('revision')
-                    .insert({ content, page_id });
+                    .insert({ body, page_id });
 
                 if(transObj)
                 {
