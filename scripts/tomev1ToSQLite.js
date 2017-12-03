@@ -192,7 +192,7 @@ if(oldDBPath)
         client: 'sqlite3',
         connection: {
             //TODO: We need to allow the db to setup to be specified... eventually.
-            filename: './server/db/tome.sqlite'
+            filename: './server/db/tome.db'
         },
         useNullAsDefault: true
     });
