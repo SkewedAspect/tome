@@ -39,6 +39,12 @@ class WikiManager
             .then(() => wikiRA.getRevisions(path));
     } // end getHistory
 
+    getPermission(path, action)
+    {
+        return wikiRE.validatePath(path)
+            .then(() => wikiRA.getPermission(path, action));
+    } // end getPermission
+
     editPage(page)
     {
         return wikiRE.validatePage(page)

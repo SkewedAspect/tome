@@ -34,7 +34,7 @@ const GoogleAuth = require('./server/auth/google');
 
 // Routes
 const accountsRoute = require('./server/routes/accounts');
-// const wikiRoute = require('./server/routes/wiki');
+const wikiRoute = require('./server/routes/wiki');
 const routeUtils = require('./server/routes/utils');
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ const loading = dbMan.getDB()
 
         // Set up our application routes
         app.use('/account', accountsRoute);
-        // app.use('/wiki', wikiRoute);
+        app.use('/wiki', wikiRoute);
 
         // Serve index.html for any html requests, but 404 everything else.
         app.get('*', (request, response) => {

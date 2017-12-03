@@ -68,26 +68,26 @@ class WikiResourceAccess
         return this.loading
             .then((db) => db.transaction((trans) =>
                 {
-                    return db('page')
+                    db('page')
                         .transacting(trans)
                         .insert(_.pick(page, 'title', 'path', 'action_view', 'action_modify'))
                         .then(([ newPageID ]) =>
                         {
                             return db('revision')
                                 .transacting(trans)
-                                .insert(_.pick({ page_id: newPageID, body: page.body }));
+                                .insert({ page_id: newPageID, body: page.body });
                         })
-                        .then(() => trans.commit())
+                        .then(trans.commit)
                         .catch((error) =>
                         {
                             console.error(`Failed to create page '${ page.path }':`, error.stack);
 
-                            // Rollback the transaction
-                            trans.rollback();
-
                             // Throw a generic error, because we want the outside code to know this didn't work,
                             // but we don't want to expose the details.
-                            throw AppError(`Failed to create page '${ page.path }'.`);
+                            const newError = new AppError(`Failed to create page '${ page.path }'.`);
+
+                            // Rollback the transaction
+                            return trans.rollback(newError);
                         });
                 })
             );
@@ -116,6 +116,11 @@ class WikiResourceAccess
             }));
     } // end getPage
 
+    getPermission(path, action)
+    {
+        return this._getPermission(path, action);
+    } // end getPermission
+
     updatePage(newPage)
     {
         return this.loading
@@ -134,12 +139,20 @@ class WikiResourceAccess
                 }
                 else
                 {
-                    return db.transaction((trans) =>
-                    {
-                        return db('page')
-                            .transacting(trans)
-                            .where({ page_id: currentPage.page_id })
-                            .update(_.pick(newPage, 'title', 'action_view', 'action_modify'))
+                    return db.transaction((trans) => {
+                        let pageQuery = Promise.resolve();
+                        const newPageObj = _.pick(newPage, 'title', 'action_view', 'action_modify');
+
+                        if(!_.isEmpty(newPageObj))
+                        {
+                            pageQuery = db('page')
+                                .transacting(trans)
+                                .update(newPageObj)
+                                .where({ page_id: currentPage.page_id });
+                        } // end if
+
+                        // We don't return, or else it auto-commits.
+                        pageQuery
                             .then(() =>
                             {
                                 if(newPage.body && currentPage.body !== newPage.body)
@@ -157,17 +170,17 @@ class WikiResourceAccess
                                     } // end if
                                 } // end if
                             })
-                            .then(() => trans.commit())
+                            .then(trans.commit)
                             .catch((error) =>
                             {
                                 console.error(`Failed to update page '${ newPage.path }':`, error.stack);
 
-                                // Rollback the transaction
-                                trans.rollback();
-
                                 // Throw a generic error, because we want the outside code to know this didn't work,
                                 // but we don't want to expose the details.
-                                throw AppError(`Failed to update page '${ newPage.path }'.`);
+                                const newError = new AppError(`Failed to update page '${ newPage.path }'.`);
+
+                                // Rollback the transaction
+                                return trans.rollback(newError);
                             });
                     });
                 } // end if
@@ -230,8 +243,7 @@ class WikiResourceAccess
         return this.loading
             .then((db) =>
             {
-                const query = db('revision')
-                    .insert({ body, page_id });
+                const query = db('revision');
 
                 if(transObj)
                 {
@@ -239,6 +251,7 @@ class WikiResourceAccess
                 } // end if
 
                 return query
+                    .insert({ body, page_id })
                     .then(([ id ]) => ({ id }));
             });
     } // end addRevision

@@ -1,20 +1,19 @@
 //----------------------------------------------------------------------------------------------------------------------
-// Account REST API
+// Wiki REST API
 //
 // @module
 //----------------------------------------------------------------------------------------------------------------------
 
 const _ = require('lodash');
-const Promise = require('bluebird');
 const express = require('express');
 
-const permSvc = require('../permissions/service');
-const { hasPerm } = require('../permissions/middleware');
-
 const { interceptHTML, ensureAuthenticated, promisify } = require('./utils');
-const models = require('../models');
 
-const logger = require('trivial-logging').loggerFor(module);
+// Managers
+const wikiMan = require('../managers/wiki');
+const permsMan = require('../managers/permissions');
+
+const { NotFoundError } = require('../errors');
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -22,259 +21,219 @@ const router = express.Router();
 
 //----------------------------------------------------------------------------------------------------------------------
 
-function findInheritedPerm(path, action)
+function getUser(req)
 {
-    if(path !== '/')
+    return _.get(req, 'user', { username: 'anonymous', permissions: [], groups: [] });
+} // end getUser
+
+function getPath(req)
+{
+    let path = _.get(req, 'params[0]', '/');
+    if(path.length > 1 && path.substr(-1) === '/')
     {
-        return models.Page.getAll(path, { index: 'path' })
-            .then((pages) =>
-            {
-                let perm = 'inherit';
-                if(pages && pages.length > 0)
-                {
-                    perm = pages[0].actions[action];
-                } // end if
-
-                if(perm === 'inherit')
-                {
-                    // Drop the last item off path
-                    path = path.split('/').slice(0, -1).join('/') || '/';
-
-                    // Keep looking for a real permission
-                    return findInheritedPerm(path, action);
-                }
-                else
-                {
-                    return perm;
-                } // end if
-            });
+        path = path.substr(0, path.length - 1);
     } // end if
 
-    return Promise.resolve();
-} // end findInheritedPerm
+    return path
+} // end getPath
 
 //----------------------------------------------------------------------------------------------------------------------
+
+router.head('*', promisify((req, resp) =>
+{
+    const path = getPath(req);
+
+    return wikiMan.getPage(path)
+        .then((page) =>
+        {
+            const user = getUser(req);
+            const viewPerm = `wikiView/${ page.actions.wikiView }`;
+            if(viewPerm !== 'wikiView/*' && !permsMan.hasPerm(user, viewPerm))
+            {
+                resp.status(403).end();
+            }
+            else if(page.body === null)
+            {
+                // Treat null body as deleted.
+                resp.status(404).end();
+            }
+            else
+            {
+                resp.status(200).end();
+            } // end if
+        })
+        .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+        {
+            resp.status(404).end();
+        });
+}));
 
 router.get('*', (request, response) =>
 {
     interceptHTML(response, promisify((req, resp) =>
         {
-            let path = req.params[0] || '/';
-            return models.Page.getAll(path, { index: 'path' })
-                .then((pages) =>
+            const path = getPath(req);
+
+            return wikiMan.getPage(path)
+                .tap((page) =>
                 {
-                    if(pages && pages.length > 0)
+                    const user = getUser(req);
+                    const viewPerm = `wikiView/${ page.actions.wikiView }`;
+                    if(viewPerm !== 'wikiView/*' && !permsMan.hasPerm(user, viewPerm))
                     {
-                        const page = pages[0];
-
-                        // We skip all permission checks for reading '/'. That page is always accessible.
-                        if(path === '/')
-                        {
-                            return page;
-                        }
-                        else
-                        {
-                            // Get the special read permission, if there is one. (This may involve walking backwards up
-                            // the path, checking for inherited permissions.)
-                            let permPromise = Promise.resolve(page.actions.view);
-                            if(page.actions.view === 'inherit')
-                            {
-                                // Drop the last item off path
-                                path = path.split('/').slice(0, -1).join('/') || '/';
-                                permPromise = findInheritedPerm(path, 'view');
-                            } // end if
-
-                            return permPromise.then((requiredPerm) =>
-                            {
-                                // If we have a required permission, and no user, we will simply fail.
-                                if(requiredPerm && !permSvc.hasPerm(req.user || { permissions: [] }, requiredPerm))
-                                {
-                                    const email = _.get(req, 'user.email', 'anonymous');
-                                    logger.warn(`User '${ email }' does not have required permission ${ requiredPerm }.`);
-
-                                    response.status(403).json({
-                                        name: 'Permission Denied',
-                                        message: `User '${ email }' does not have required permission.`
-                                    });
-                                }
-                                else
-                                {
-                                    return page;
-                                } // end if
-                            });
-                        } // end if
+                        resp.status(403).json({
+                            name: 'Permission Denied',
+                            code: 'ERR_PERMISSION',
+                            message: `User '${ user.username }' does not have required permission.`
+                        });
                     }
-                    else
+                    else if(page.body === null)
                     {
-                        // Page not found.
-                        resp.status(404).end();
+                        // Treat null body as deleted.
+                        resp.status(404).json({
+                            name: 'Page not found',
+                            code: 'ERR_NOT_FOUND',
+                            message: `No page found for path '${ path }'.`
+                        });
                     } // end if
+                })
+                .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+                {
+                    resp.status(404).json({
+                        name: 'Page not found',
+                        code: 'ERR_NOT_FOUND',
+                        message: `No page found for path '${ path }'.`
+                    });
                 });
         }));
 });
 
-router.post('*', ensureAuthenticated, hasPerm('wiki/update'), promisify((req, resp) =>
+router.post('*', ensureAuthenticated, promisify((req, resp) =>
 {
-    const path = req.params[0] || '/';
-    return models.Page.getAll(path, { index: 'path' })
-        .then((pages) =>
+    const path = getPath(req);
+
+    // First, we need to get the page, so we can check the permissions.
+    return wikiMan.getPage(path)
+        .then((page) =>
         {
-            if(pages && pages.length > 0)
+            const user = getUser(req);
+            const viewPerm = `wikiModify/${ page.actions.wikiModify }`;
+            if(viewPerm !== 'wikiModify/*' && !permsMan.hasPerm(user, viewPerm))
             {
-                return findInheritedPerm(path, 'update')
-                    .then((requiredPerm) =>
-                    {
-                        // If we have a required permission, and no user, we will simply fail.
-                        if(requiredPerm && !permSvc.hasPerm(req.user || { permissions: [] }, requiredPerm))
-                        {
-                            const email = _.get(req, 'user.email', 'anonymous');
-                            logger.warn(`User '${ email }' does not have required permission ${ requiredPerm }.`);
-
-                            resp.status(403).json({
-                                name: 'Permission Denied',
-                                message: `User '${ email }' does not have required permission.`
-                            });
-                        }
-                        else
-                        {
-                            const page = pages[0];
-
-                            if(page.revisions[0].id === req.body.lastRevision)
-                            {
-                                // Update main page properties
-                                _.assign(page, {
-                                    path,
-                                    title: req.body.title,
-                                    actions: req.body.actions || {}
-                                });
-
-                                // Insert new revision
-                                page.revisions.unshift({
-                                    content: req.body.content,
-                                    user: req.user.email
-                                });
-
-                                return page.save();
-                            }
-                            else
-                            {
-                                // Page has been updated since
-                                resp.status(409).json({
-                                    name: 'Last Revision Mismatch',
-                                    message: `The last revision submitted was '${ req.lastRevision }', however, the current last revision is '${ page.revisions[0].id }'.`
-                                });
-                            } // end if
-                        } // end if
-                    });
+                resp.status(403).json({
+                    name: 'Permission Denied',
+                    code: 'ERR_PERMISSION',
+                    message: `User '${ user.username }' does not have required permission.`
+                });
             }
             else
             {
-                // Page not found.
-                resp.status(404).json({
-                    name: 'Page does not exist',
-                    message: `The page at '${ path }' does not exist.`
-                });
-            } // end if
-        });
-}));
-
-router.put('*', ensureAuthenticated, hasPerm('wiki/create'), promisify((req, resp) =>
-{
-    const path = req.params[0] || '/';
-    return models.Page.getAll(path, { index: 'path' })
-        .then((pages) =>
-        {
-            if(!pages || pages.length === 0)
-            {
-                return findInheritedPerm(path, 'create')
-                    .then((requiredPerm) =>
-                    {
-                        // If we have a required permission, and no user, we will simply fail.
-                        if(requiredPerm && !permSvc.hasPerm(req.user || { permissions: [] }, requiredPerm))
-                        {
-                            const email = _.get(req, 'user.email', 'anonymous');
-                            logger.warn(`User '${ email }' does not have required permission ${ requiredPerm }.`);
-
-                            resp.status(403).json({
-                                name: 'Permission Denied',
-                                message: `User '${ email }' does not have required permission.`
-                            });
-                        }
-                        else
-                        {
-                            const page = new models.Page({
-                                path,
-                                title: req.body.title,
-                                revisions: [{
-                                    content: req.body.content,
-                                    user: req.user.email
-                                }],
-                                actions: req.body.actions || {}
-                            });
-
-                            return page.save();
-                        } // end if
-                    });
-            }
-            else
-            {
-                // Page already exists
-                resp.status(409).json({
-                    name: 'Page Already Exists',
-                    message: `The page at '${ path }' already exists.`
-                });
-            } // end if
-        });
-}));
-
-router.delete('*', ensureAuthenticated, hasPerm('wiki/delete'), promisify((req, resp) =>
-{
-    const path = req.params[0] || '/';
-    if(path === '/')
-    {
-        resp.status(403).json({
-            name: 'Cannot delete root page.',
-            message: `The root wiki page '/' cannot be deleted.`
-        });
-    }
-    else
-    {
-        return models.Page.getAll(path, { index: 'path' })
-            .then((pages) =>
-            {
-                if(pages && pages.length > 0)
+                const newPage = _.merge({}, req.body, { path, page_id: page.page_id });
+                if(newPage.revision_id !== page.revision_id)
                 {
-                    return findInheritedPerm(path, 'delete')
-                        .then((requiredPerm) =>
-                        {
-                            // If we have a required permission, and no user, we will simply fail.
-                            if(requiredPerm && !permSvc.hasPerm(req.user || { permissions: [] }, requiredPerm))
-                            {
-                                const email = _.get(req, 'user.email', 'anonymous');
-                                logger.warn(`User '${ email }' does not have required permission ${ requiredPerm }.`);
-
-                                resp.status(403).json({
-                                    name: 'Permission Denied',
-                                    message: `User '${ email }' does not have required permission.`
-                                });
-                            }
-                            else
-                            {
-                                const page = pages[0];
-                                return page.delete().then(() => {});
-                            } // end if
-                        });
+                    resp.status(409).json({
+                        name: 'Version Conflict',
+                        code: 'ERR_VERSION_CONFLICT',
+                        message: `Edit made against older revision than most recent revision for '${ path }'.`,
+                        page
+                    });
                 }
                 else
                 {
-                    // Page not found.
-                    resp.status(404).json({
-                        name: 'Page does not exist',
-                        message: `The page at '${ path }' does not exist.`
-                    });
+                    return wikiMan.editPage(newPage);
                 } // end if
+            } // end if
+        })
+        .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+        {
+            resp.status(404).json({
+                name: 'Page not found',
+                code: 'ERR_NOT_FOUND',
+                message: `No page found for path '${ path }'.`
             });
-    } // end if
+        });
+}));
+
+router.put('*', ensureAuthenticated, promisify((req, resp) =>
+{
+    const path = getPath(req);
+
+    // First, we need to get the page, so we can check the permissions.
+    return wikiMan.getPage(path)
+        .then((page) =>
+        {
+            resp.status(409).json({
+                name: 'Page Already Exists',
+                code: 'ERR_PAGE_EXISTS',
+                message: `A page already exists at path '${ path }'.`,
+                page
+            });
+        })
+        .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+        {
+            return wikiMan.getPermission(path, 'modify')
+                .then((perm) =>
+                {
+                    const user = getUser(req);
+                    const viewPerm = `wikiModify/${ perm }`;
+                    if(viewPerm !== 'wikiModify/*' && !permsMan.hasPerm(user, viewPerm))
+                    {
+                        resp.status(403).json({
+                            name: 'Permission Denied',
+                            code: 'ERR_PERMISSION',
+                            message: `User '${ user.username }' does not have required permission.`
+                        });
+                    }
+                    else
+                    {
+                        const newPage = _.merge({}, req.body, { path });
+                        return wikiMan.createPage(newPage);
+                    } // end if
+                });
+        });
+}));
+
+router.delete('*', ensureAuthenticated, promisify((req, resp) =>
+{
+    const path = getPath(req);
+
+    // First, we need to get the page, so we can check the permissions.
+    return wikiMan.getPage(path)
+        .then((page) =>
+        {
+            const user = getUser(req);
+            const viewPerm = `wikiModify/${ page.actions.wikiModify }`;
+            if(viewPerm !== 'wikiModify/*' && !permsMan.hasPerm(user, viewPerm))
+            {
+                resp.status(403).json({
+                    name: 'Permission Denied',
+                    code: 'ERR_PERMISSION',
+                    message: `User '${ user.username }' does not have required permission.`
+                });
+            }
+            else if(page.body === null)
+            {
+                // Treat null body as deleted.
+                resp.status(404).json({
+                    name: 'Page not found',
+                    code: 'ERR_NOT_FOUND',
+                    message: `No page found for path '${ path }'.`
+                });
+            }
+            else
+            {
+                return wikiMan.deletePage(path)
+                    .then(() => ({ status: 'success' }));
+            } // end if
+        })
+        .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+        {
+            resp.status(404).json({
+                name: 'Page not found',
+                code: 'ERR_NOT_FOUND',
+                message: `No page found for path '${ path }'.`
+            });
+        });
 }));
 
 //----------------------------------------------------------------------------------------------------------------------
