@@ -7,8 +7,6 @@
 const accountRE = require('../rules-engines/account');
 const accountRA = require('../resource-access/accounts');
 
-const { NotFoundError } = require('../errors');
-
 //----------------------------------------------------------------------------------------------------------------------
 
 class AccountManager

@@ -4,8 +4,6 @@
 // @module
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Promise = require('bluebird');
-
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
