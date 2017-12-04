@@ -2,6 +2,12 @@
 
 A simple wiki.
 
+## Getting Started
+
+The initial database setup is in `migrations`, just run `npm start` to start the
+server and kick off the migrations. The database lives at `server/db/tome.db`
+for now.
+
 ## TODO:
 
 * [] Move over to sqlite for the database
