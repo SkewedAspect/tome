@@ -13,8 +13,6 @@ const { interceptHTML, ensureAuthenticated, promisify } = require('./utils');
 const wikiMan = require('../managers/wiki');
 const permsMan = require('../managers/permissions');
 
-const { NotFoundError } = require('../errors');
-
 //----------------------------------------------------------------------------------------------------------------------
 
 const router = express.Router();

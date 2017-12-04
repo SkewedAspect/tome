@@ -33,7 +33,6 @@ let db;
 
 // Start the server
 const server = listen();
-
 const request = chai.request(server);
 const { expect } = chai;
 
