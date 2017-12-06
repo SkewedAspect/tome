@@ -1,10 +1,23 @@
+stages:
+  - build
+  - test
+
+Unit Tests:
+  script:
+    - yarn install
+    - yarn run test
+  stage: test
+  image: node:carbon-alpine
+
 Build Docker:
-   image: docker:latest
-   services:
-   - docker:dind
-   stage: build
-   script:
-     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-     - docker build -t registry.gitlab.com/skewed-aspect/tome:latest -t registry.gitlab.com/skewed-aspect/tome:$CI_BUILD_REF_NAME .
-     - docker push registry.gitlab.com/skewed-aspect/tome:latest
-     - docker push registry.gitlab.com/skewed-aspect/tome:$CI_BUILD_REF_NAME
+  image: docker:latest
+  services:
+    - docker:dind
+  only:
+    - tags
+  stage: build
+  script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    - docker build -t registry.gitlab.com/skewed-aspect/tome:latest -t registry.gitlab.com/skewed-aspect/tome:$CI_BUILD_REF_NAME .
+    - docker push registry.gitlab.com/skewed-aspect/tome:latest
+    - docker push registry.gitlab.com/skewed-aspect/tome:$CI_BUILD_REF_NAME
