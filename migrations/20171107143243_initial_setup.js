@@ -71,7 +71,7 @@ exports.up = function(knex, Promise)
         knex.raw(`CREATE VIEW current_revision (page_id, path, title, body, created, edited, revision_id, action_view, action_modify) AS 
             SELECT p.page_id, p.path, p.title, r.body, curr.created, r.edited, r.revision_id, p.action_view, p.action_modify 
                 FROM (
-                    SELECT page_id, MAX(edited) AS edited, min(edited) AS created 
+                    SELECT page_id, MAX(edited) AS edited, min(edited) AS created, MAX(revision_id) as revision_id 
                         FROM revision GROUP BY page_id
                 ) AS curr 
                 NATURAL JOIN page AS p 
