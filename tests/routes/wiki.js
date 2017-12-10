@@ -439,7 +439,7 @@ describe("Wiki API ('/wiki')", () =>
                             .then(() => accountMan.getAccountByUsername('specialUser').then((user) => app.set('user', user)))
                             .then(() =>
                             {
-                                return request.put('/wiki/bar')
+                                return request.put('/wiki/normal/sub/perm/bar')
                                     .set('Accept', 'application/json')
                                     .send(newPage)
                                     .then((response) =>
@@ -451,7 +451,7 @@ describe("Wiki API ('/wiki')", () =>
                                         expect(page).to.not.be.empty;
 
                                         expect(page).to.have.property('page_id');
-                                        expect(page).to.have.property('path', '/bar');
+                                        expect(page).to.have.property('path', '/normal/sub/perm/bar');
                                         expect(page).to.have.property('title', 'Bar Page');
                                         expect(page).to.have.property('body');
                                         expect(page).to.have.property('created');
@@ -461,11 +461,11 @@ describe("Wiki API ('/wiki')", () =>
                                         const actions = page.actions;
                                         expect(actions).to.be.an('object');
                                         expect(actions).to.not.be.empty;
-                                        expect(actions).to.have.property('wikiView', '*');
-                                        expect(actions).to.have.property('wikiModify', '*');
+                                        expect(actions).to.have.property('wikiView', 'special');
+                                        expect(actions).to.have.property('wikiModify', 'special');
 
                                         // Attempt to look up the page we just created
-                                        return request.get('/wiki/bar')
+                                        return request.get('/wiki/normal/sub/perm/bar')
                                             .set('Accept', 'application/json')
                                             .then((response) =>
                                             {
@@ -476,7 +476,7 @@ describe("Wiki API ('/wiki')", () =>
                                                 expect(page).to.not.be.empty;
 
                                                 expect(page).to.have.property('page_id');
-                                                expect(page).to.have.property('path', '/bar');
+                                                expect(page).to.have.property('path', '/normal/sub/perm/bar');
                                                 expect(page).to.have.property('title', 'Bar Page');
                                                 expect(page).to.have.property('body');
                                                 expect(page).to.have.property('created');
@@ -486,8 +486,8 @@ describe("Wiki API ('/wiki')", () =>
                                                 const actions = page.actions;
                                                 expect(actions).to.be.an('object');
                                                 expect(actions).to.not.be.empty;
-                                                expect(actions).to.have.property('wikiView', '*');
-                                                expect(actions).to.have.property('wikiModify', '*');
+                                                expect(actions).to.have.property('wikiView', 'special');
+                                                expect(actions).to.have.property('wikiModify', 'special');
                                             });
                                     });
                             });
@@ -524,7 +524,8 @@ describe("Wiki API ('/wiki')", () =>
                             expect(page).to.have.property('page_id');
                             expect(page).to.have.property('title', newEdit.title);
                             expect(page).to.have.property('body', newEdit.body);
-                            expect(page).to.have.property('revision_id', newEdit.revision_id + 1);
+                            expect(page).to.have.property('revision_id');
+                            expect(page).to.not.have.property('revision_id', newEdit.revision_id);
 
                             // Attempt to look up the page we just created
                             return request.get('/wiki/normal')
@@ -540,58 +541,242 @@ describe("Wiki API ('/wiki')", () =>
                                     expect(page).to.have.property('page_id');
                                     expect(page).to.have.property('title', newEdit.title);
                                     expect(page).to.have.property('body', newEdit.body);
-                                    expect(page).to.have.property('revision_id', newEdit.revision_id + 1);
+                                    expect(page).to.have.property('revision_id');
+                                    expect(page).to.not.have.property('revision_id', newEdit.revision_id);
                                 });
                         });
                 });
         });
 
-        xit('edits are refused if other edits have happened since this edit was started', () =>
+        it('edits are refused if other edits have happened since this edit was started', () =>
         {
-
+            const newEdit = { title: 'Edited Title', body: 'This is an edited page.', revision_id: 1 };
+            return request.post('/wiki/normal')
+                .set('Accept', 'application/json')
+                .send(newEdit)
+                .catch(({ response }) => response)
+                .then((response) =>
+                {
+                    expect(response).to.have.status(409);
+                });
         });
 
-        xit("editing a page that doesn't exist returns a 404", () =>
+        it("editing a page that doesn't exist returns a 404", () =>
         {
-
+            const newEdit = { title: 'Edited Title', body: 'This is an edited page.', revision_id: 1 };
+            return request.post('/wiki/dne')
+                .set('Accept', 'application/json')
+                .send(newEdit)
+                .catch(({ response }) => response)
+                .then((response) =>
+                {
+                    expect(response).to.have.status(404);
+                });
         });
 
         describe('Permissions', () =>
         {
-            xit('only allows edits if the user has the appropriate permission', () =>
+            it('only allows edits if the user has the appropriate permission', () =>
             {
+                const newEdit = { title: 'Edited Title', body: 'This is an edited page.', revision_id: 1 };
+                return accountMan.getAccountByUsername('normalUser')
+                    .then((user) => app.set('user', user))
+                    .then(() =>
+                    {
+                        return request.post('/wiki/perm')
+                            .set('Accept', 'application/json')
+                            .send(newEdit)
+                            .catch(({ response }) => response)
+                            .then((response) =>
+                            {
+                                expect(response).to.have.status(403);
+                            });
+                    })
+                    .then(() => accountMan.getAccountByUsername('specialUser').then((user) => app.set('user', user)))
+                    .then(() =>
+                    {
+                        return request.get('/wiki/perm')
+                            .set('Accept', 'application/json')
+                            .then((data) =>
+                            {
+                                const page = data.body;
 
+                                // We need to save the current revision number to save this correctly.
+                                newEdit.revision_id = page.revision_id;
+
+                                return request.post('/wiki/perm')
+                                    .set('Accept', 'application/json')
+                                    .send(newEdit)
+                                    .then((response) =>
+                                    {
+                                        expect(response).to.be.json;
+
+                                        const page = response.body;
+                                        expect(page).to.be.an('object');
+                                        expect(page).to.not.be.empty;
+
+                                        expect(page).to.have.property('title', newEdit.title);
+                                        expect(page).to.have.property('body', newEdit.body);
+                                        expect(page).to.not.have.property('revision_id', newEdit.revision_id);
+                                    });
+                            });
+                    });
             });
 
-            xit("inherits the permissions from it's parent page", () =>
+            it("inherits the permissions from it's parent page", () =>
             {
+                const newEdit = { title: 'Edited Title', body: 'This is an edited page.', revision_id: 1 };
+                return accountMan.getAccountByUsername('normalUser')
+                    .then((user) => app.set('user', user))
+                    .then(() =>
+                    {
+                        return request.post('/wiki/normal/sub/perm/inherited')
+                            .set('Accept', 'application/json')
+                            .send(newEdit)
+                            .catch(({ response }) => response)
+                            .then((response) =>
+                            {
+                                expect(response).to.have.status(403);
+                            });
+                    })
+                    .then(() => accountMan.getAccountByUsername('specialUser').then((user) => app.set('user', user)))
+                    .then(() =>
+                    {
+                        return request.get('/wiki/normal/sub/perm/inherited')
+                            .set('Accept', 'application/json')
+                            .then((data) =>
+                            {
+                                const page = data.body;
 
+                                // We need to save the current revision number to save this correctly.
+                                newEdit.revision_id = page.revision_id;
+
+                                return request.post('/wiki/normal/sub/perm/inherited')
+                                    .set('Accept', 'application/json')
+                                    .send(newEdit)
+                                    .then((response) =>
+                                    {
+                                        expect(response).to.be.json;
+
+                                        const page = response.body;
+                                        expect(page).to.be.an('object');
+                                        expect(page).to.not.be.empty;
+
+                                        expect(page).to.have.property('title', newEdit.title);
+                                        expect(page).to.have.property('body', newEdit.body);
+                                        expect(page).to.not.have.property('revision_id', newEdit.revision_id);
+                                    });
+                            });
+                    });
             });
         });
     });
 
     describe('DELETE /wiki/:path', () =>
     {
-        xit("deleting a page completely removes it's history", () =>
+        it("deleting a page adds an empty revision", () =>
         {
+            return request.delete('/wiki/normal')
+                .set('Accept', 'application/json')
+                .then((response) =>
+                {
+                    const json = response.body;
+                    expect(json).to.have.property('status', 'success');
 
+                    return db('current_revision')
+                        .select('body')
+                        .where({ path: '/normal' })
+                        .then(([ row ]) =>
+                        {
+                            expect(row).to.have.property('body', null);
+                        });
+                });
         });
 
-        xit("deleting a page that doesn't exist returns a 404", () =>
+        it("getting a deleted page returns a 404", () =>
         {
+            return request.delete('/wiki/normal')
+                .set('Accept', 'application/json')
+                .then((response) =>
+                {
+                    const json = response.body;
+                    expect(json).to.have.property('status', 'success');
 
+                    return request.get('/wiki/normal')
+                        .set('Accept', 'application/json')
+                        .catch(({ response }) => response)
+                        .then((response) =>
+                        {
+                            expect(response).to.have.status(404);
+                        });
+                });
+        });
+
+        it("deleting a page that doesn't exist returns a 404", () =>
+        {
+            return request.get('/wiki/dne')
+                .set('Accept', 'application/json')
+                .catch(({ response }) => response)
+                .then((response) =>
+                {
+                    expect(response).to.have.status(404);
+                });
         });
 
         describe('Permissions', () =>
         {
-            xit('only allows deletes if the user has the appropriate permission for editing', () =>
+            it('only allows deletes if the user has the appropriate permission for editing', () =>
             {
-
+                return accountMan.getAccountByUsername('normalUser')
+                    .then((user) => app.set('user', user))
+                    .then(() =>
+                    {
+                        return request.delete('/wiki/perm')
+                            .set('Accept', 'application/json')
+                            .catch(({ response }) => response)
+                            .then((response) =>
+                            {
+                                expect(response).to.have.status(403);
+                            });
+                    })
+                    .then(() => accountMan.getAccountByUsername('specialUser').then((user) => app.set('user', user)))
+                    .then(() =>
+                    {
+                        return request.delete('/wiki/perm')
+                            .set('Accept', 'application/json')
+                            .then((response) =>
+                            {
+                                const json = response.body;
+                                expect(json).to.have.property('status', 'success');
+                            });
+                    });
             });
 
-            xit("inherits the permissions from it's parent page", () =>
+            it("inherits the permissions from it's parent page", () =>
             {
-
+                return accountMan.getAccountByUsername('normalUser')
+                    .then((user) => app.set('user', user))
+                    .then(() =>
+                    {
+                        return request.delete('/wiki/normal/sub/perm/inherited')
+                            .set('Accept', 'application/json')
+                            .catch(({ response }) => response)
+                            .then((response) =>
+                            {
+                                expect(response).to.have.status(403);
+                            });
+                    })
+                    .then(() => accountMan.getAccountByUsername('specialUser').then((user) => app.set('user', user)))
+                    .then(() =>
+                    {
+                        return request.delete('/wiki/normal/sub/perm/inherited')
+                            .set('Accept', 'application/json')
+                            .then((response) =>
+                            {
+                                const json = response.body;
+                                expect(json).to.have.property('status', 'success');
+                            });
+                    });
             });
         });
     });
