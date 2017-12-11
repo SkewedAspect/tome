@@ -116,6 +116,39 @@ class WikiResourceAccess
             }));
     } // end getPage
 
+    getPageHistory(path)
+    {
+        return this.loading
+            .then((db) => db('page')
+            .innerJoin('revision', 'page.page_id', '=', 'revision.page_id')
+            .where({ path })
+            .orderBy('edited', 'desc')
+            .then((pages) =>
+            {
+                if(pages.length > 0)
+                {
+                    const page = _.omit(pages[0], 'body');
+                    const revisions = _.reduce(pages, (revs, page) =>
+                    {
+                        page.created = new Date(page.created);
+                        page.edited = new Date(page.edited);
+
+                        revs.push(_.pick(page, 'revision_id', 'body', 'edited'));
+                        return revs;
+                    }, []);
+
+                    page.revisions = revisions;
+                    page.created = _.last(revisions).edited;
+
+                    return this._mungeWikiPage(page);
+                }
+                else
+                {
+                    throw new NotFoundError(`No page found for url '${ path }'.`);
+                } // end if
+            }));
+    } // end getPageHistory
+
     getPermission(path, action)
     {
         return this._getPermission(path, action);
@@ -255,14 +288,6 @@ class WikiResourceAccess
                     .then(([ id ]) => ({ id }));
             });
     } // end addRevision
-
-    getRevisions(page_id)
-    {
-        return this.loading
-            .then((db) => db('revision')
-            .select()
-            .where({ page_id }));
-    } // end getRevisions
 } // end WikiResourceAccess.js
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------------------------------------------------
-// Unit Tests for the accounts module.
+// Unit Tests for the wiki module.
 //
 // @module
 // ---------------------------------------------------------------------------------------------------------------------
@@ -49,8 +49,7 @@ describe("Wiki API ('/wiki')", () =>
 
     afterEach(() =>
     {
-        // Clear the database between runs
-        return db.seed.run({ directory: './tests/seeds' });
+        return dbMan.runSeeds(true);
     });
 
     describe('HEAD /wiki/:path', () =>
@@ -300,28 +299,6 @@ describe("Wiki API ('/wiki')", () =>
                                 expect(response).to.have.status(403);
                             });
                     });
-            });
-        });
-    });
-
-    //TODO: Pull out into it's own tests.
-    describe('GET /history/:path', () =>
-    {
-        xit('returns the entire revision history of the page', () =>
-        {
-
-        });
-
-        xit("requesting a page that doesn't exist returns a 404", () =>
-        {
-
-        });
-
-        describe('Permissions', () =>
-        {
-            xit('only returns history for pages that are visible to the user', () =>
-            {
-
             });
         });
     });
@@ -684,7 +661,7 @@ describe("Wiki API ('/wiki')", () =>
                     expect(json).to.have.property('status', 'success');
 
                     return db('current_revision')
-                        .select('body')
+                        .select()
                         .where({ path: '/normal' })
                         .then(([ row ]) =>
                         {

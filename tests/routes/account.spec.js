@@ -42,15 +42,14 @@ describe("Account API ('/account')", () =>
 {
     beforeEach(() =>
     {
-        return dbMan.getDB()
+        return dbMan.getDB(true)
             .then((testDB) => db = testDB)
             .then(() => accountMan.getAccountByUsername('globalAdmin').then((user) => app.set('user', user)));
     });
 
     afterEach(() =>
     {
-        // Clear the database between runs
-        return db.seed.run();
+        return dbMan.runSeeds(true);
     });
 
     describe("GET '/account'", () =>

@@ -36,7 +36,7 @@ class WikiManager
     getHistory(path)
     {
         return wikiRE.validatePath(path)
-            .then(() => wikiRA.getRevisions(path));
+            .then(() => wikiRA.getPageHistory(path));
     } // end getHistory
 
     getPermission(path, action)
