@@ -10,7 +10,7 @@ exports.up = function(knex, Promise)
         knex.schema.createTable('account', (table) =>
         {
             table.increments('account_id').primary();
-            table.string('username').notNullable().index();
+            table.string('username').notNullable().unique().index();
             table.text('email').notNullable().unique().index();
             table.text('full_name');
             table.text('avatar');
