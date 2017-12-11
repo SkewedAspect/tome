@@ -9,11 +9,18 @@ system, where sub-pages inherit from their parent pages.
 Most of these are planned, any that have been checked off have been implemented.
 
 * [X] Google federated login
-* [X] Hierarchical wiki pages
-* [X] Hierarchical wiki page permissions
-* [ ] Comments on pages
-* [ ] Page History
-* [X] Full Text Search
+* [X] Server
+    * [X] Hierarchical wiki pages
+    * [X] Hierarchical wiki page permissions
+    * [ ] Comments on pages
+    * [X] Page History
+    * [X] Full Text Search
+* [ ] UI
+    * [ ] Hierarchical wiki pages
+    * [ ] Hierarchical wiki page permissions
+    * [ ] Comments on pages
+    * [ ] Page History
+    * [ ] Full Text Search
 * [ ] Image Upload/embedding
 * [ ] File Attachments (maybe)
 * [ ] Branding and Theming
@@ -30,6 +37,7 @@ This is just a rough list of things to do while I get the project going.
 
 * [X] Move over to sqlite for the database
     * [X] Permissions checks in the db
+* [X] Add Unit Tests for the rest api
 * [ ] Switch to bootstrap-vue for the ui
 * [ ] Switch to webpack
 * [ ] Use socket.io to inform users when a page they're working on has been edited
