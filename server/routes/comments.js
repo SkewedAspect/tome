@@ -132,7 +132,7 @@ router.patch('*/:commentID', ensureAuthenticated, promisify((req, resp) =>
                 {
                     if(currentComment.page_id === page.page_id)
                     {
-                        if(currentComment.account_id === user.account_id || permsMan.hasPerm(user, 'comments/canEditAll'))
+                        if(currentComment.account_id === user.account_id || permsMan.hasPerm(user, 'Comments/canEditAny'))
                         {
                             // Replace some properties with server side values.
                             const comment = req.body;
