@@ -68,7 +68,7 @@ describe("Account API ('/account')", () =>
 
                             const json = response.body;
                             expect(json).to.be.a('array');
-                            expect(json).to.have.length.of(5);
+                            expect(json).to.have.length(5);
 
                             const admin = json[0];
                             expect(admin.email).to.equal('fake-admin@test.com');
@@ -100,7 +100,7 @@ describe("Account API ('/account')", () =>
 
                     const json = response.body;
                     expect(json).to.be.a('array');
-                    expect(json).to.have.length.of(5);
+                    expect(json).to.have.length(5);
 
                     const admin = json[0];
                     expect(admin.email).to.equal('fake-admin@test.com');

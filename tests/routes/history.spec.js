@@ -76,7 +76,7 @@ describe("History API ('/history')", () =>
 
                     const revisions = page.revisions;
                     expect(revisions).to.be.an('array');
-                    expect(revisions).to.have.length.of(3);
+                    expect(revisions).to.have.length(3);
 
                     const actions = page.actions;
                     expect(actions).to.be.an('object');
@@ -108,7 +108,7 @@ describe("History API ('/history')", () =>
 
                     const revisions = page.revisions;
                     expect(revisions).to.be.an('array');
-                    expect(revisions).to.have.length.of(1);
+                    expect(revisions).to.have.length(1);
 
                     const actions = page.actions;
                     expect(actions).to.be.an('object');
@@ -153,7 +153,7 @@ describe("History API ('/history')", () =>
 
                         const revisions = page.revisions;
                         expect(revisions).to.be.an('array');
-                        expect(revisions).to.have.length.of(1);
+                        expect(revisions).to.have.length(1);
 
                         const actions = page.actions;
                         expect(actions).to.be.an('object');
@@ -196,7 +196,7 @@ describe("History API ('/history')", () =>
 
                         const revisions = page.revisions;
                         expect(revisions).to.be.an('array');
-                        expect(revisions).to.have.length.of(1);
+                        expect(revisions).to.have.length(1);
 
                         const actions = page.actions;
                         expect(actions).to.be.an('object');

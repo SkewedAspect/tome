@@ -24,6 +24,7 @@ Most of these are planned, any that have been checked off have been implemented.
 * [ ] Image Upload/embedding
 * [ ] File Attachments (maybe)
 * [ ] Branding and Theming
+* [ ] Ability to run as a library
 
 ## Getting Started
 
