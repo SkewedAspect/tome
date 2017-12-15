@@ -7,6 +7,8 @@
 const _ = require('lodash');
 const dbMan = require('../database');
 
+const { NotFoundError } = require('../errors');
+
 //----------------------------------------------------------------------------------------------------------------------
 
 class CommentResourceAccess
@@ -31,6 +33,29 @@ class CommentResourceAccess
     //------------------------------------------------------------------------------------------------------------------
     // Public API
     //------------------------------------------------------------------------------------------------------------------
+
+    getComment(comment_id)
+    {
+        return this.loading
+            .then((db) => db('comment')
+            .select()
+            .where({ comment_id }))
+            .then((comments) =>
+            {
+                if(comments.length > 1)
+                {
+                    throw new MultipleResultsError('comment');
+                }
+                else if(comments.length === 0)
+                {
+                    throw new NotFoundError(`No comment with id '${ comment_id }' found.`);
+                }
+                else
+                {
+                    return this._mungeComment(comments[0]);
+                } // end if
+            });
+    } // end getComment
 
     getComments(path)
     {
@@ -70,12 +95,19 @@ class CommentResourceAccess
             .where({ comment_id }));
     } // end updateComment
 
-    deleteComment(comment_id)
+    deleteComment(page_id, comment_id)
     {
         return this.loading
             .then((db) => db('comment')
-            .where({ comment_id })
-            .delete());
+            .where({ page_id, comment_id })
+            .delete())
+            .then((rowsAffected) =>
+            {
+                if(rowsAffected === 0)
+                {
+                    throw new NotFoundError(`No comment with id '${ comment_id }' found on page with id '${ page_id }'.`);
+                } // end if
+            });
     } // end deleteComment
 } // end CommentResourceAccess
 

@@ -132,9 +132,7 @@ class DatabaseManager
         return this.getDB(testing)
             .then((db) =>
             {
-                return db('sqlite_sequence')
-                    .del()
-                    .then(() => db.seed.run(options.seed));
+                return db.seed.run(options.seed);
             });
     } // end runSeeds
 

@@ -81,23 +81,25 @@ class WikiManager
             .then(() => commentRA.getComments(path));
     } // end getComments
 
-    addComment(path, comment)
+    addComment(comment)
     {
-        return wikiRE.validatePath(path)
-            .then(() => commentRE.validateComment(comment))
-            .then(() => commentRA.addComment(path));
+        return commentRE.validateComment(comment)
+            .then(() => commentRA.addComment(comment))
+            .then(({ id }) => commentRA.getComment(id));
     } // end addComment
 
     editComment(comment)
     {
         return commentRE.validateComment(comment)
             .then(() => commentRA.updateComment(comment))
+            .then(() => commentRA.getComment(comment.comment_id));
     } // end editComment
 
-    deleteComment(commentID)
+    deleteComment(pageID, commentID)
     {
-        return commentRE.validateCommentID(commentID)
-            .then(() => commentRA.deleteComment(commentID));
+        return wikiRE.validatePageID(pageID)
+            .then(() => commentRE.validateCommentID(commentID))
+            .then(() => commentRA.deleteComment(pageID, commentID));
     } // end deleteCommentID
 } // end WikiManager
 

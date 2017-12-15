@@ -34,6 +34,7 @@ const GoogleAuth = require('./server/auth/google');
 
 // Routes
 const accountsRoute = require('./server/routes/accounts');
+const commentRoute = require('./server/routes/comments');
 const historyRoute = require('./server/routes/history');
 const wikiRoute = require('./server/routes/wiki');
 const routeUtils = require('./server/routes/utils');
@@ -101,6 +102,7 @@ const loading = dbMan.getDB()
 
         // Set up our application routes
         app.use('/account', accountsRoute);
+        app.use('/comment', commentRoute);
         app.use('/history', historyRoute);
         app.use('/wiki', wikiRoute);
 

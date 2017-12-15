@@ -12,6 +12,20 @@ const { ValidationError } = require('../errors');
 
 class WikiRulesEngine
 {
+    validatePageID(pageID)
+    {
+        return new Promise((resolve, reject) =>
+        {
+            if(!_.isString(pageID) && !_.isFinite(pageID))
+            {
+                reject(new ValidationError('pageID', 'must be either a string, or a number'));
+            } // end if
+
+            // We've successfully validated
+            resolve(true);
+        });
+    } // end validatePageID
+
     validatePath(path)
     {
         return new Promise((resolve, reject) =>
