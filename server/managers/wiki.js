@@ -75,6 +75,12 @@ class WikiManager
     // Comments
     //------------------------------------------------------------------------------------------------------------------
 
+    getComment(comment_id)
+    {
+        return commentRE.validateCommentID(comment_id)
+            .then(() => commentRA.getComment(comment_id));
+    } // end getComment
+
     getComments(path)
     {
         return wikiRE.validatePath(path)

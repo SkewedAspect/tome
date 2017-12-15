@@ -127,12 +127,38 @@ router.patch('*/:commentID', ensureAuthenticated, promisify((req, resp) =>
     return getPage(path, user, 'wikiModify')
         .then((page) =>
         {
-            // Replace some properties with server side values.
-            const comment = req.body;
-            comment.comment_id = req.params.commentID;
-            comment.page_id = page.page_id;
+            return wikiMan.getComment(req.params.commentID)
+                .then((currentComment) =>
+                {
+                    if(currentComment.page_id === page.page_id)
+                    {
+                        if(currentComment.account_id === user.account_id || permsMan.hasPerm(user, 'comments/canEditAll'))
+                        {
+                            // Replace some properties with server side values.
+                            const comment = req.body;
+                            comment.comment_id = req.params.commentID;
+                            comment.page_id = page.page_id;
 
-            return wikiMan.editComment(comment);
+                            return wikiMan.editComment(comment);
+                        }
+                        else
+                        {
+                            resp.status(403).json({
+                                name: 'Permission Denied',
+                                code: 'ERR_PERMISSION',
+                                message: `User '${ user.username }' does not have required permission.`
+                            });
+                        } // end if
+                    }
+                    else
+                    {
+                        resp.status(404).json({
+                            name: 'Comment not found',
+                            code: 'ERR_NOT_FOUND',
+                            message: `No comment with id '${ currentComment.comment_id }' found on page with path '${ path }'.`
+                        });
+                    } // end if
+                });
         })
         .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
         {

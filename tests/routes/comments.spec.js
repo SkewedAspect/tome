@@ -136,7 +136,7 @@ describe("Comment API ('/comment')", () =>
                         expect(comment).to.have.property('body');
                         expect(comment).to.have.property('created');
                         expect(comment).to.have.property('edited');
-                        expect(comment).to.have.property('account_id', 3);
+                        expect(comment).to.have.property('account_id', 5);
                     })
                     .then(() => accountMan.getAccountByUsername('normalUser').then((user) => app.set('user', user)))
                     .then(() =>
@@ -171,7 +171,7 @@ describe("Comment API ('/comment')", () =>
                         expect(comment).to.have.property('body');
                         expect(comment).to.have.property('created');
                         expect(comment).to.have.property('edited');
-                        expect(comment).to.have.property('account_id', 3);
+                        expect(comment).to.have.property('account_id', 5);
                     })
                     .then(() => accountMan.getAccountByUsername('normalUser').then((user) => app.set('user', user)))
                     .then(() =>
@@ -374,6 +374,70 @@ describe("Comment API ('/comment')", () =>
                 });
         });
 
+        it('only allows edits if the user is the author, or an admin', () =>
+        {
+            const newEdit = { title: 'Edited Title', body: 'This is an edited page.' };
+            return accountMan.getAccountByUsername('normalUser')
+                .then((user) => app.set('user', user))
+                .then(() =>
+                {
+                    return request.patch('/comment/normal/3')
+                        .set('Accept', 'application/json')
+                        .send(newEdit)
+                        .catch(({ response }) => response)
+                        .then((response) =>
+                        {
+                            expect(response).to.have.status(403);
+                        });
+                })
+                .then(() => accountMan.getAccountByUsername('groupUser').then((user) => app.set('user', user)))
+                .then(() =>
+                {
+                    return request.patch('/comment/normal/3')
+                        .set('Accept', 'application/json')
+                        .send(newEdit)
+                        .then((response) =>
+                        {
+                            expect(response).to.be.json;
+
+                            const comment = response.body;
+                            expect(comment).to.be.an('object');
+                            expect(comment).to.not.be.empty;
+
+                            expect(comment).to.have.property('comment_id');
+                            expect(comment).to.have.property('page_id', 3);
+                            expect(comment).to.have.property('title', newEdit.title);
+                            expect(comment).to.have.property('body', newEdit.body);
+                            expect(comment).to.have.property('created');
+                            expect(comment).to.have.property('edited');
+                            expect(comment).to.have.property('account_id', 4);
+                        });
+                })
+                .then(() => accountMan.getAccountByUsername('globalAdmin').then((user) => app.set('user', user)))
+                .then(() =>
+                {
+                    return request.patch('/comment/normal/3')
+                        .set('Accept', 'application/json')
+                        .send(newEdit)
+                        .then((response) =>
+                        {
+                            expect(response).to.be.json;
+
+                            const comment = response.body;
+                            expect(comment).to.be.an('object');
+                            expect(comment).to.not.be.empty;
+
+                            expect(comment).to.have.property('comment_id');
+                            expect(comment).to.have.property('page_id', 3);
+                            expect(comment).to.have.property('title', newEdit.title);
+                            expect(comment).to.have.property('body', newEdit.body);
+                            expect(comment).to.have.property('created');
+                            expect(comment).to.have.property('edited');
+                            expect(comment).to.have.property('account_id', 4);
+                        });
+                });
+        });
+
         it("editing a comment that doesn't exist returns a 404", () =>
         {
             const newEdit = { title: 'Edited Title', body: 'This is an edited page.' };
@@ -409,7 +473,7 @@ describe("Comment API ('/comment')", () =>
                     .then((user) => app.set('user', user))
                     .then(() =>
                     {
-                        return request.patch('/comment/normal/sub/perm/1')
+                        return request.patch('/comment/normal/sub/perm/4')
                             .set('Accept', 'application/json')
                             .send(newEdit)
                             .catch(({ response }) => response)
@@ -421,7 +485,7 @@ describe("Comment API ('/comment')", () =>
                     .then(() => accountMan.getAccountByUsername('specialUser').then((user) => app.set('user', user)))
                     .then(() =>
                     {
-                        return request.patch('/comment/normal/sub/perm/1')
+                        return request.patch('/comment/normal/sub/perm/4')
                             .set('Accept', 'application/json')
                             .send(newEdit)
                             .then((response) =>
@@ -434,7 +498,7 @@ describe("Comment API ('/comment')", () =>
 
                                 expect(comment).to.have.property('title', newEdit.title);
                                 expect(comment).to.have.property('body', newEdit.body);
-                                expect(comment).to.have.property('account_id', 3);
+                                expect(comment).to.have.property('account_id', 5);
                             });
                     });
             });
@@ -446,7 +510,7 @@ describe("Comment API ('/comment')", () =>
                     .then((user) => app.set('user', user))
                     .then(() =>
                     {
-                        return request.patch('/comment/normal/sub/perm/inherited/1')
+                        return request.patch('/comment/normal/sub/perm/inherited/6')
                             .set('Accept', 'application/json')
                             .send(newEdit)
                             .catch(({ response }) => response)
@@ -458,7 +522,7 @@ describe("Comment API ('/comment')", () =>
                     .then(() => accountMan.getAccountByUsername('specialUser').then((user) => app.set('user', user)))
                     .then(() =>
                     {
-                        return request.patch('/comment/normal/sub/perm/inherited/1')
+                        return request.patch('/comment/normal/sub/perm/inherited/6')
                             .set('Accept', 'application/json')
                             .send(newEdit)
                             .then((response) =>
@@ -471,7 +535,7 @@ describe("Comment API ('/comment')", () =>
 
                                 expect(comment).to.have.property('title', newEdit.title);
                                 expect(comment).to.have.property('body', newEdit.body);
-                                expect(comment).to.have.property('account_id', 3);
+                                expect(comment).to.have.property('account_id', 5);
                             });
                     });
             });
