@@ -303,7 +303,7 @@ describe("Wiki API ('/wiki')", () =>
         });
     });
 
-    describe('PUT /wiki/:path', () =>
+    describe('POST /wiki/:path', () =>
     {
         it('logged in users can create new pages', () =>
         {
@@ -313,7 +313,7 @@ describe("Wiki API ('/wiki')", () =>
                 .then((user) => app.set('user', user))
                 .then(() =>
                 {
-                    return request.put('/wiki/bar')
+                    return request.post('/wiki/bar')
                         .set('Accept', 'application/json')
                         .send(newPage)
                         .then((response) =>
@@ -372,7 +372,7 @@ describe("Wiki API ('/wiki')", () =>
             const newPage = { path: "/bar", title: "Bar Page", body: "The bar page." };
             app.set('user', null);
 
-            return request.put('/wiki/bar')
+            return request.post('/wiki/bar')
                 .set('Accept', 'application/json')
                 .send(newPage)
                 .catch(({ response }) => response)
@@ -386,7 +386,7 @@ describe("Wiki API ('/wiki')", () =>
         {
             const newPage = { path: "/normal", title: "Bar Page", body: "The bar page." };
 
-            return request.put('/wiki/normal')
+            return request.post('/wiki/normal')
                 .set('Accept', 'application/json')
                 .send(newPage)
                 .catch(({ response }) => response)
@@ -406,7 +406,7 @@ describe("Wiki API ('/wiki')", () =>
                     .then((user) => app.set('user', user))
                     .then(() =>
                     {
-                        return request.put('/wiki/normal/sub/perm/bar')
+                        return request.post('/wiki/normal/sub/perm/bar')
                             .set('Accept', 'application/json')
                             .send(newPage)
                             .catch(({ response }) => response)
@@ -416,7 +416,7 @@ describe("Wiki API ('/wiki')", () =>
                             .then(() => accountMan.getAccountByUsername('specialUser').then((user) => app.set('user', user)))
                             .then(() =>
                             {
-                                return request.put('/wiki/normal/sub/perm/bar')
+                                return request.post('/wiki/normal/sub/perm/bar')
                                     .set('Accept', 'application/json')
                                     .send(newPage)
                                     .then((response) =>
@@ -473,7 +473,7 @@ describe("Wiki API ('/wiki')", () =>
         });
     });
 
-    describe('POST /wiki/:path', () =>
+    describe('PATCH /wiki/:path', () =>
     {
         it('editing a page generates a new revision', () =>
         {
@@ -487,7 +487,7 @@ describe("Wiki API ('/wiki')", () =>
                     // We need to save the current revision number to save this correctly.
                     newEdit.revision_id = page.revision_id;
 
-                    return request.post('/wiki/normal')
+                    return request.patch('/wiki/normal')
                         .set('Accept', 'application/json')
                         .send(newEdit)
                         .then((response) =>
@@ -528,7 +528,7 @@ describe("Wiki API ('/wiki')", () =>
         it('edits are refused if other edits have happened since this edit was started', () =>
         {
             const newEdit = { title: 'Edited Title', body: 'This is an edited page.', revision_id: 1 };
-            return request.post('/wiki/normal')
+            return request.patch('/wiki/normal')
                 .set('Accept', 'application/json')
                 .send(newEdit)
                 .catch(({ response }) => response)
@@ -541,7 +541,7 @@ describe("Wiki API ('/wiki')", () =>
         it("editing a page that doesn't exist returns a 404", () =>
         {
             const newEdit = { title: 'Edited Title', body: 'This is an edited page.', revision_id: 1 };
-            return request.post('/wiki/dne')
+            return request.patch('/wiki/dne')
                 .set('Accept', 'application/json')
                 .send(newEdit)
                 .catch(({ response }) => response)
@@ -560,7 +560,7 @@ describe("Wiki API ('/wiki')", () =>
                     .then((user) => app.set('user', user))
                     .then(() =>
                     {
-                        return request.post('/wiki/perm')
+                        return request.patch('/wiki/perm')
                             .set('Accept', 'application/json')
                             .send(newEdit)
                             .catch(({ response }) => response)
@@ -581,7 +581,7 @@ describe("Wiki API ('/wiki')", () =>
                                 // We need to save the current revision number to save this correctly.
                                 newEdit.revision_id = page.revision_id;
 
-                                return request.post('/wiki/perm')
+                                return request.patch('/wiki/perm')
                                     .set('Accept', 'application/json')
                                     .send(newEdit)
                                     .then((response) =>
@@ -607,7 +607,7 @@ describe("Wiki API ('/wiki')", () =>
                     .then((user) => app.set('user', user))
                     .then(() =>
                     {
-                        return request.post('/wiki/normal/sub/perm/inherited')
+                        return request.patch('/wiki/normal/sub/perm/inherited')
                             .set('Accept', 'application/json')
                             .send(newEdit)
                             .catch(({ response }) => response)
@@ -628,7 +628,7 @@ describe("Wiki API ('/wiki')", () =>
                                 // We need to save the current revision number to save this correctly.
                                 newEdit.revision_id = page.revision_id;
 
-                                return request.post('/wiki/normal/sub/perm/inherited')
+                                return request.patch('/wiki/normal/sub/perm/inherited')
                                     .set('Accept', 'application/json')
                                     .send(newEdit)
                                     .then((response) =>
