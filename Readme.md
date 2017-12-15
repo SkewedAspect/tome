@@ -12,7 +12,7 @@ Most of these are planned, any that have been checked off have been implemented.
 * [X] Server
     * [X] Hierarchical wiki pages
     * [X] Hierarchical wiki page permissions
-    * [ ] Comments on pages
+    * [X] Comments on pages
     * [X] Page History
     * [X] Full Text Search
 * [ ] UI
