@@ -13,7 +13,10 @@
 
 <style lang="scss">
 	#app {
-		padding-top: 116px;
+		height: 100%;
+		overflow: auto;
+		margin-top: 100px;
+		padding-top: 10px;
 	}
 </style>
 

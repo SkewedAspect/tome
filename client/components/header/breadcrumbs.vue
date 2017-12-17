@@ -17,7 +17,7 @@
 				</b-btn>
 			</b-button-group>
 		</b-button-toolbar>
-		<b-breadcrumb id="site-breadcrumb-bar" :items="[{ text: 'Foo' }, { text: 'Bar' }, { text: 'Baz' }]"/>
+		<b-breadcrumb id="site-breadcrumb-bar" class="mb-0" :items="[{ text: 'Foo' }, { text: 'Bar' }, { text: 'Baz' }]"/>
     </div>
 </template>
 
