@@ -117,7 +117,7 @@ if(process.env.NODE_ENV === 'production')
 
         // Uglify the source code
         new webpack.optimize.UglifyJsPlugin({
-            sourceMap: true,
+            sourceMap: false,
             compress: {
                 warnings: false
             }

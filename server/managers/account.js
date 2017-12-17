@@ -16,6 +16,11 @@ class AccountManager
         return accountRA.getAccounts();
     } // end getAllAccounts
 
+    getAccount(idObj)
+    {
+        return accountRA.getAccount(idObj);
+    } // end getAccount
+
     getAccountByID(accountID)
     {
         return accountRE.validateGetAccountBy('account_id', accountID)

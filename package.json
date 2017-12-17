@@ -12,6 +12,7 @@
   "dependencies": {
     "bluebird": "^3.4.3",
     "body-parser": "^1.15.2",
+    "bootstrap": "4.0.0-beta.2",
     "chai": "^4.1.2",
     "chai-http": "^3.0.0",
     "codemirror": "^5.26.0",
@@ -28,11 +29,17 @@
     "passport": "^0.4.0",
     "passport-google-oauth20": "^1.0.0",
     "passport-google-web": "^1.0.0",
+    "rxjs": "^5.5.5",
     "sqlite3": "^3.1.13",
     "trivial-logging": "^1.2.0",
-    "trivialperms": "^1.0.0-rc.4"
+    "trivialperms": "^1.0.0-rc.4",
+    "vue-rx": "^5.0.0"
   },
   "devDependencies": {
+    "@fortawesome/fontawesome": "^1.0.1",
+    "@fortawesome/fontawesome-free-brands": "^5.0.1",
+    "@fortawesome/fontawesome-pro-solid": "^5.0.1",
+    "@fortawesome/vue-fontawesome": "^0.0.21",
     "autoprefixer": "^7.1.1",
     "axios": "^0.17.1",
     "babel-core": "^6.26.0",
@@ -45,6 +52,7 @@
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-webpack": "^3.0.2",
+    "jquery": "^3.2.1",
     "marked": "^0.3.6",
     "node-sass": "^4.6.0",
     "postcss-loader": "^2.0.8",
@@ -55,6 +63,7 @@
     "vue-cm": "^1.1.0",
     "vue-loader": "^13.5.0",
     "vue-router": "^3.0.1",
+    "vue-template-compiler": "^2.5.11",
     "webpack": "^3.8.1",
     "webpack-dev-server": "^2.9.4"
   }

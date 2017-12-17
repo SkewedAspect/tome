@@ -74,6 +74,27 @@ class DatabaseManager
             if(this.dbConfig.client === 'sqlite3')
             {
                 this.dbConfig.connection.filename = appMan.getRootPath(this.dbConfig.connection.filename);
+
+                if(this.dbConfig.traceQueries)
+                {
+                    const afterCreate = _.get(this.dbConfig, 'pool.afterCreate');
+                    _.set(this.dbConfig, 'pool.afterCreate', function(db, done)
+                    {
+                        // Turn on tracing
+                        db.on('trace', (queryString) => {
+                            logger.debug('QUERY TRACE:', queryString);
+                        });
+
+                        if(_.isFunction(afterCreate))
+                        {
+                            afterCreate(db, done);
+                        }
+                        else
+                        {
+                            done(null, db);
+                        } // end if
+                    });
+                } // end if
             } // end if
 
             // Setup the database

@@ -1,28 +1,32 @@
 //----------------------------------------------------------------------------------------------------------------------
-// BaseService
+// AuthResourceAccess
 //
 // @module
 //----------------------------------------------------------------------------------------------------------------------
 
-import Vue from 'vue';
-import stateSvc from './state';
+import $http from 'axios';
+
+// Models
+import AccountModel from '../models/account';
 
 //----------------------------------------------------------------------------------------------------------------------
 
-class BaseService {
-    defineProperty(propName, defaultVal)
+class AuthResourceAccess
+{
+    completeSignIn(idToken)
     {
-        stateSvc.state[propName] = defaultVal;
+        return $http.post('/auth/google', { idToken })
+            .then(({ data }) => new AccountModel(data));
+    } // end completeSignIn
 
-        Object.defineProperty(this, propName, {
-            get: function(){ return stateSvc.state[propName]; },
-            set: function(val){ Vue.set(stateSvc.state, propName, val); }
-        });
-    } // end defineProperty
-} // end BaseService
+    signOut()
+    {
+        return $http.post('/auth/logout');
+    } // end signOut
+} // end AuthResourceAccess
 
 //----------------------------------------------------------------------------------------------------------------------
 
-export default BaseService;
+export default new AuthResourceAccess();
 
 //----------------------------------------------------------------------------------------------------------------------

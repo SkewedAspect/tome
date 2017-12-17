@@ -11,8 +11,20 @@ window.Promise = Promise;
 //----------------------------------------------------------------------------------------------------------------------
 
 import Vue from 'vue';
-import VueMaterial from 'vue-material';
 import VueRouter from 'vue-router';
+import BootstrapVue from 'bootstrap-vue'
+
+// VueRX
+import VueRx from 'vue-rx'
+import { Observable } from 'rxjs/Observable'
+import { Subscription } from 'rxjs/Subscription'
+import { Subject } from 'rxjs/Subject'
+
+// Font Awesome
+import fontawesome from '@fortawesome/fontawesome'
+import faBrands from '@fortawesome/fontawesome-free-brands'
+import faSolid from '@fortawesome/fontawesome-pro-solid'
+import FontAwesomeIcon from '@fortawesome/vue-fontawesome';
 
 import pkg from '../package.json';
 
@@ -21,36 +33,33 @@ import AppComponent from './app.vue';
 
 // Pages
 import WikiPage from './pages/wiki/wiki.vue';
-import SettingsPage from './pages/settings.vue';
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Vue Material
+// VueRX
 // ---------------------------------------------------------------------------------------------------------------------
 
-Vue.use(VueMaterial);
-
-Vue.material.registerTheme({
-    default: {
-        primary: {
-            color: 'light-blue',
-            hue: 800
-        },
-        accent: 'purple'
-    },
-    secondary: {
-        primary: {
-            color: 'light-blue',
-            hue: 500
-        },
-        accent: 'purple'
-    },
-    settings: {
-        primary: 'grey',
-        accent: 'blue'
-    }
+Vue.use(VueRx, {
+    Observable,
+    Subscription,
+    Subject
 });
 
-Vue.material.setCurrentTheme('default');
+// ---------------------------------------------------------------------------------------------------------------------
+// Font Awesome
+// ---------------------------------------------------------------------------------------------------------------------
+
+fontawesome.library.add(faBrands, faSolid);
+Vue.component(FontAwesomeIcon.name, FontAwesomeIcon);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Bootstrap Vue
+// ---------------------------------------------------------------------------------------------------------------------
+
+import './scss/theme.scss';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+
+Vue.use(BootstrapVue);
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // Vue Router
@@ -64,7 +73,7 @@ const router = new VueRouter({
         { path: '/', redirect: '/wiki' },
         { path: '/wiki', component: WikiPage },
         { path: '/wiki/*', component: WikiPage },
-        { path: '/settings', component: SettingsPage },
+        { path: '/auth/logout', redirect: '/wiki' }
     ]
 });
 

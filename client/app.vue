@@ -13,7 +13,7 @@
 
 <style lang="scss">
 	#app {
-		height: calc(100% - 64px);
+		padding-top: 116px;
 	}
 </style>
 
@@ -22,24 +22,14 @@
 <script>
 	//------------------------------------------------------------------------------------------------------------------
 
-	// Services
-	import stateSvc from './services/state';
-
 	// Components
-	import SiteHeader from './components/header.vue';
+	import SiteHeader from './components/header/header.vue';
 
 	//------------------------------------------------------------------------------------------------------------------
 
 	export default {
 		components: {
-			siteHeader: SiteHeader
-		},
-		data()
-		{
-			return { state: stateSvc.state };
-		},
-		provide: {
-			state: stateSvc.state
+			SiteHeader
 		}
 	}
 </script>

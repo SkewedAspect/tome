@@ -3,45 +3,14 @@
 <!--------------------------------------------------------------------------------------------------------------------->
 
 <template>
-	<div id="wiki-page">
-		<!-- Breadcrumb and Action Bar -->
-		<md-toolbar class="md-dense" md-theme="secondary">
-			<breadcrumbs :path="$route.path" theme="secondary"></breadcrumbs>
-			<div class="action-bar">
-				<md-button v-if="!editing" class="md-icon-button">
-					<md-icon>insert_comment</md-icon>
-				</md-button>
-
-				<md-button v-if="editing" @click="cancel()">Cancel</md-button>
-			</div>
-		</md-toolbar>
-
-		<!-- Page Content -->
-		<page-edit v-if="editing" :page="page"></page-edit>
-		<page-display :page="page" @edit="edit()" v-else></page-display>
-
-		<!-- Main Page Action -->
-		<md-button v-if="editing" class="md-fab md-fab-bottom-right md-primary" @click="save()">
-			<md-icon>save</md-icon>
-		</md-button>
-		<md-button class="md-fab md-fab-bottom-right" @click="edit()" v-else>
-			<md-icon>edit</md-icon>
-		</md-button>
-	</div>
+	<b-container id="wiki-page" v-html="page">
+	</b-container>
 </template>
 
 <!--------------------------------------------------------------------------------------------------------------------->
 
 <style lang="scss">
 	#wiki-page {
-		.md-fab {
-			position: fixed;
-		}
-
-		.action-bar {
-            flex: 1;
-			text-align: right;
-		}
 	}
 </style>
 
@@ -51,60 +20,84 @@
 	//------------------------------------------------------------------------------------------------------------------
 
 	import _ from 'lodash';
-
-	import pageSvc from '../../services/wikiPage';
-
-	import Breadcrumbs from '../../components/breadcrumbs.vue';
-	import PageDisplay from './components/display.vue';
-	import PageEdit from './components/edit.vue';
+	import marked from 'marked';
 
 	//------------------------------------------------------------------------------------------------------------------
 
     export default {
 		components: {
-			Breadcrumbs,
-			PageDisplay,
-			PageEdit
 		},
-		inject: ['state'],
-		computed: {
-		    page(){ return this.state.currentPage; }
+		computed:
+		{
+			page()
+			{
+				return marked(this.fakePage);
+			}
 		},
         data()
         {
             return {
-				editing: false,
+            	fakePage: "Congratulations, you've successfully setup your Tome wiki!\n" +
+				"\n" +
+				"Here is some markdown examples to get you started:\n" +
+				"\n" +
+				"---\n" +
+				"\n" +
+				"# h1 Heading\n" +
+				"## h2 Heading\n" +
+				"### h3 Heading\n" +
+				"#### h4 Heading\n" +
+				"##### h5 Heading\n" +
+				"###### h6 Heading\n" +
+				"\n" +
+				"\n" +
+				"## Emphasis\n" +
+				"\n" +
+				"**This is bold text**\n" +
+				"\n" +
+				"__This is bold text__\n" +
+				"\n" +
+				"*This is italic text*\n" +
+				"\n" +
+				"_This is italic text_\n" +
+				"\n" +
+				"~~Strikethrough~~\n" +
+				"\n" +
+				"\n" +
+				"## Blockquotes\n" +
+				"\n" +
+				"> Blockquotes can also be nested...\n" +
+				">> ...by using additional greater-than signs right next to each other...\n" +
+				"> > > ...or with spaces between arrows.\n" +
+				"\n" +
+				"\n" +
+				"## Lists\n" +
+				"\n" +
+				"Unordered\n" +
+				"\n" +
+				"+ Create a list by starting a line with `+`, `-`, or `*`\n" +
+				"+ Sub-lists are made by indenting 2 spaces:\n" +
+				"  - Marker character change forces new list start:\n" +
+				"    * Ac tristique libero volutpat at\n" +
+				"    + Facilisis in pretium nisl aliquet\n" +
+				"    - Nulla volutpat aliquam velit\n" +
+				"+ Very easy!\n" +
+				"\n" +
+				"Ordered\n" +
+				"\n" +
+				"1. Lorem ipsum dolor sit amet\n" +
+				"2. Consectetur adipiscing elit\n" +
+				"3. Integer molestie lorem at massa\n" +
+				"\n" +
+				"\n" +
+				"1. You can use sequential numbers...\n" +
+				"1. ...or keep all the numbers as `1.`\n" +
+				"\n" +
+				"Start numbering with offset:\n" +
+				"\n" +
+				"57. foo\n" +
+				"1. bar"
 			};
-		},
-		methods: {
-			loadPage()
-			{
-				this.editing = false;
-				const path = this.$route.path.replace(/^\/wiki/, '') || '/';
-
-				return pageSvc.loadPage(path);
-			},
-			edit()
-			{
-			    this.editing = true;
-			},
-			save()
-			{
-			    //TODO: Actually save!
-			    this.editing = false;
-			},
-			cancel()
-			{
-			    this.page.revert();
-				this.editing = false;
-			}
-		},
-		watch: {
-			'$route': 'loadPage'
-		},
-		created()
-		{
-			this.loadPage();
 		}
     }
 </script>

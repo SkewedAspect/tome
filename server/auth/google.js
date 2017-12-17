@@ -13,6 +13,8 @@ const serialization = require('./serialization');
 const accountMan = require('../managers/account');
 const configMan = require('../managers/config');
 
+const { NotFound } = require('../errors');
+
 const logging = require('trivial-logging');
 const logger = logging.loggerFor(module);
 
@@ -20,29 +22,34 @@ const logger = logging.loggerFor(module);
 
 passport.use(new GoogleStrategy((token, profile, done) =>
     {
-        return accountMan.getAccountByGoogleID(profile.id)
+        const accountDef = {
+            google_id: profile.id,
+            avatar: profile.picture,
+            email: profile.email,
+            username: profile.name,
+            full_name: profile.givenName
+        };
+
+        return accountMan.getAccount(accountDef)
             .then((account) =>
             {
-                if(account)
+                return accountMan.updateAccount(_.merge(account, accountDef));
+            })
+            .catch({ code: 'ERR_NOT_FOUND' }, () =>
+            {
+                if(configMan.get('allowRegistration', true))
                 {
-                    return account;
+                    return accountMan.createAccount({
+                            google_id: profile.id,
+                            avatar: profile.picture,
+                            email: profile.email,
+                            username: profile.name,
+                            full_name: profile.givenName
+                        });
                 }
                 else
                 {
-                    if(configMan.get('allowRegistration', true))
-                    {
-                        return accountMan.createAccount({
-                                google_id: profile.id,
-                                avatar: profile.picture,
-                                email: profile.email,
-                                username: profile.name,
-                                full_name: profile.givenName
-                            });
-                    }
-                    else
-                    {
-                        throw new Error('User not found.');
-                    } // end if
+                    throw new NotFound('User not found.');
                 } // end if
             })
             .then((account) =>

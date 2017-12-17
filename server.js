@@ -63,14 +63,14 @@ const loading = dbMan.getDB()
     .then((db) =>
     {
         const store = new KnexSessionStore({
-            sidfieldname: config.key || 'sid',
+            sidfieldname: config.key || 'tome_session',
             knex: db,
             createTable: true
         });
 
         app.use(session({
             secret: config.secret || 'nosecret',
-            key: config.key || 'sid',
+            key: config.key || 'tome_session',
             resave: false,
             store,
 
