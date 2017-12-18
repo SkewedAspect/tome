@@ -26,7 +26,6 @@ passport.use(new GoogleStrategy((token, profile, done) =>
             google_id: profile.id,
             avatar: profile.picture,
             email: profile.email,
-            username: profile.name,
             full_name: profile.givenName
         };
 
@@ -39,13 +38,8 @@ passport.use(new GoogleStrategy((token, profile, done) =>
             {
                 if(configMan.get('allowRegistration', true))
                 {
-                    return accountMan.createAccount({
-                            google_id: profile.id,
-                            avatar: profile.picture,
-                            email: profile.email,
-                            username: profile.name,
-                            full_name: profile.givenName
-                        });
+                    accountDef.username = accountDef.email.split('@')[0];
+                    return accountMan.createAccount(accountDef);
                 }
                 else
                 {
