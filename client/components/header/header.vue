@@ -19,7 +19,6 @@
                     <b-nav-form>
 						<login></login>
                     </b-nav-form>
-
                 </b-navbar-nav>
             </b-collapse>
         </b-navbar>

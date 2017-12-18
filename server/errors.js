@@ -6,13 +6,13 @@
 
 class AppError extends Error
 {
-    constructor (message, code)
+    constructor (message, code, name)
     {
         // Calling parent constructor of base Error class.
         super(message);
 
         // Saving class name in the property of our custom error as a shortcut.
-        this.name = this.constructor.name;
+        this.name = name || this.constructor.name;
 
         // Capturing stack trace, excluding constructor call from it.
         Error.captureStackTrace(this, this.constructor);
@@ -20,6 +20,11 @@ class AppError extends Error
         // Set a code property to allow the error to be easily identified. This is in keeping with current nodejs.
         this.code = !!code ? code : 'ERR_APPLICATION_ERROR';
     } // end constructor
+
+    static fromJSON({ name, message, code })
+    {
+        return new AppError(message, code, name);
+    } // end fromJSON
 
     toJSON()
     {

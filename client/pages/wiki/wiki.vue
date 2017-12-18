@@ -3,7 +3,28 @@
 <!--------------------------------------------------------------------------------------------------------------------->
 
 <template>
-	<b-container id="wiki-page" v-html="page">
+	<b-container id="wiki-page">
+		<div v-if="loading">
+			<h4 class="text-center">Loading...</h4>
+			<b-progress :value="100" variant="primary" :animated="true"></b-progress>
+		</div>
+		<div v-else-if="notFound">
+			<h4 class="text-center">Page Not Found</h4>
+			<p class="text-center">
+				The page at path <code>{{ path }}</code> was not found. Would you like to
+				<a href="#">create it</a>?
+			</p>
+		</div>
+		<div v-else-if="errorMessage">
+			<h4 class="text-center">Page Error</h4>
+			<p class="text-center">
+				The page at path <code>{{ path }}</code> encountered an error while loading:
+			</p>
+            <b-alert show variant="danger">
+                <pre class="mb-0"><code>{{ errorMessage }}</code></pre>
+            </b-alert>
+		</div>
+		<page-display v-else></page-display>
 	</b-container>
 </template>
 
@@ -20,84 +41,65 @@
 	//------------------------------------------------------------------------------------------------------------------
 
 	import _ from 'lodash';
-	import marked from 'marked';
+
+	// Managers
+	import pageMan from '../../api/managers/page';
+
+	// Components
+	import PageDisplay from './components/pageDisplay.vue';
 
 	//------------------------------------------------------------------------------------------------------------------
 
     export default {
 		components: {
+			PageDisplay
 		},
-		computed:
+		data()
 		{
-			page()
-			{
-				return marked(this.fakePage);
-			}
-		},
-        data()
-        {
-            return {
-            	fakePage: "Congratulations, you've successfully setup your Tome wiki!\n" +
-				"\n" +
-				"Here is some markdown examples to get you started:\n" +
-				"\n" +
-				"---\n" +
-				"\n" +
-				"# h1 Heading\n" +
-				"## h2 Heading\n" +
-				"### h3 Heading\n" +
-				"#### h4 Heading\n" +
-				"##### h5 Heading\n" +
-				"###### h6 Heading\n" +
-				"\n" +
-				"\n" +
-				"## Emphasis\n" +
-				"\n" +
-				"**This is bold text**\n" +
-				"\n" +
-				"__This is bold text__\n" +
-				"\n" +
-				"*This is italic text*\n" +
-				"\n" +
-				"_This is italic text_\n" +
-				"\n" +
-				"~~Strikethrough~~\n" +
-				"\n" +
-				"\n" +
-				"## Blockquotes\n" +
-				"\n" +
-				"> Blockquotes can also be nested...\n" +
-				">> ...by using additional greater-than signs right next to each other...\n" +
-				"> > > ...or with spaces between arrows.\n" +
-				"\n" +
-				"\n" +
-				"## Lists\n" +
-				"\n" +
-				"Unordered\n" +
-				"\n" +
-				"+ Create a list by starting a line with `+`, `-`, or `*`\n" +
-				"+ Sub-lists are made by indenting 2 spaces:\n" +
-				"  - Marker character change forces new list start:\n" +
-				"    * Ac tristique libero volutpat at\n" +
-				"    + Facilisis in pretium nisl aliquet\n" +
-				"    - Nulla volutpat aliquam velit\n" +
-				"+ Very easy!\n" +
-				"\n" +
-				"Ordered\n" +
-				"\n" +
-				"1. Lorem ipsum dolor sit amet\n" +
-				"2. Consectetur adipiscing elit\n" +
-				"3. Integer molestie lorem at massa\n" +
-				"\n" +
-				"\n" +
-				"1. You can use sequential numbers...\n" +
-				"1. ...or keep all the numbers as `1.`\n" +
-				"\n" +
-				"Start numbering with offset:\n" +
-				"\n" +
-				"57. foo\n" +
-				"1. bar"
+			return {
+				loading: true,
+				notFound: false,
+				errorMessage: undefined
 			};
+		},
+		computed: {
+			path()
+			{
+				let path = _.get(this.$route, 'params[0]', '/');
+				if(path.length > 1)
+				{
+					if(path[0] !== '/')
+					{
+						path = `/${ path }`;
+					} // end if
+
+					if(path.substr(-1) === '/')
+					{
+						path = path.substr(0, path.length - 1);
+					} // end if
+				} // end if
+
+				return path
+			},
+		},
+		mounted()
+		{
+			pageMan.selectPage(this.path)
+				.catch({ code: 'ERR_NOT_FOUND' }, () =>
+				{
+					this.loading = false;
+					this.notFound = true;
+				})
+				.catch((error) =>
+				{
+					this.loading = false;
+					this.errorMessage = error.message;
+					console.error('Error loading page:', error);
+				})
+				.then(() =>
+				{
+					this.loading = false;
+				});
 		}
     }
 </script>

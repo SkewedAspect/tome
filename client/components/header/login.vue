@@ -70,10 +70,7 @@
 			loading(){ return this.authStatus === 'signing in'; },
 		},
 		methods: {
-			signOut()
-			{
-				return authMan.signOut();
-			}
+			signOut(){ return authMan.signOut(); }
 		},
 		mounted()
 		{
