@@ -15,6 +15,15 @@
 				<a href="#">create it</a>?
 			</p>
 		</div>
+		<div v-else-if="noPerm">
+			<h4 class="text-center">Page Permissions Error</h4>
+			<b-alert v-if="account" show variant="danger" class="text-center">
+				The user <code>{{ account.username }}</code> does not have permission to view the page at path <code>{{ path }}</code>.
+			</b-alert>
+			<b-alert v-else show variant="danger" class="text-center">
+				The user <code>anonymous</code> does not have permission to view the page at path <code>{{ path }}</code>.
+			</b-alert>
+		</div>
 		<div v-else-if="errorMessage">
 			<h4 class="text-center">Page Error</h4>
 			<p class="text-center">
@@ -43,6 +52,7 @@
 	import _ from 'lodash';
 
 	// Managers
+	import authMan from '../../api/managers/auth';
 	import pageMan from '../../api/managers/page';
 
 	// Components
@@ -59,6 +69,7 @@
 			return {
 				loading: true,
 				notFound: false,
+				noPerm: false,
 				errorMessage: undefined
 			};
 		},
@@ -66,40 +77,55 @@
 			path()
 			{
 				let path = _.get(this.$route, 'params[0]', '/');
-				if(path.length > 1)
-				{
-					if(path[0] !== '/')
-					{
-						path = `/${ path }`;
-					} // end if
-
-					if(path.substr(-1) === '/')
-					{
-						path = path.substr(0, path.length - 1);
-					} // end if
-				} // end if
-
-				return path
+				return pageMan.normalizePath(path);
 			},
+		},
+		methods: {
+			selectPage()
+			{
+				return pageMan.selectPage(this.path)
+					.catch({ code: 'ERR_NOT_FOUND' }, () =>
+					{
+						this.loading = false;
+						this.notFound = true;
+					})
+					.catch({ code: 'ERR_PERMISSION' }, () =>
+					{
+						this.loading = false;
+						this.noPerm = true;
+					})
+					.catch((error) =>
+					{
+						this.loading = false;
+						this.errorMessage = error.message;
+						console.error('Error loading page:', error);
+					})
+					.then(() =>
+					{
+						this.loading = false;
+					});
+			},
+			clearPageVars()
+			{
+				this.loading = true;
+				this.notFound = false;
+				this.noPerm = false;
+				this.errorMessage = undefined;
+			}
+		},
+		watch: {
+			'$route'(to, from)
+			{
+				this.clearPageVars();
+				this.selectPage();
+			}
+		},
+		subscriptions: {
+			account: authMan.account$
 		},
 		mounted()
 		{
-			pageMan.selectPage(this.path)
-				.catch({ code: 'ERR_NOT_FOUND' }, () =>
-				{
-					this.loading = false;
-					this.notFound = true;
-				})
-				.catch((error) =>
-				{
-					this.loading = false;
-					this.errorMessage = error.message;
-					console.error('Error loading page:', error);
-				})
-				.then(() =>
-				{
-					this.loading = false;
-				});
+			this.selectPage();
 		}
     }
 </script>

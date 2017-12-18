@@ -17,7 +17,7 @@
 				</b-btn>
 			</b-button-group>
 		</b-button-toolbar>
-		<b-breadcrumb id="site-breadcrumb-bar" class="mb-0" :items="[{ text: 'Foo' }, { text: 'Bar' }, { text: 'Baz' }]"/>
+		<b-breadcrumb id="site-breadcrumb-bar" class="mb-0" :items="breadcrumbs"/>
     </div>
 </template>
 
@@ -45,7 +45,11 @@
 <script>
     //------------------------------------------------------------------------------------------------------------------
 
-    // Imports go here
+	import _ from 'lodash';
+
+    // Managers
+	import authMan from '../../api/managers/auth';
+	import pageMan from '../../api/managers/page';
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -55,7 +59,31 @@
             return {
                 // Data goes here
             };
-        }
+        },
+		computed: {
+            path()
+            {
+                let path = _.get(this.$route, 'params[0]', '/');
+                return pageMan.normalizePath(path);
+            },
+        	breadcrumbs()
+			{
+				let breadcrumbs = [{ text: 'wiki', to: { path: '/wiki' } }];
+                let crumbPath = '/wiki';
+                const pathCrumbs = _.compact(this.path.split('/'));
+                _.each(pathCrumbs, (crumb) =>
+                {
+                    crumbPath += `/${ crumb }`;
+                    breadcrumbs.push({ text: crumb, to: { path: crumbPath } });
+                });
+
+				return breadcrumbs;
+			}
+		},
+		subscriptions: {
+        	account: authMan.account$,
+			page: pageMan.currentPage$
+		}
     }
 </script>
 

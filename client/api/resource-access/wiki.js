@@ -40,7 +40,7 @@ class WikiResourceAccess
                 } // end if
             })
             .then(({ data }) => data)
-            .tap((pageDef) =>
+            .then((pageDef) =>
             {
                 let pageInst = this.$pages[path];
                 if(pageInst)
@@ -52,6 +52,8 @@ class WikiResourceAccess
                     pageInst = new PageModel(pageDef);
                     this.$pages[path] = pageInst;
                 } // end if
+
+                return pageInst;
             });
     } // end getPage
 } // end WikiResourceAccess
