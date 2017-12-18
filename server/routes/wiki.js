@@ -73,7 +73,7 @@ router.get('*', (request, response) =>
             const path = getPath(req);
 
             return wikiMan.getPage(path)
-                .tap((page) =>
+                .then((page) =>
                 {
                     const user = getUser(req);
                     const viewPerm = `wikiView/${ page.actions.wikiView }`;
@@ -93,6 +93,10 @@ router.get('*', (request, response) =>
                             code: 'ERR_NOT_FOUND',
                             message: `No page found for path '${ path }'.`
                         });
+                    }
+                    else
+                    {
+                        return page;
                     } // end if
                 })
                 .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
