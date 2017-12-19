@@ -15,7 +15,10 @@ class AppError extends Error
         this.name = name || this.constructor.name;
 
         // Capturing stack trace, excluding constructor call from it.
-        Error.captureStackTrace(this, this.constructor);
+        if(Error.captureStackTrace)
+        {
+            Error.captureStackTrace(this, this.constructor);
+        } // end if
 
         // Set a code property to allow the error to be easily identified. This is in keeping with current nodejs.
         this.code = !!code ? code : 'ERR_APPLICATION_ERROR';
