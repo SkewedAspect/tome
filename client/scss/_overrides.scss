@@ -2,6 +2,15 @@
 // Overrides
 //----------------------------------------------------------------------------------------------------------------------
 
-// Nothing here, yet.
+// Original Bootstrap's css depended on an empty href to style cursors for several components. This cases unwanted
+// route changes, so we fix this with css.
+.nav,
+.pagination,
+.carousel,
+.panel-title,
+a,
+.btn {
+	cursor: pointer;
+}
 
 //----------------------------------------------------------------------------------------------------------------------

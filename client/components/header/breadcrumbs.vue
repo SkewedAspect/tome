@@ -3,7 +3,7 @@
 <!--------------------------------------------------------------------------------------------------------------------->
 
 <template>
-    <div class="breadcrumb-area">
+    <div v-if="show" class="breadcrumb-area">
 		<b-button-toolbar id="breadcrumb-buttons">
 			<b-button-group class="mx-1" v-if="canView">
 				<b-btn v-if="canModify" variant="link" size="sm">
@@ -91,6 +91,7 @@
 
 				return false;
 			},
+			show(){ return _.includes(['wiki', 'history', 'comments'], this.$route.name); }
 		},
 		subscriptions: {
         	account: authMan.account$,

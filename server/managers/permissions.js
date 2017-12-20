@@ -20,6 +20,16 @@ class PermissionsManager
         });
     } // end constructor
 
+    //------------------------------------------------------------------------------------------------------------------
+    // Public API
+    //------------------------------------------------------------------------------------------------------------------
+
+    getRoles()
+    {
+        return rolesRA.getRoles()
+            .then((roles) => roles || []);
+    } // end getRoles
+
     hasPerm(...args)
     {
         return trivialPerms.hasPerm(...args);
