@@ -1,12 +1,12 @@
 <!--------------------------------------------------------------------------------------------------------------------->
-<!-- breadcrumbs.vue                                                                                                         -->
+<!-- Breadcrumbs Component                                                                                           -->
 <!--------------------------------------------------------------------------------------------------------------------->
 
 <template>
     <div class="breadcrumb-area">
 		<b-button-toolbar id="breadcrumb-buttons">
-			<b-button-group class="mx-1">
-				<b-btn variant="link" size="sm">
+			<b-button-group class="mx-1" v-if="canView">
+				<b-btn v-if="canModify" variant="link" size="sm">
 					<font-awesome-icon icon="edit"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Edit</span>
 				</b-btn>
 				<b-btn variant="link" size="sm">
@@ -54,12 +54,6 @@
     //------------------------------------------------------------------------------------------------------------------
 
     export default {
-        data()
-        {
-            return {
-                // Data goes here
-            };
-        },
 		computed: {
             path()
             {
@@ -78,7 +72,25 @@
                 });
 
 				return breadcrumbs;
-			}
+			},
+			canView()
+			{
+				if(this.page)
+				{
+					return pageMan.canView(this.page);
+				} // end if
+
+				return false;
+			},
+			canModify()
+			{
+				if(this.page)
+				{
+                    return pageMan.canModify(this.page);
+				} // end if
+
+				return false;
+			},
 		},
 		subscriptions: {
         	account: authMan.account$,

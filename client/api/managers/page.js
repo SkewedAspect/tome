@@ -7,6 +7,10 @@
 import Promise from 'bluebird';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
+// Managers
+import authMan from './auth.js';
+import permsMan from './permissions';
+
 // Resource Access
 import wikiRA from '../resource-access/wiki';
 
@@ -69,6 +73,20 @@ class PageManager
             return Promise.resolve(this.currentPage);
         } // end if
     } // end selectPage
+
+    canView(page)
+    {
+        const user = authMan.account || { permissions: [], groups: [] };
+        const viewPerm = `wikiView/${ page.actions.wikiView }`;
+        return viewPerm === 'wikiView/*' || permsMan.hasPerm(user, viewPerm);
+    } // end canView
+
+    canModify(page)
+    {
+        const user = authMan.account || { permissions: [], groups: [] };
+        const viewPerm = `wikiModify/${ page.actions.wikiModify }`;
+        return viewPerm === 'wikiModify/*' || permsMan.hasPerm(user, viewPerm);
+    } // end canModify
 } // end PageManager
 
 //----------------------------------------------------------------------------------------------------------------------
