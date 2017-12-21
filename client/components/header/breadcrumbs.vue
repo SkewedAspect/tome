@@ -6,13 +6,13 @@
     <div v-if="show" class="breadcrumb-area">
 		<b-button-toolbar id="breadcrumb-buttons">
 			<b-button-group class="mx-1" v-if="canView">
-				<b-btn v-if="canModify" variant="link" size="sm">
+				<b-btn v-if="canModify" variant="link" size="sm" :to="{ query: { edit: null } }">
 					<font-awesome-icon icon="edit"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Edit</span>
 				</b-btn>
-				<b-btn variant="link" size="sm">
+				<b-btn variant="link" size="sm" :to="historyLink">
 					<font-awesome-icon icon="history"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">History</span>
 				</b-btn>
-				<b-btn variant="link" size="sm">
+				<b-btn variant="link" size="sm" :to="commentLink">
 					<font-awesome-icon icon="comments"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Comments</span>
 				</b-btn>
 			</b-button-group>
@@ -31,6 +31,14 @@
 			height: 100%;
 			position: absolute;
 			right: 1rem;
+
+			a.btn.btn-link {
+				padding-top: 0.5rem;
+
+				& > * {
+					vertical-align: middle;
+				}
+			}
 		}
 
 		#site-breadcrumb-bar {
@@ -57,9 +65,12 @@
 		computed: {
             path()
             {
-                let path = _.get(this.$route, 'params[0]', '/');
+                let path = _.get(this.$route, 'params.path', '/');
                 return pageMan.normalizePath(path);
             },
+			historyLink(){ return { path: `/history/${ this.$route.params.path }` }; },
+			commentLink(){ return { path: `/comment/${ this.$route.params.path }` }; },
+
         	breadcrumbs()
 			{
 				let breadcrumbs = [{ text: 'wiki', to: { path: '/wiki' } }];
