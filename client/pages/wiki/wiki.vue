@@ -70,13 +70,14 @@
 				loading: true,
 				notFound: false,
 				noPerm: false,
-				errorMessage: undefined
+				errorMessage: undefined,
+				mode: 'display'
 			};
 		},
 		computed: {
 			path()
 			{
-				let path = _.get(this.$route, 'params[0]', '/');
+				let path = _.get(this.$route, 'params.path', '/');
 				return pageMan.normalizePath(path);
 			},
 		},
@@ -116,8 +117,23 @@
 		watch: {
 			'$route'(to, from)
 			{
-				this.clearPageVars();
-				this.selectPage();
+				if(to.path !== from.path)
+				{
+					this.clearPageVars();
+					if(to.name === 'wiki')
+					{
+						this.selectPage();
+					} // end if
+				} // end if
+
+				if(_.includes(_.keys(to.query), 'edit'))
+				{
+					this.mode = 'edit';
+				}
+				else
+				{
+					this.mode = 'display';
+				} // end if
 			}
 		},
 		subscriptions: {
@@ -126,6 +142,15 @@
 		mounted()
 		{
 			this.selectPage();
+
+			if(_.includes(_.keys(this.$route.query), 'edit'))
+			{
+				this.mode = 'edit';
+			}
+			else
+			{
+				this.mode = 'display';
+			} // end if
 		}
     }
 </script>
