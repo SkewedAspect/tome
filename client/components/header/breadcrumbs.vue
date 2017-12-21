@@ -6,8 +6,11 @@
     <div v-if="show" class="breadcrumb-area">
 		<b-button-toolbar id="breadcrumb-buttons">
 			<b-button-group class="mx-1" v-if="canView">
-				<b-btn v-if="canModify" variant="link" size="sm" :to="{ query: { edit: null } }">
+				<b-btn v-if="canModify && !editing" variant="link" size="sm" :to="{ query: { edit: null } }">
 					<font-awesome-icon icon="edit"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Edit</span>
+				</b-btn>
+				<b-btn v-else-if="editing" variant="link" size="sm" :to="{ query: {} }">
+					<font-awesome-icon icon="undo"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Cancel</span>
 				</b-btn>
 				<b-btn variant="link" size="sm" :to="historyLink">
 					<font-awesome-icon icon="history"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">History</span>
@@ -68,6 +71,7 @@
                 let path = _.get(this.$route, 'params.path', '/');
                 return pageMan.normalizePath(path);
             },
+			editing(){ return _.includes(_.keys(this.$route.query), 'edit'); },
 			historyLink(){ return { path: `/history/${ this.$route.params.path }` }; },
 			commentLink(){ return { path: `/comment/${ this.$route.params.path }` }; },
 
