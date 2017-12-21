@@ -71,7 +71,7 @@ const router = new VueRouter({
     mode: 'history',
     routes: [
         { path: '/', redirect: '/wiki/' },
-        { path: '/wiki/*', name: 'wiki', component: WikiPage },
+        { path: '/wiki/:path*', name: 'wiki', component: WikiPage },
         // { path: '*', redirect: '/wiki/' }
     ]
 });
