@@ -303,6 +303,85 @@ describe("Wiki API ('/wiki')", () =>
         });
     });
 
+    describe('OPTIONS /wiki/:path', () =>
+    {
+        it('gives the inherited permissions for any path', () =>
+        {
+            return request.options('/wiki/normal/sub/perm/inherited')
+                .set('Accept', 'application/json')
+                .then((response) =>
+                {
+                    const perms = response.body;
+                    expect(perms).to.be.an('object');
+                    expect(perms).to.not.be.empty;
+
+                    expect(perms).to.have.property('actions');
+
+                    const actions = perms.actions;
+                    expect(actions).to.not.be.empty;
+                    expect(actions).to.have.property('wikiView', 'special');
+                    expect(actions).to.have.property('wikiModify', 'special');
+                })
+                .then(() =>
+                {
+                    return request.options('/wiki/normal/sub/perm/does-not-exist')
+                        .set('Accept', 'application/json')
+                        .then((response) =>
+                        {
+                            const perms = response.body;
+                            expect(perms).to.be.an('object');
+                            expect(perms).to.not.be.empty;
+
+                            expect(perms).to.have.property('actions');
+
+                            const actions = perms.actions;
+                            expect(actions).to.not.be.empty;
+                            expect(actions).to.have.property('wikiView', 'special');
+                            expect(actions).to.have.property('wikiModify', 'special');
+                        });
+                });
+        });
+
+        it('can be called by unauthenticated users', () =>
+        {
+            app.set('user', null);
+
+            return request.options('/wiki/normal/sub/perm/inherited')
+                .set('Accept', 'application/json')
+                .then((response) =>
+                {
+                    const perms = response.body;
+                    expect(perms).to.be.an('object');
+                    expect(perms).to.not.be.empty;
+
+                    expect(perms).to.have.property('actions');
+
+                    const actions = perms.actions;
+                    expect(actions).to.not.be.empty;
+                    expect(actions).to.have.property('wikiView', 'special');
+                    expect(actions).to.have.property('wikiModify', 'special');
+                })
+                .then(() =>
+                {
+                    return request.options('/wiki/normal/sub/perm/does-not-exist')
+                        .set('Accept', 'application/json')
+                        .then((response) =>
+                        {
+                            const perms = response.body;
+                            expect(perms).to.be.an('object');
+                            expect(perms).to.not.be.empty;
+
+                            expect(perms).to.have.property('actions');
+
+                            const actions = perms.actions;
+                            expect(actions).to.not.be.empty;
+                            expect(actions).to.have.property('wikiView', 'special');
+                            expect(actions).to.have.property('wikiModify', 'special');
+                        });
+                });
+        });
+    });
+
     describe('POST /wiki/:path', () =>
     {
         it('logged in users can create new pages', () =>

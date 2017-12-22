@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 const _ = require('lodash');
+const Promise = require('bluebird');
 const express = require('express');
 
 const { interceptHTML, ensureAuthenticated, promisify } = require('./utils');
@@ -109,6 +110,14 @@ router.get('*', (request, response) =>
                 });
         }));
 });
+
+// Yeah, I know I'm abusing `OPTIONS`, but it's the easiest path forward.
+router.options('*', promisify((req, resp) =>
+{
+    const path = getPath(req);
+    return Promise.join(wikiMan.getPermission(path, 'view'), wikiMan.getPermission(path, 'modify'))
+        .then(([viewPerm, modifyPerm]) => ({ actions: { wikiView: viewPerm, wikiModify: modifyPerm } }));
+}));
 
 router.post('*', ensureAuthenticated, promisify((req, resp) =>
 {
