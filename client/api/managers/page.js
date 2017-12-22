@@ -58,6 +58,12 @@ class PageManager
         return path
     } // end normalizePath
 
+    createPage(path)
+    {
+        return wikiRA.createPage(path)
+            .then((page) => this._currentPageSubject.next(page))
+    } // end createPage
+
     selectPage(path)
     {
         if(!this.currentPage || this.currentPage.path !== path)
@@ -74,7 +80,7 @@ class PageManager
         } // end if
     } // end selectPage
 
-    save()
+    savePage()
     {
         return wikiRA.savePage(this.currentPage);
     } // end save

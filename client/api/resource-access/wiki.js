@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 import _ from 'lodash';
+import Promise from 'bluebird';
 import $http from 'axios';
 
 // Models
@@ -21,6 +22,18 @@ class WikiResourceAccess
     {
         this.$pages = {};
     } // end constructor
+
+    createPage(path)
+    {
+        return Promise.resolve(new PageModel({
+            path,
+            title: undefined,
+            body: undefined,
+            created: new Date(),
+            edited: new Date(),
+            actions: { wikiView: '*', wikiModify: '*' }
+        }));
+    } // end createPage
 
     getPage(path)
     {
@@ -59,7 +72,8 @@ class WikiResourceAccess
 
     savePage(page)
     {
-        return $http.patch(`/wiki${ page.path }`, page)
+        const verb = !!page.page_id ? 'patch' : 'post';
+        return $http[verb](`/wiki${ page.path }`, page)
             .then(({ data }) =>
             {
                 page.update(data);

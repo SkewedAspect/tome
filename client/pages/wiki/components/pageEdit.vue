@@ -3,7 +3,7 @@
 <!--------------------------------------------------------------------------------------------------------------------->
 
 <template>
-    <div class="page-edit">
+    <div class="page-edit" v-if="page">
 		<b-form @submit.prevent="save()" @reset.prevent="reset()">
 			<b-form-group id="pageTitleGroup"
 						  label="Title"
@@ -86,7 +86,7 @@
 		methods: {
         	save()
 			{
-				return pageMan.save(this.page)
+				return pageMan.savePage(this.page)
 					.then(() =>
 					{
 						this.$router.push({ query: {} });
@@ -99,7 +99,11 @@
 		},
 		subscriptions: {
 			page: pageMan.currentPage$
-        }
+        },
+		mounted()
+		{
+			console.log("I've been mounted! o.O");
+		}
     }
 </script>
 

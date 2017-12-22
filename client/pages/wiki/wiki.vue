@@ -12,7 +12,7 @@
 			<h4 class="text-center">Page Not Found</h4>
 			<p class="text-center">
 				The page at path <code>{{ path }}</code> was not found. Would you like to
-				<a href="#">create it</a>?
+				<router-link :to="{ query: { edit: null } }">create it</router-link>?
 			</p>
 		</div>
 		<div v-else-if="noPerm">
@@ -91,7 +91,15 @@
 					.catch({ code: 'ERR_NOT_FOUND' }, () =>
 					{
 						this.loading = false;
-						this.notFound = true;
+
+						if(this.mode === 'edit')
+						{
+							return pageMan.createPage(this.path);
+						}
+						else
+						{
+							this.notFound = true;
+						} // end if
 					})
 					.catch({ code: 'ERR_PERMISSION' }, () =>
 					{
@@ -162,15 +170,6 @@
 		watch: {
 			'$route'(to, from)
 			{
-				if(to.path !== from.path)
-				{
-					this.clearPageVars();
-					if(to.name === 'wiki')
-					{
-						this.selectPage();
-					} // end if
-				} // end if
-
 				if(_.includes(_.keys(to.query), 'edit'))
 				{
 					this.mode = 'edit';
@@ -178,6 +177,15 @@
 				else
 				{
 					this.mode = 'display';
+				} // end if
+
+				if(to.path !== from.path || !_.isEqual(to.query, from.query))
+				{
+					this.clearPageVars();
+					if(to.name === 'wiki')
+					{
+						this.selectPage();
+					} // end if
 				} // end if
 			}
 		},
@@ -187,8 +195,6 @@
 		},
 		mounted()
 		{
-			this.selectPage();
-
 			if(_.includes(_.keys(this.$route.query), 'edit'))
 			{
 				this.mode = 'edit';
@@ -197,6 +203,8 @@
 			{
 				this.mode = 'display';
 			} // end if
+
+			this.selectPage();
 		}
     }
 </script>
