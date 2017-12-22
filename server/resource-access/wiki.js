@@ -55,6 +55,7 @@ class WikiResourceAccess
             .distinct()
             .select(`action_${ action } as ${ action }`)
             .whereNot(`action_${ action }`, 'inherit')
+            .orderBy('path', 'desc')
             .limit(1)
             .then(([ permObj ]) => permObj[action]));
     } // end _getPermission
