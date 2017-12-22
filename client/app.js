@@ -26,6 +26,13 @@ import faBrands from '@fortawesome/fontawesome-free-brands'
 import faSolid from '@fortawesome/fontawesome-pro-solid'
 import FontAwesomeIcon from '@fortawesome/vue-fontawesome';
 
+// CodeMirror
+import "codemirror/lib/codemirror.css";
+
+// Highlight JS
+import "highlightjs/styles/github.css";
+
+// Package.json
 import pkg from '../package.json';
 
 // Views
@@ -73,7 +80,18 @@ const router = new VueRouter({
         { path: '/', redirect: '/wiki/' },
         { path: '/wiki/:path*', name: 'wiki', component: WikiPage },
         // { path: '*', redirect: '/wiki/' }
-    ]
+    ],
+    // scrollBehavior(to, from, savedPosition)
+    // {
+    //     console.log('sup??');
+    //     if(to.hash)
+    //     {
+    //         return {
+    //             selector: to.hash
+    //             // , offset: { x: 0, y: 10 }
+    //         };
+    //     } // ed if
+    // }
 });
 
 //----------------------------------------------------------------------------------------------------------------------

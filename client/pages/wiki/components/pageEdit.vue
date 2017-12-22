@@ -18,13 +18,13 @@
 			<b-form-group id="pageBodyGroup"
 						  label="Body"
 						  label-for="pageBody">
-				<b-form-textarea id="pageBody"
-							  type="text"
-							  v-model="page.body"
-							  rows="16"
-							  required
-							  placeholder="Page content...">
-				</b-form-textarea>
+				<b-card no-body>
+					<code-mirror
+						id="pageBody"
+						v-model="page.body"
+						:options="cmOptions">
+					</code-mirror>
+				</b-card>
 			</b-form-group>
 			<b-button type="submit" variant="primary">Submit</b-button>
 			<b-button type="reset" variant="danger">Reset</b-button>
@@ -44,17 +44,44 @@
 <script>
     //------------------------------------------------------------------------------------------------------------------
 
+	// Codemirror
+	import 'codemirror/addon/mode/overlay';
+	import 'codemirror/mode/xml/xml';
+	import 'codemirror/mode/markdown/markdown';
+	import 'codemirror/mode/gfm/gfm';
+	import 'codemirror/mode/javascript/javascript';
+	import 'codemirror/mode/css/css';
+	import 'codemirror/mode/htmlmixed/htmlmixed';
+	import 'codemirror/mode/clike/clike';
+	import 'codemirror/mode/meta';
+
 	// Managers
 	import pageMan from '../../../api/managers/page';
+
+	// Components
+	import CodeMirror from 'vue-cm'
 
     //------------------------------------------------------------------------------------------------------------------
 
     export default {
+		components: {
+			CodeMirror
+		},
         data()
         {
             return {
-                dirty: true
-            };
+				cmOptions: {
+					mode: {
+						name: "gfm",
+						gitHubSpice: false,
+						tokenTypeOverrides: {
+							emoji: "emoji"
+						}
+					},
+					lineNumbers: true,
+					theme: "default"
+				}
+			};
 		},
 		methods: {
         	save()

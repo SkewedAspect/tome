@@ -12,4 +12,24 @@ html, body {
 	overflow: hidden;
 }
 
+// Add some sweet, sweet anchor link styling
+
+h1, h2, h3, h4, h5, h6 {
+	.tome-anchor-link {
+		font-size: 80%;
+		color: $text-muted !important;
+		opacity: 0;
+		transition: opacity .16s linear;
+	}
+
+	&:hover .tome-anchor-link {
+		text-decoration: none;
+		opacity: .85;
+
+		&:hover {
+			opacity: 1;
+		}
+	}
+}
+
 //----------------------------------------------------------------------------------------------------------------------

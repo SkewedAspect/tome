@@ -18,7 +18,7 @@
 <script>
     //------------------------------------------------------------------------------------------------------------------
 
-	import marked from 'marked';
+	import markdown from '../../../lib/markdown';
 
 	// Managers
 	import pageMan from '../../../api/managers/page';
@@ -31,7 +31,7 @@
 			{
 				if(this.page)
 				{
-					return marked(this.page.body);
+					return markdown.render(this.page.body);
 				}
 				else
 				{
