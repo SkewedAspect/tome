@@ -74,6 +74,11 @@ class PageManager
         } // end if
     } // end selectPage
 
+    save()
+    {
+        return wikiRA.savePage(this.currentPage);
+    } // end save
+
     canView(page)
     {
         const user = authMan.account || { permissions: [], groups: [] };

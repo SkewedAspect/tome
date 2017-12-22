@@ -56,6 +56,15 @@ class WikiResourceAccess
                 return pageInst;
             });
     } // end getPage
+
+    savePage(page)
+    {
+        return $http.patch(`/wiki${ page.path }`, page)
+            .then(({ data }) =>
+            {
+                page.update(data);
+            });
+    } // end savePage
 } // end WikiResourceAccess
 
 //----------------------------------------------------------------------------------------------------------------------

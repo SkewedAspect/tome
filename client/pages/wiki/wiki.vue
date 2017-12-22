@@ -33,7 +33,7 @@
                 <pre class="mb-0"><code>{{ errorMessage }}</code></pre>
             </b-alert>
 		</div>
-		<page-display v-else></page-display>
+		<component :is="pageComponent" v-else></component>
 	</b-container>
 </template>
 
@@ -57,12 +57,14 @@
 
 	// Components
 	import PageDisplay from './components/pageDisplay.vue';
+	import PageEdit from './components/pageEdit.vue';
 
 	//------------------------------------------------------------------------------------------------------------------
 
     export default {
 		components: {
-			PageDisplay
+			PageDisplay,
+			PageEdit
 		},
 		data()
 		{
@@ -80,6 +82,7 @@
 				let path = _.get(this.$route, 'params.path', '/');
 				return pageMan.normalizePath(path);
 			},
+			pageComponent(){ return this.mode === 'edit' ? 'page-edit' : 'page-display' }
 		},
 		methods: {
 			selectPage()
@@ -114,6 +117,48 @@
 				this.errorMessage = undefined;
 			}
 		},
+		beforeRouteUpdate (to, from, next)
+		{
+			if(this.mode === 'edit' && this.page.dirty)
+			{
+				//FIXME: Change this to a toast with an undo system, a la: http://alistapart.com/article/neveruseawarning
+				const answer = window.confirm('Do you really want to leave? You have unsaved changes!');
+				if(answer)
+				{
+					this.page.reset();
+					next();
+				}
+				else
+				{
+					next(false);
+				} // end if
+			}
+			else
+			{
+				next();
+			} // end if
+		},
+		beforeRouteLeave (to, from, next)
+		{
+			if(this.mode === 'edit' && this.page.dirty)
+			{
+				//FIXME: Change this to a toast with an undo system, a la: http://alistapart.com/article/neveruseawarning
+				const answer = window.confirm('Do you really want to leave? You have unsaved changes!');
+				if(answer)
+				{
+					this.page.reset();
+					next();
+				}
+				else
+				{
+					next(false);
+				} // end if
+			}
+			else
+			{
+				next();
+			} // end if
+		},
 		watch: {
 			'$route'(to, from)
 			{
@@ -137,7 +182,8 @@
 			}
 		},
 		subscriptions: {
-			account: authMan.account$
+			account: authMan.account$,
+			page: pageMan.currentPage$
 		},
 		mounted()
 		{
