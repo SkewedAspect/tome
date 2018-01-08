@@ -35,7 +35,8 @@ import "highlightjs/styles/github.css";
 // Package.json
 import pkg from '../package.json';
 
-// Views
+// Components
+import WikiLink from './components/wikiLink.vue';
 import AppComponent from './app.vue';
 
 // Pages
@@ -93,6 +94,12 @@ const router = new VueRouter({
     //     } // ed if
     // }
 });
+
+//----------------------------------------------------------------------------------------------------------------------
+// Global Components
+//----------------------------------------------------------------------------------------------------------------------
+
+Vue.component('wiki-link', WikiLink);
 
 //----------------------------------------------------------------------------------------------------------------------
 // App Setup

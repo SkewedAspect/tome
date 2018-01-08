@@ -3,7 +3,9 @@
 <!--------------------------------------------------------------------------------------------------------------------->
 
 <template>
-    <div id="page-display" v-html="renderedBody"></div>
+    <div id="page-display">
+		<div id="page-content"></div>
+	</div>
 </template>
 
 <!--------------------------------------------------------------------------------------------------------------------->
@@ -18,29 +20,33 @@
 <script>
     //------------------------------------------------------------------------------------------------------------------
 
+	import Vue from 'vue';
 	import markdown from '../../../lib/markdown';
 
 	// Managers
 	import pageMan from '../../../api/managers/page';
 
+	//------------------------------------------------------------------------------------------------------------------
+
+	let mdComponent;
+
     //------------------------------------------------------------------------------------------------------------------
 
     export default {
-		computed: {
-			renderedBody()
-			{
-				if(this.page)
-				{
-					return markdown.render(this.page.body);
-				}
-				else
-				{
-					return '';
-				} // end if
-			}
-		},
 		subscriptions: {
         	page: pageMan.currentPage$
+		},
+		mounted()
+		{
+			this.$subscribeTo(pageMan.currentPage$, (page) =>
+			{
+				const htmlTxt = !!page ? markdown.render(page.body) : '';
+				const res = Vue.compile(`<div id="page-display">\n${ htmlTxt }\n</div>`);
+
+				// Build and mount the new component
+				mdComponent = new Vue({ parent: this, render: res.render, staticRenderFns: res.staticRenderFns });
+				mdComponent.$mount('#page-content');
+			});
 		}
     }
 </script>

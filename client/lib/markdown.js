@@ -4,6 +4,7 @@
 // @module
 //----------------------------------------------------------------------------------------------------------------------
 
+import _ from 'lodash';
 import hljs from 'highlightjs';
 import MarkdownIt from 'markdown-it';
 import anchor from 'markdown-it-anchor';
@@ -49,10 +50,26 @@ class MarkdownService
 
     $modifyRules()
     {
-        //TODO: Make the table classes configurable.
         this.mdRenderer.renderer.rules.table_open = function(tokens, idx)
         {
+            //TODO: Make the table classes configurable.
             return '<table class="table table-bordered table-striped">';
+        };
+
+        this.mdRenderer.renderer.rules.link_open = function(tokens, idx, options, env, renderer)
+        {
+            const token = tokens[idx];
+            const closeToken = tokens[idx + 2];
+            const attrs = _.fromPairs(token.attrs);
+
+            if(!_.includes(attrs.class, 'tome-anchor-link'))
+            {
+                token.tag = 'wiki-link';
+                closeToken.tag = 'wiki-link';
+            } // end if
+
+            // Render the tokens
+            return renderer.renderToken(tokens, idx, options);
         };
     } // end $modifyRules
 
