@@ -5,8 +5,8 @@
 	<!-- TODO: This needs to get all the wonderful functionality of a true wiki link. -->
     <a :href="url" class="wiki-link" :class="{ 'text-danger': !exists }" @click="handleClick">
 		<slot></slot>
-		<font-awesome-icon v-if="isExternal" icon="external-link-alt" size="xs" />
-		<font-awesome-icon v-else-if="isPrivate" icon="lock-alt" size="xs" />
+		<font-awesome-icon v-if="isExternal" icon="external-link-alt" size="xs" class="text-muted"/>
+		<font-awesome-icon v-else-if="isPrivate" icon="lock-alt" size="xs" class="text-warning" />
 	</a>
 </template>
 
