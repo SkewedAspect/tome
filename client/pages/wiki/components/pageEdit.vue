@@ -78,6 +78,14 @@
     #page-edit {
 		.CodeMirror {
 			height: 100%;
+
+			.CodeMirror-scroll {
+				min-height: calc(100vh - 420px);
+
+				@media (max-width: 575px) {
+					min-height: calc(100vh - 450px);
+				}
+			}
 		}
     }
 </style>
