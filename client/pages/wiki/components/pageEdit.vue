@@ -3,8 +3,8 @@
 <!--------------------------------------------------------------------------------------------------------------------->
 
 <template>
-    <div class="page-edit" v-if="page">
-		<b-form @submit.prevent="save()" @reset.prevent="reset()">
+    <div id="page-edit" v-if="page">
+		<b-form @submit.prevent="save()" @reset.prevent="reset()" :validated="formValidated" novalidate>
 			<b-form-group id="pageTitleGroup"
 						  label="Title"
 						  label-for="pageTitle">
@@ -26,16 +26,59 @@
 					</code-mirror>
 				</b-card>
 			</b-form-group>
-			<b-button type="submit" variant="primary">Submit</b-button>
-			<b-button type="reset" variant="danger">Reset</b-button>
+			<b-form-group id="permissionsGroup" label="Permissions">
+				<b-form-row>
+					<b-form-group horizontal
+								  class="col"
+								  label="View"
+								  label-class="text-sm-right"
+								  label-for="viewPerm">
+						<b-form-input id="viewPerm"
+									  type="text"
+									  v-model="page.actions.wikiView"
+									  required
+									  placeholder="inherited">
+						</b-form-input>
+					</b-form-group>
+					<b-form-group horizontal
+								  class="col"
+								  label="Modify"
+								  label-class="text-sm-right"
+								  label-for="modifyPerm">
+						<b-form-input id="modifyPerm"
+									  type="text"
+									  v-model="page.actions.wikiModify"
+									  required
+									  placeholder="inherited">
+						</b-form-input>
+					</b-form-group>
+				</b-form-row>
+			</b-form-group>
+			<div class="text-right mb-3">
+				<b-button type="reset" variant="secondary">
+					<font-awesome-icon icon="times"/>
+					Cancel
+				</b-button>
+				<b-button type="reset" variant="danger">
+					<font-awesome-icon icon="undo"/>
+					Reset
+				</b-button>
+				<b-button type="submit" variant="success">
+					<font-awesome-icon icon="save"/>
+					Save
+				</b-button>
+			</div>
 		</b-form>
     </div>
 </template>
 
 <!--------------------------------------------------------------------------------------------------------------------->
 
-<style lang="scss" scoped>
-    .page-edit {
+<style lang="scss">
+    #page-edit {
+		.CodeMirror {
+			height: 100%;
+		}
     }
 </style>
 
@@ -70,6 +113,7 @@
         data()
         {
             return {
+            	formValidated: false,
 				cmOptions: {
 					mode: {
 						name: "gfm",
@@ -86,9 +130,10 @@
 		methods: {
         	save()
 			{
+				this.formValidated = true;
 				return pageMan.savePage(this.page)
-					.then(() =>
-					{
+					.then(() => {
+						this.formValidated = false;
 						this.$router.push({ query: {} });
 					});
 			},
@@ -99,10 +144,6 @@
 		},
 		subscriptions: {
 			page: pageMan.currentPage$
-        },
-		mounted()
-		{
-			console.log("I've been mounted! o.O");
 		}
     }
 </script>
