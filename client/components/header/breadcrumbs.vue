@@ -10,13 +10,19 @@
 					<font-awesome-icon icon="edit"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Edit</span>
 				</b-btn>
 				<b-btn v-else-if="editing" variant="link" size="sm" :to="{ query: {} }">
-					<font-awesome-icon icon="undo"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Cancel</span>
+					<font-awesome-icon icon="times"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Cancel</span>
 				</b-btn>
-				<b-btn variant="link" size="sm" :to="historyLink">
+				<b-btn v-if="canModify && !editing" variant="link" size="sm" :to="historyLink">
 					<font-awesome-icon icon="history"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">History</span>
 				</b-btn>
-				<b-btn variant="link" size="sm" :to="commentLink">
+				<b-btn v-else-if="editing" variant="link" size="sm" @click="broadcast('page reset')">
+					<font-awesome-icon icon="undo"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Reset</span>
+				</b-btn>
+				<b-btn v-if="canModify && !editing" variant="link" size="sm" :to="commentLink">
 					<font-awesome-icon icon="comments"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Comments</span>
+				</b-btn>
+				<b-btn v-else-if="editing" variant="link" size="sm" @click="broadcast('page save')">
+					<font-awesome-icon icon="save"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Save</span>
 				</b-btn>
 			</b-button-group>
 		</b-button-toolbar>
@@ -107,6 +113,12 @@
 				return false;
 			},
 			show(){ return _.includes(['wiki', 'history', 'comments'], this.$route.name); }
+		},
+		methods: {
+			broadcast(event, ...args)
+			{
+				this.$root.$emit(event, ...args);
+			}
 		},
 		subscriptions: {
         	account: authMan.account$,

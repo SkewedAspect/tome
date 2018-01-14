@@ -4,6 +4,10 @@
 
 <template>
     <div id="page-edit" v-if="page">
+		<b-alert variant="danger">
+			<font-awesome-icon icon="exclamation-triangle"/>
+			Unable to save. (For some reason or another. Who knows. Gremlins, maybe?)
+		</b-alert>
 		<b-form @submit.prevent="save()" @reset.prevent="reset()" :validated="formValidated" novalidate>
 			<b-form-group id="pageTitleGroup"
 						  label="Title"
@@ -77,7 +81,11 @@
 <style lang="scss">
     #page-edit {
 		.CodeMirror {
-			height: 100%;
+			height: calc(100vh - 420px);
+
+			@media (max-width: 575px) {
+				height: calc(100vh - 450px);
+			}
 
 			.CodeMirror-scroll {
 				min-height: calc(100vh - 420px);
@@ -152,6 +160,15 @@
 		},
 		subscriptions: {
 			page: pageMan.currentPage$
+		},
+		beforeDestroy() {
+			this.$root.$off('page reset', this.reset);
+			this.$root.$off('page save', this.save);
+		},
+		created()
+		{
+			this.$root.$on('page reset', this.reset);
+			this.$root.$on('page save', this.save);
 		}
     }
 </script>
