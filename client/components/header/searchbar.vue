@@ -5,11 +5,11 @@
 <template>
 	<b-input-group class="search-bar">
 		<b-form-input type="text" placeholder="Search..." />
-		<b-input-group-button>
+		<b-input-group-append>
 			<b-button>
 				<font-awesome-icon icon="search" />
 			</b-button>
-		</b-input-group-button>
+		</b-input-group-append>
 	</b-input-group>
 </template>
 
