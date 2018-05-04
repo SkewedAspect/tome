@@ -25,8 +25,8 @@ class WikiResourceAccess
 
     _mungeWikiPage(page)
     {
-        page.created = new Date(page.created);
-        page.edited = new Date(page.edited);
+        page.created = Date.parse(page.created + ' GMT');
+        page.edited = Date.parse(page.edited + ' GMT');
 
         page.actions = {
             wikiView: page.action_view === 'inherit' ? this._getPermission(page.path, 'view') : page.action_view,

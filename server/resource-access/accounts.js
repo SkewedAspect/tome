@@ -23,6 +23,7 @@ class AccountResourceAccess
 
     _parseAccount(account)
     {
+        account.created = Date.parse(account.created + ' GMT');
         account.permissions = JSON.parse(_.get(account, 'permissions', []));
         account.settings = JSON.parse(_.get(account, 'settings', {}));
 

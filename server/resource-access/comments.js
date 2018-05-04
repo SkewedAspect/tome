@@ -24,8 +24,8 @@ class CommentResourceAccess
 
     _mungeComment(comment)
     {
-        comment.created = new Date(comment.created);
-        comment.edited = new Date(comment.edited);
+        comment.created = Date.parse(comment.created + ' GMT');
+        comment.edited = Date.parse(comment.edited + ' GMT');
 
         return comment;
     } // end _mungeWikiPage
