@@ -4,13 +4,12 @@
 .idea
 
 # Build artifacts
+.cache
 dist
 
-# Bower artifacts
-vendor
-
 # DB artifacts
-server/db/*.json
+*.db
+*.sqlite
 
 # Node artifacts
 node_modules

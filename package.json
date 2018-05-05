@@ -1,22 +1,27 @@
 {
   "name": "tome",
   "version": "0.1.0",
-  "description": "A simple manager for pokemon in pokemon go.",
+  "description": "A simple wiki.",
   "main": "server.js",
   "scripts": {
+    "clean": "rm -rf dist/*; rm -rf .cache",
+    "copy": "cp -r client/static dist/",
+    "build": "npm run clean && npm run copy && parcel build client/index.html",
+    "watch": "npm run clean && npm run copy && parcel watch client/index.html",
     "test": "LOG_LEVEL=ERROR mocha tests/ --recursive --exit",
     "start": "DEBUG=TRUE node devServer.js"
   },
   "author": "Christopher S. Case <chris.case@g33xnexus.com>",
   "license": "MIT",
+  "alias": {
+    "vue": "./node_modules/vue/dist/vue.common.js"
+  },
   "dependencies": {
     "bluebird": "^3.4.3",
     "body-parser": "^1.15.2",
-    "bootstrap": "^4.0.0",
     "chai": "^4.1.2",
     "chai-http": "^4.0.0",
     "codemirror": "^5.35.0",
-    "commander": "^2.14.1",
     "connect-session-knex": "^1.4.0",
     "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
@@ -39,6 +44,7 @@
     "sqlite3": "^4.0.0",
     "trivial-logging": "^1.2.0",
     "trivialperms": "^1.0.0-rc.4",
+    "vue-hot-reload-api": "^2.3.0",
     "vue-rx": "^5.0.0"
   },
   "devDependencies": {
@@ -46,30 +52,20 @@
     "@fortawesome/fontawesome-free-brands": "^5.0.6",
     "@fortawesome/fontawesome-pro-solid": "^5.0.6",
     "@fortawesome/vue-fontawesome": "0.0.22",
+    "@vue/component-compiler-utils": "^1.2.1",
     "autoprefixer": "^8.0.0",
     "axios": "^0.18.0",
     "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
-    "bootstrap-vue": "^2.0.0-rc.1",
-    "css-loader": "^0.28.10",
-    "file-loader": "^1.1.9",
-    "grunt": "^1.0.2",
-    "grunt-contrib-clean": "^1.0.0",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-webpack": "^3.0.2",
+    "bootstrap": "^4.1.1",
+    "bootstrap-vue": "^2.0.0-rc.9",
+    "commander": "^2.15.1",
     "jquery": "^3.2.1",
     "node-sass": "^4.6.0",
-    "postcss-loader": "^2.1.0",
     "precss": "^3.1.1",
-    "sass-loader": "^7.0.1",
-    "style-loader": "^0.21.0",
     "vue": "^2.3.3",
     "vue-cm": "^1.1.0",
-    "vue-loader": "^14.1.1",
     "vue-router": "^3.0.1",
-    "vue-template-compiler": "^2.5.11",
-    "webpack": "^3.11.0",
-    "webpack-dev-server": "^2.9.4"
+    "vue-template-compiler": "^2.5.11"
   }
 }
