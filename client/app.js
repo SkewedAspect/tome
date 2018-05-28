@@ -16,9 +16,7 @@ import BootstrapVue from 'bootstrap-vue'
 
 // VueRX
 import VueRx from 'vue-rx'
-import { Observable } from 'rxjs/Observable'
-import { Subscription } from 'rxjs/Subscription'
-import { Subject } from 'rxjs/Subject'
+import { Observable, Subject, Subscription } from 'rxjs';
 
 // Font Awesome
 import fontawesome from '@fortawesome/fontawesome'

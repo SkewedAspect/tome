@@ -5,7 +5,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 import Promise from 'bluebird';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 
 // Managers
 import authMan from './auth.js';
