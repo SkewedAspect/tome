@@ -1,11 +1,10 @@
 <!--------------------------------------------------------------------------------------------------------------------->
-<!-- wikiLink.vue                                                                                                    -->
+<!-- WikiLinks
 <!--------------------------------------------------------------------------------------------------------------------->
 <template>
-	<!-- TODO: This needs to get all the wonderful functionality of a true wiki link. -->
     <a :href="url" class="wiki-link" :class="{ 'text-danger': !exists }" @click="handleClick">
 		<slot></slot>
-		<font-awesome-icon v-if="isExternal" icon="external-link-alt" size="xs" class="text-muted"/>
+		<font-awesome-icon v-if="isExternal" icon="external-link" size="xs" class="text-muted"/>
 		<font-awesome-icon v-else-if="isPrivate" icon="lock-alt" size="xs" class="text-warning" />
 	</a>
 </template>
@@ -68,36 +67,46 @@
 
 					this.$router.push(this.url);
 				} // end if
-			}
+			},
+            checkExists()
+            {
+                if(!this.isExternal)
+                {
+                    $http.head(this.url)
+                        .then(() => {
+                            this.exists = true;
+                            this.isPrivate = false;
+                        })
+                        .catch(({ response }) => {
+                            switch(response.status)
+                            {
+                                case 403:
+                                    this.exists = true;
+                                    this.isPrivate = true;
+                                    break;
+
+                                case 404:
+                                default:
+                                    this.exists = false;
+                                    this.isPrivate = false;
+                            } // end switch
+                        });
+                }
+                else
+                {
+                    this.exists = true;
+                } // end if
+            }
 		},
+        watch: {
+            href()
+            {
+                this.checkExists();
+            }
+        },
 		mounted()
 		{
-			if(!this.isExternal)
-			{
-				$http.head(this.url)
-					.then(() => {
-						this.exists = true;
-						this.isPrivate = false;
-					})
-					.catch(({ response }) => {
-						switch(response.status)
-						{
-							case 403:
-								this.exists = true;
-								this.isPrivate = true;
-								break;
-
-							case 404:
-							default:
-								this.exists = false;
-								this.isPrivate = false;
-						} // end switch
-					});
-			}
-			else
-			{
-				this.exists = true;
-			} // end if
+		    this.checkExists();
 		}
     }
 </script>
