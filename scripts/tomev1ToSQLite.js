@@ -191,8 +191,7 @@ if(oldDBPath)
     const db = knex({
         client: 'sqlite3',
         connection: {
-            //TODO: We need to allow the db to setup to be specified... eventually.
-            filename: './server/db/tome.db'
+            filename: './db/tome.db'
         },
         useNullAsDefault: true
     });
