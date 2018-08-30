@@ -25,7 +25,7 @@
 				<b-card no-body>
 					<code-mirror
 						id="pageBody"
-						v-model="page.body"
+						v-model="pageBody"
 						:options="cmOptions">
 					</code-mirror>
 				</b-card>
@@ -103,6 +103,8 @@
 <script>
     //------------------------------------------------------------------------------------------------------------------
 
+    import _ from 'lodash';
+
 	// Codemirror
 	import 'codemirror/addon/mode/overlay';
 	import 'codemirror/mode/xml/xml';
@@ -143,6 +145,18 @@
 				}
 			};
 		},
+        computed: {
+		    pageBody: {
+		        get()
+                {
+                    return _.get(this.page, 'body', '');
+                },
+                set(val)
+                {
+                    this.$set(this.page, 'body', val);
+                }
+            }
+        },
 		methods: {
         	save()
 			{
