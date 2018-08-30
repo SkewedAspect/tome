@@ -47,6 +47,26 @@ exports.seed = function(knex, Promise)
                             "\n\n" +
                             "~~Strikethrough~~\n" +
                             "\n\n" +
+                            "## Links" +
+                            "\n\n" +
+                            "Here we have an example of a [wiki link](/foobar), followed by an [external link](https://gitlab.com) in the same sentence." +
+                            "\n\n" +
+                            "### Wiki Links" +
+                            "\n\n" +
+                            "Creating a wiki link is fairly easy. It works exactly the same as any normal markdown link (all versions of the link syntax are\n" +
+                            "supported), but the url will start with either `'/wiki'` or simply `'/'`." +
+                            "\n\n" +
+                            "Ex:" +
+                            "\n\n" +
+                            "```markdown\n" +
+                            "Here is some text containing a [wiki link](/some-page). This [also](/wiki/some-other-page) works. As does [this][]." +
+                            "\n\n" +
+                            "However, [this link](example.com) is an external one. Also [this one][]." +
+                            "\n\n" +
+                            "[this]: /some-other-other-page\n" +
+                            "[this one]: https://google.com\n" +
+                            "```" +
+                            "\n\n" +
                             "## Blockquotes" +
                             "\n\n" +
                             "> Blockquotes can also be nested...\n" +
@@ -78,7 +98,7 @@ exports.seed = function(knex, Promise)
                             "\n\n" +
                             "57. foo\n" +
                             "1. bar"
-                        })
+                        });
                 });
         });
 };
