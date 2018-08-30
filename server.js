@@ -1,11 +1,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Main server module for Tome.
-//
-// @module server.js
 //----------------------------------------------------------------------------------------------------------------------
 
 // Config
-const { config } = require('./server/managers/config');
+const { config } = require('./server/api/managers/config');
 
 // Logging
 const logging = require('trivial-logging');
@@ -39,10 +37,6 @@ const historyRoute = require('./server/routes/history');
 const rolesRoute = require('./server/routes/roles');
 const wikiRoute = require('./server/routes/wiki');
 const routeUtils = require('./server/routes/utils');
-
-//----------------------------------------------------------------------------------------------------------------------
-
-let server;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -122,29 +116,27 @@ const loading = dbMan.getDB()
                 }
             })
         });
+
+        // Start the server
+        const server = app.listen(config.http.port, () =>
+        {
+            const { address, port } = server.address();
+            const version = require('./package').version;
+
+            const host = address === '::' ? 'localhost' : address;
+            logger.info(`Tome v${ version } listening at http://${ host }:${ port }.`);
+        });
+
+        return server;
+    })
+    .tap((server) =>
+    {
+        // Setup our websocket handling
+        //socketMan.setServer(io(server));
     });
 
 //----------------------------------------------------------------------------------------------------------------------
 
-function listen()
-{
-    if(!server)
-    {
-        // Start the server
-        server = app.listen(config.http.port, () =>
-        {
-            const host = server.address().address;
-            const port = server.address().port;
-
-            logger.info('Tome v%s listening at http://%s:%s', require('./package').version, host, port);
-        });
-    } // end if
-
-    return server;
-} // end listen
-
-//----------------------------------------------------------------------------------------------------------------------
-
-module.exports = { app, loading, listen };
+module.exports = { app, loading };
 
 //----------------------------------------------------------------------------------------------------------------------

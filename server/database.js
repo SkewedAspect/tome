@@ -1,14 +1,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 // DatabaseManager
-//
-// @module
 //----------------------------------------------------------------------------------------------------------------------
 
 const _ = require('lodash');
 const knex = require('knex');
 
-const appMan = require('./managers/app');
-const configMan = require('./managers/config');
+const configMan = require('./api/managers/config');
 
 const logger = require('trivial-logging').loggerFor(module);
 
@@ -18,24 +15,24 @@ class DatabaseManager
 {
     constructor()
     {
-        // a global override
-        this.testing = false;
+        // If true, we load the in-memory test DB.
+        this.testing = configMan.get('unitTests');
 
         // Loading promises for both the testing DB and the actual DB.
         this.loading = undefined;
         this.loadingTest = undefined;
 
         // Check to see if we need to initialize the db
-        this._getDB();
+        this.getDB();
     } // end constructor
 
     //------------------------------------------------------------------------------------------------------------------
     // Utils
     //------------------------------------------------------------------------------------------------------------------
 
-    _setupDB(db, options = {})
+    _setupDB(db, options = { migrate: { directory: './server/knex/migrations' }, seed: { directory: './server/knex/seeds' } })
     {
-        return db('page')
+        return db('knex_migrations')
             .select()
             .limit(1)
             .then(() =>
@@ -51,7 +48,7 @@ class DatabaseManager
             })
             .catch({ code: 'SQLITE_ERROR' }, (error) =>
             {
-                logger.warn("No existing database, creating one.");
+                logger.warn("No existing database, creating one. Options:", options);
 
                 return db.migrate.latest(options.migrate)
                     .then(() => db.seed.run(options.seed))
@@ -66,15 +63,13 @@ class DatabaseManager
             this.dbConfig = _.defaults({
                 client: 'sqlite3',
                 connection: {
-                    filename: './server/db/tome.db'
+                    filename: './db/tome.db'
                 },
                 useNullAsDefault: true
             }, configMan.get('database'));
 
             if(this.dbConfig.client === 'sqlite3')
             {
-                this.dbConfig.connection.filename = appMan.getRootPath(this.dbConfig.connection.filename);
-
                 if(this.dbConfig.traceQueries)
                 {
                     const afterCreate = _.get(this.dbConfig, 'pool.afterCreate');
@@ -130,7 +125,7 @@ class DatabaseManager
                 }
             });
 
-            return this.loadingTest = this._setupDB(this.testDB, { seed: { directory: './tests/seeds' } });
+            return this.loadingTest = this._setupDB(this.testDB, { migrate: { directory: './server/knex/migrations' },  seed: { directory: './tests/seeds' } });
         }
         else
         {
@@ -142,19 +137,17 @@ class DatabaseManager
     // Public API
     //------------------------------------------------------------------------------------------------------------------
 
-    getDB(testing = this.testing)
+    getDB()
     {
-        return testing ? this._getTestDB() : this._getDB();
+        return this.testing ? this._getTestDB() : this._getDB();
     } // end getDB
 
-    runSeeds(testing = this.testing)
+    runSeeds()
     {
         const options = this.testing ? { seed: { directory: './tests/seeds' } } : {};
-        return this.getDB(testing)
-            .then((db) =>
-            {
-                return db.seed.run(options.seed);
-            });
+
+        logger.info('Running seeds...', options);
+        return this.getDB().then((db) => { return db.seed.run(options.seed); });
     } // end runSeeds
 
     getConnObj()

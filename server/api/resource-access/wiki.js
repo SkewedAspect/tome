@@ -1,13 +1,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 // WikiResourceAccess.js
-//
-// @module
 //----------------------------------------------------------------------------------------------------------------------
 
 const _ = require('lodash');
 const Promise = require('bluebird');
 
-const dbMan = require('../database');
+const dbMan = require('../../database');
 const { AppError, NotFoundError, MultipleResultsError, ValidationError } = require('../errors');
 
 //----------------------------------------------------------------------------------------------------------------------

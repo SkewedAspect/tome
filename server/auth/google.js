@@ -1,7 +1,5 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Google+ Authentication Support
-//
-// @module google-plus.js
 //----------------------------------------------------------------------------------------------------------------------
 
 const _ = require('lodash');
@@ -10,10 +8,10 @@ const GoogleStrategy = require('passport-google-web');
 const serialization = require('./serialization');
 
 // Managers
-const accountMan = require('../managers/account');
-const configMan = require('../managers/config');
+const accountMan = require('../api/managers/account');
+const configMan = require('../api/managers/config');
 
-const { NotFound } = require('../errors');
+const { NotFound } = require('../api/errors');
 
 const logging = require('trivial-logging');
 const logger = logging.loggerFor(module);

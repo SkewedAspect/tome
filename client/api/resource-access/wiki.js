@@ -12,7 +12,7 @@ import $http from 'axios';
 import PageModel from '../models/page';
 
 // Errors
-import { AppError } from '../../../server/errors';
+import { AppError } from '../../../server/api/errors';
 
 //----------------------------------------------------------------------------------------------------------------------
 

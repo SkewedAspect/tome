@@ -8,8 +8,8 @@
     "copy": "cp -r client/static dist/",
     "build": "npm run clean && npm run copy && parcel build client/index.html",
     "watch": "npm run clean && npm run copy && parcel watch client/index.html",
-    "test": "LOG_LEVEL=ERROR mocha tests/ --recursive --exit",
-    "start": "DEBUG=TRUE node devServer.js"
+    "test": "LOG_LEVEL=ERROR UNIT_TESTS=TRUE mocha tests/ --recursive --exit --delay",
+    "start": "DEBUG=TRUE node server.js"
   },
   "author": "Christopher S. Case <chris.case@g33xnexus.com>",
   "license": "MIT",

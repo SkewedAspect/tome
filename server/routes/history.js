@@ -1,7 +1,5 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Page History REST API
-//
-// @module
 //----------------------------------------------------------------------------------------------------------------------
 
 const _ = require('lodash');
@@ -10,8 +8,8 @@ const express = require('express');
 const { interceptHTML, promisify } = require('./utils');
 
 // Managers
-const wikiMan = require('../managers/wiki');
-const permsMan = require('../managers/permissions');
+const wikiMan = require('../api/managers/wiki');
+const permsMan = require('../api/managers/permissions');
 
 //----------------------------------------------------------------------------------------------------------------------
 

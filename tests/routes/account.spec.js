@@ -1,40 +1,19 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Unit Tests for the account module.
-//
-// @module
 // ---------------------------------------------------------------------------------------------------------------------
 
-const chai = require('chai');
-const chaiHttp = require('chai-http');
-
-chai.use(chaiHttp);
-
-// Setup Logging
-process.env.LOG_LEVEL = 'ERROR';
-
-// Setup Database
-const dbMan = require('../../server/database');
-dbMan.testing = true;
-
-// Setup config
-const configMan = require('../../server/managers/config');
-configMan.set('overrideAuth', true);
-configMan.set('http.port', undefined);
+const { expect } = require('chai');
 
 // Managers
-const accountMan = require('../../server/managers/account');
-
-// Server
-const { app, listen } = require('../../server');
+const dbMan = require('../../server/database');
+const configMan = require('../../server/api/managers/config');
+const accountMan = require('../../server/api/managers/account');
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 let db;
-
-// Start the server
-const server = listen();
-const request = chai.request(server);
-const { expect } = chai;
+let app;
+let request;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -42,6 +21,13 @@ describe("Account API ('/account')", () =>
 {
     beforeEach(() =>
     {
+        // Setup chai
+        request = configMan.get('chaiRequest');
+
+        // Get App
+        app = configMan.get('app');
+
+        // Setup db and users
         return dbMan.getDB(true)
             .then((testDB) => db = testDB)
             .then(() => accountMan.getAccountByUsername('globalAdmin').then((user) => app.set('user', user)));
@@ -67,6 +53,7 @@ describe("Account API ('/account')", () =>
                             expect(response).to.be.json;
 
                             const json = response.body;
+
                             expect(json).to.be.a('array');
                             expect(json).to.have.length(5);
 
