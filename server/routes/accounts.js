@@ -1,7 +1,5 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Account REST API
-//
-// @module
 //----------------------------------------------------------------------------------------------------------------------
 
 const _ = require('lodash');
@@ -10,10 +8,10 @@ const express = require('express');
 const { ensureAuthenticated, promisify } = require('./utils');
 
 // Managers
-const accountMan = require('../managers/account');
-const permsMan = require('../managers/permissions');
+const accountMan = require('../api/managers/account');
+const permsMan = require('../api/managers/permissions');
 
-const { NotFoundError } = require('../errors');
+const { NotFoundError } = require('../api/errors');
 
 //----------------------------------------------------------------------------------------------------------------------
 

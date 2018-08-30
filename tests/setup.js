@@ -8,7 +8,7 @@ const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 
 // Setup config
-const configMan = require('../server/managers/config');
+const configMan = require('../server/api/managers/config');
 configMan.set('overrideAuth', true);
 configMan.set('http.port', undefined);
 

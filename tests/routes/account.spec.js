@@ -6,8 +6,8 @@ const { expect } = require('chai');
 
 // Managers
 const dbMan = require('../../server/database');
-const configMan = require('../../server/managers/config');
-const accountMan = require('../../server/managers/account');
+const configMan = require('../../server/api/managers/config');
+const accountMan = require('../../server/api/managers/account');
 
 // ---------------------------------------------------------------------------------------------------------------------
 

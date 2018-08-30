@@ -1,11 +1,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Main server module for Tome.
-//
-// @module server.js
 //----------------------------------------------------------------------------------------------------------------------
 
 // Config
-const { config } = require('./server/managers/config');
+const { config } = require('./server/api/managers/config');
 
 // Logging
 const logging = require('trivial-logging');

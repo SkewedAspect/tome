@@ -1,13 +1,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 // DatabaseManager
-//
-// @module
 //----------------------------------------------------------------------------------------------------------------------
 
 const _ = require('lodash');
 const knex = require('knex');
 
-const configMan = require('./managers/config');
+const configMan = require('./api/managers/config');
 
 const logger = require('trivial-logging').loggerFor(module);
 

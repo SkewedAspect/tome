@@ -1,41 +1,46 @@
 //----------------------------------------------------------------------------------------------------------------------
-// ConfigManager
+// PermissionsManager
 //----------------------------------------------------------------------------------------------------------------------
 
-const _ = require('lodash');
+const trivialPerms = require('trivialperms');
+
+const rolesRA = require('../resource-access/roles');
 
 //----------------------------------------------------------------------------------------------------------------------
 
-class ConfigManager
+class PermissionsManager
 {
     constructor()
     {
-        this._config = require('../../config');
+        trivialPerms.loadGroups(() =>
+        {
+            return rolesRA.getRoles();
+        });
     } // end constructor
 
     //------------------------------------------------------------------------------------------------------------------
-    // Properties
+    // Public API
     //------------------------------------------------------------------------------------------------------------------
 
-    get config(){ return this._config; }
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Public
-    //------------------------------------------------------------------------------------------------------------------
-
-    get(...args)
+    getRoles()
     {
-        return _.get(this._config, ...args);
-    } // end get
+        return rolesRA.getRoles()
+            .then((roles) => roles || []);
+    } // end getRoles
 
-    set(...args)
+    hasPerm(...args)
     {
-        _.set(this._config, ...args);
-    } // end set
-} // end ConfigManager
+        return trivialPerms.hasPerm(...args);
+    } // end hasPerm
+
+    hasGroup(...args)
+    {
+        return trivialPerms.hasGroup(...args);
+    } // end hasGroup
+} // end PermissionsManager
 
 //----------------------------------------------------------------------------------------------------------------------
 
-module.exports = new ConfigManager();
+module.exports = new PermissionsManager();
 
 //----------------------------------------------------------------------------------------------------------------------
