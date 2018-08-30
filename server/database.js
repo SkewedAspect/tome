@@ -18,15 +18,15 @@ class DatabaseManager
 {
     constructor()
     {
-        // a global override
-        this.testing = false;
+        // If true, we load the in-memory test DB.
+        this.testing = configMan.get('unitTests');
 
         // Loading promises for both the testing DB and the actual DB.
         this.loading = undefined;
         this.loadingTest = undefined;
 
         // Check to see if we need to initialize the db
-        this._getDB();
+        this.getDB();
     } // end constructor
 
     //------------------------------------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ class DatabaseManager
             })
             .catch({ code: 'SQLITE_ERROR' }, (error) =>
             {
-                logger.warn("No existing database, creating one.");
+                logger.warn("No existing database, creating one. Options:", options);
 
                 return db.migrate.latest(options.migrate)
                     .then(() => db.seed.run(options.seed))
@@ -142,19 +142,17 @@ class DatabaseManager
     // Public API
     //------------------------------------------------------------------------------------------------------------------
 
-    getDB(testing = this.testing)
+    getDB()
     {
-        return testing ? this._getTestDB() : this._getDB();
+        return this.testing ? this._getTestDB() : this._getDB();
     } // end getDB
 
-    runSeeds(testing = this.testing)
+    runSeeds()
     {
         const options = this.testing ? { seed: { directory: './tests/seeds' } } : {};
-        return this.getDB(testing)
-            .then((db) =>
-            {
-                return db.seed.run(options.seed);
-            });
+
+        logger.info('Running seeds...', options);
+        return this.getDB().then((db) => { return db.seed.run(options.seed); });
     } // end runSeeds
 
     getConnObj()

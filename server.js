@@ -42,7 +42,8 @@ const routeUtils = require('./server/routes/utils');
 
 //----------------------------------------------------------------------------------------------------------------------
 
-let server;
+const appMan = require('./server/managers/app');
+appMan.setRootDir(__dirname);
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -122,29 +123,26 @@ const loading = dbMan.getDB()
                 }
             })
         });
-    });
 
-//----------------------------------------------------------------------------------------------------------------------
-
-function listen()
-{
-    if(!server)
-    {
         // Start the server
-        server = app.listen(config.http.port, () =>
+        const server = app.listen(config.http.port, () =>
         {
             const host = server.address().address;
             const port = server.address().port;
 
             logger.info('Tome v%s listening at http://%s:%s', require('./package').version, host, port);
         });
-    } // end if
 
-    return server;
-} // end listen
+        return server;
+    })
+    .tap((server) =>
+    {
+        // Setup our websocket handling
+        //socketMan.setServer(io(server));
+    });
 
 //----------------------------------------------------------------------------------------------------------------------
 
-module.exports = { app, loading, listen };
+module.exports = { app, loading };
 
 //----------------------------------------------------------------------------------------------------------------------

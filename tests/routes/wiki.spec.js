@@ -1,40 +1,19 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Unit Tests for the wiki module.
-//
-// @module
 // ---------------------------------------------------------------------------------------------------------------------
 
-const chai = require('chai');
-const chaiHttp = require('chai-http');
-
-chai.use(chaiHttp);
-
-// Setup Logging
-process.env.LOG_LEVEL = 'ERROR';
-
-// Setup Database
-const dbMan = require('../../server/database');
-dbMan.testing = true;
-
-// Setup config
-const configMan = require('../../server/managers/config');
-configMan.set('overrideAuth', true);
-configMan.set('http.port', undefined);
+let { expect } = require('chai');
 
 // Managers
+const dbMan = require('../../server/database');
+const configMan = require('../../server/managers/config');
 const accountMan = require('../../server/managers/account');
-
-// Server
-const { app, listen } = require('../../server');
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 let db;
-
-// Start the server
-const server = listen();
-const request = chai.request(server);
-const { expect } = chai;
+let app;
+let request;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -42,6 +21,13 @@ describe("Wiki API ('/wiki')", () =>
 {
     beforeEach(() =>
     {
+        // Setup chai
+        request = configMan.get('chaiRequest');
+
+        // Get App
+        app = configMan.get('app');
+
+        // Setup db and users
         return dbMan.getDB()
             .then((testDB) => db = testDB)
             .then(() => accountMan.getAccountByUsername('globalAdmin').then((user) => app.set('user', user)));
