@@ -2,10 +2,19 @@
 // Knex Migration configuration
 //----------------------------------------------------------------------------------------------------------------------
 
+const _ = require('lodash');
 const dbMan = require('./server/database');
 
 //----------------------------------------------------------------------------------------------------------------------
 
-module.exports = dbMan.getConnObj();
+module.exports = _.merge({}, dbMan.getConnObj(), {
+    migrations: {
+        directory: './server/knex/migrations'
+    },
+    seeds: {
+        directory: './server/knex/seeds'
+    }
+});
 
 //----------------------------------------------------------------------------------------------------------------------
+

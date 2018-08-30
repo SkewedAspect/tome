@@ -32,9 +32,9 @@ class DatabaseManager
     // Utils
     //------------------------------------------------------------------------------------------------------------------
 
-    _setupDB(db, options = {})
+    _setupDB(db, options = { migrate: { directory: './server/knex/migrations' }, seed: { directory: './server/knex/seeds' } })
     {
-        return db('page')
+        return db('knex_migrations')
             .select()
             .limit(1)
             .then(() =>
@@ -65,7 +65,7 @@ class DatabaseManager
             this.dbConfig = _.defaults({
                 client: 'sqlite3',
                 connection: {
-                    filename: './server/db/tome.db'
+                    filename: './db/tome.db'
                 },
                 useNullAsDefault: true
             }, configMan.get('database'));
@@ -127,7 +127,7 @@ class DatabaseManager
                 }
             });
 
-            return this.loadingTest = this._setupDB(this.testDB, { seed: { directory: './tests/seeds' } });
+            return this.loadingTest = this._setupDB(this.testDB, { migrate: { directory: './server/knex/migrations' },  seed: { directory: './tests/seeds' } });
         }
         else
         {
