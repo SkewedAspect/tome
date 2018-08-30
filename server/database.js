@@ -7,7 +7,6 @@
 const _ = require('lodash');
 const knex = require('knex');
 
-const appMan = require('./managers/app');
 const configMan = require('./managers/config');
 
 const logger = require('trivial-logging').loggerFor(module);
@@ -73,8 +72,6 @@ class DatabaseManager
 
             if(this.dbConfig.client === 'sqlite3')
             {
-                this.dbConfig.connection.filename = appMan.getRootPath(this.dbConfig.connection.filename);
-
                 if(this.dbConfig.traceQueries)
                 {
                     const afterCreate = _.get(this.dbConfig, 'pool.afterCreate');

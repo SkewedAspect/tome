@@ -42,11 +42,6 @@ const routeUtils = require('./server/routes/utils');
 
 //----------------------------------------------------------------------------------------------------------------------
 
-const appMan = require('./server/managers/app');
-appMan.setRootDir(__dirname);
-
-//----------------------------------------------------------------------------------------------------------------------
-
 // Build the express app
 const app = express();
 
@@ -127,10 +122,10 @@ const loading = dbMan.getDB()
         // Start the server
         const server = app.listen(config.http.port, () =>
         {
-            const host = server.address().address;
-            const port = server.address().port;
+            const { host, port } = server.address();
+            const version = require('./package').version;
 
-            logger.info('Tome v%s listening at http://%s:%s', require('./package').version, host, port);
+            logger.info(`Tome v${ version } listening at http://${ host }:${ port }.`);
         });
 
         return server;
