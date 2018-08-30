@@ -16,7 +16,7 @@ Most of these are planned, any that have been checked off have been implemented.
     * [X] Page History
     * [X] Full Text Search
 * [ ] UI
-    * [ ] Hierarchical wiki pages
+    * [X] Hierarchical wiki pages
     * [ ] Hierarchical wiki page permissions
     * [ ] Comments on pages
     * [ ] Page History
@@ -39,7 +39,7 @@ This is just a rough list of things to do while I get the project going.
 * [X] Move over to sqlite for the database
     * [X] Permissions checks in the db
 * [X] Add Unit Tests for the rest api
-* [ ] Switch to bootstrap-vue for the ui
-* [ ] Switch to webpack
+* [X] Switch to bootstrap-vue for the ui
+* [X] Switch to ~~webpack~~parceljs
 * [ ] Use socket.io to inform users when a page they're working on has been edited
 * [ ] Use socket.io to update comments when a new one is posted.
