@@ -120,9 +120,10 @@ const loading = dbMan.getDB()
         // Start the server
         const server = app.listen(config.http.port, () =>
         {
-            const { host, port } = server.address();
+            const { address, port } = server.address();
             const version = require('./package').version;
 
+            const host = address === '::' ? 'localhost' : address;
             logger.info(`Tome v${ version } listening at http://${ host }:${ port }.`);
         });
 
