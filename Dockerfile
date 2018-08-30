@@ -1,5 +1,5 @@
-FROM node:6.5
-EXPOSE 4000
+FROM node:carbon-alpine
+EXPOSE 4321
 
 MAINTAINER Christopher S. Case <chris.case@g33xnexus.com>
 
@@ -8,8 +8,7 @@ WORKDIR /app
 
 ADD . /app/
 
-RUN npm install \
-	&& npm install grunt-cli \
-	&& ./node_modules/.bin/grunt build
+RUN yarn \
+	&& yarn build
 
 CMD [ "node", "server.js" ]

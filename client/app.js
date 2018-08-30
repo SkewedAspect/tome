@@ -19,10 +19,11 @@ import VueRx from 'vue-rx'
 import { Observable, Subject, Subscription } from 'rxjs';
 
 // Font Awesome
-import fontawesome from '@fortawesome/fontawesome'
-import faBrands from '@fortawesome/fontawesome-free-brands'
-import faSolid from '@fortawesome/fontawesome-pro-solid'
-import FontAwesomeIcon from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/pro-solid-svg-icons';
+import { far } from '@fortawesome/pro-regular-svg-icons';
+import { fab } from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
 
 // CodeMirror
 import "codemirror/lib/codemirror.css";
@@ -54,8 +55,9 @@ Vue.use(VueRx, {
 // Font Awesome
 // ---------------------------------------------------------------------------------------------------------------------
 
-fontawesome.library.add(faBrands, faSolid);
-Vue.component(FontAwesomeIcon.name, FontAwesomeIcon);
+library.add(fab, far, fas);
+Vue.component('font-awesome-icon', FontAwesomeIcon);
+Vue.component('font-awesome-layers', FontAwesomeLayers);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Bootstrap Vue
