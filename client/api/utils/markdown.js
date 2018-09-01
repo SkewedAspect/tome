@@ -15,7 +15,7 @@ class MarkdownUtil
 {
     constructor()
     {
-        this.mdRenderer = new MarkdownIt({
+        const mdRenderer = new MarkdownIt({
                 html: true,
                 linkify: true,
                 typographer: true,
@@ -32,6 +32,9 @@ class MarkdownUtil
                     return `<pre class="hljs card bg-light"><code>${ mdRenderer.utils.escapeHtml(str) }</code></pre>`;
                 }
             });
+
+        // Save on the class
+        this.mdRenderer = mdRenderer;
 
         // Default plugins
         this.mdRenderer
