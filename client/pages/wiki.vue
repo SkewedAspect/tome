@@ -52,12 +52,12 @@
 	import _ from 'lodash';
 
 	// Managers
-	import authMan from '../../api/managers/auth';
-	import pageMan from '../../api/managers/page';
+	import authMan from '../api/managers/auth';
+	import pageMan from '../api/managers/page';
 
 	// Components
-	import PageDisplay from './components/pageDisplay.vue';
-	import PageEdit from './components/pageEdit.vue';
+	import PageDisplay from '../components/wiki/display.vue';
+	import PageEdit from '../components/wiki/edit.vue';
 
 	//------------------------------------------------------------------------------------------------------------------
 

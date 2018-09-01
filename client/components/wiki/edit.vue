@@ -117,7 +117,7 @@
 	import 'codemirror/mode/meta';
 
 	// Managers
-	import pageMan from '../../../api/managers/page';
+	import pageMan from '../../api/managers/page';
 
 	// Components
 	import CodeMirror from 'vue-cm'

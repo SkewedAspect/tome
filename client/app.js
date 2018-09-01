@@ -35,11 +35,11 @@ import "highlightjs/styles/github.css";
 import pkg from '../package.json';
 
 // Components
-import WikiLink from './components/wikiLink.vue';
+import WikiLink from './components/wiki/link.vue';
 import AppComponent from './app.vue';
 
 // Pages
-import WikiPage from './pages/wiki/wiki.vue';
+import WikiPage from './pages/wiki.vue';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // VueRX
