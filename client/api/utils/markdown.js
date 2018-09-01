@@ -1,7 +1,5 @@
 //----------------------------------------------------------------------------------------------------------------------
-// MarkdownService
-//
-// @module
+// MarkdownUtil
 //----------------------------------------------------------------------------------------------------------------------
 
 import _ from 'lodash';
@@ -13,7 +11,7 @@ import toc from 'markdown-it-table-of-contents';
 
 //----------------------------------------------------------------------------------------------------------------------
 
-class MarkdownService
+class MarkdownUtil
 {
     constructor()
     {
@@ -25,12 +23,13 @@ class MarkdownService
                 {
                     if (lang && hljs.getLanguage(lang))
                     {
-                        try {
+                        try
+                        {
                             return `<pre class="hljs card bg-light"><code>${ hljs.highlight(lang, str, true).value }</code></pre>`;
                         } catch (_) {}
                     } // end if
 
-                    return `<pre class="hljs card bg-light"><code>${ md.utils.escapeHtml(str) }</code></pre>`;
+                    return `<pre class="hljs card bg-light"><code>${ mdRenderer.utils.escapeHtml(str) }</code></pre>`;
                 }
             });
 
@@ -101,10 +100,10 @@ class MarkdownService
     {
         return this.mdRenderer.render(text);
     } // end renderInline
-} // end MarkdownService
+} // end MarkdownUtil
 
 //----------------------------------------------------------------------------------------------------------------------
 
-export default new MarkdownService();
+export default new MarkdownUtil();
 
 //----------------------------------------------------------------------------------------------------------------------
