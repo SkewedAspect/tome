@@ -4184,7 +4184,7 @@ pinkie@^2.0.0:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/pinkie/-/pinkie-2.0.4.tgz#72556b80cfa0d48a974e80e77248e80ed4f7f870"
 
-popper.js@^1.12.9:
+popper.js@^1.12.9, popper.js@^1.14.4:
   version "1.14.4"
   resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.14.4.tgz#8eec1d8ff02a5a3a152dd43414a15c7b79fd69b6"
 
@@ -6107,6 +6107,10 @@ utils-merge@1.0.1, utils-merge@1.x.x:
 uuid@^3.1.0, uuid@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
+
+v-runtime-template@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/v-runtime-template/-/v-runtime-template-1.5.2.tgz#1260a329980ae8a37ffcc6c73bdab5858393b5f8"
 
 v8-compile-cache@^2.0.0:
   version "2.0.2"

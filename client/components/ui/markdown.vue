@@ -1,15 +1,15 @@
 <!--------------------------------------------------------------------------------------------------------------------->
-<!-- Wiki Page Display
+<!-- Markdown Component - Allows for both text and vue components to be used.
 <!--------------------------------------------------------------------------------------------------------------------->
 
 <template>
-    <markdown id="page-display" :text="pageBody"></markdown>
+    <v-runtime-template :template="template"></v-runtime-template>
 </template>
 
 <!--------------------------------------------------------------------------------------------------------------------->
 
 <style lang="scss" scoped>
-    #page-display {
+    .markdown-block {
     }
 </style>
 
@@ -18,29 +18,31 @@
 <script>
     //------------------------------------------------------------------------------------------------------------------
 
-    import _ from 'lodash';
-
-	// Managers
-	import pageMan from '../../api/managers/page';
-
     // Components
-    import Markdown from "../ui/markdown.vue";
+    import VRuntimeTemplate from "v-runtime-template";
 
-	//------------------------------------------------------------------------------------------------------------------
+    // Utils
+    import markdown from '../../api/utils/markdown';
+
+    //------------------------------------------------------------------------------------------------------------------
 
     export default {
-        components: {
-            Markdown
-        },
-        computed: {
-		    pageBody()
-            {
-                return _.get(this.page, 'body', '');
+        props: {
+            text: {
+                type: String,
+                required: true
             }
         },
-        subscriptions: {
-            page: pageMan.currentPage$
-		}
+        components: {
+            VRuntimeTemplate
+        },
+        computed: {
+            template()
+            {
+                const htmlTxt = !!this.text ? markdown.render(this.text) : '';
+                return `<div class="markdown-block">${ htmlTxt }</div>`
+            }
+        }
     }
 </script>
 
