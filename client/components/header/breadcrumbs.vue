@@ -6,19 +6,25 @@
     <div v-if="show" class="breadcrumb-area">
 		<b-button-toolbar id="breadcrumb-buttons">
 			<b-button-group class="mx-1" v-if="canView">
+
+                <!-- Edit / Cancel  -->
 				<b-btn v-if="canModify && !editing" variant="link" size="sm" :to="{ query: { edit: null } }">
 					<font-awesome-icon icon="edit"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Edit</span>
 				</b-btn>
 				<b-btn v-else-if="editing" variant="link" size="sm" :to="{ query: {} }">
 					<font-awesome-icon icon="times"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Cancel</span>
 				</b-btn>
-				<b-btn v-if="canModify && !editing" variant="link" size="sm" :to="historyLink">
+
+                <!-- History / Undo -->
+                <b-btn v-if="canView && !editing" variant="link" size="sm" :to="historyLink">
 					<font-awesome-icon icon="history"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">History</span>
 				</b-btn>
 				<b-btn v-else-if="editing" variant="link" size="sm" @click="broadcast('page reset')">
 					<font-awesome-icon icon="undo"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Reset</span>
 				</b-btn>
-				<b-btn v-if="canModify && !editing" variant="link" size="sm" :to="commentLink">
+
+                <!-- Comments / Save -->
+				<b-btn v-if="canView && !editing" variant="link" size="sm" :to="commentLink">
 					<font-awesome-icon icon="comments"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Comments</span>
 				</b-btn>
 				<b-btn v-else-if="editing" variant="link" size="sm" @click="broadcast('page save')">
@@ -26,7 +32,7 @@
 				</b-btn>
 			</b-button-group>
 		</b-button-toolbar>
-		<b-breadcrumb id="site-breadcrumb-bar" class="mb-0" :items="breadcrumbs"/>
+		<b-breadcrumb id="site-breadcrumb-bar" class="mb-0" :items="breadcrumbs"></b-breadcrumb>
     </div>
 </template>
 
