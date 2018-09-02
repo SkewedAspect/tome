@@ -21,6 +21,7 @@ Most of these are planned, any that have been checked off have been implemented.
     * [ ] Comments on pages
     * [ ] Page History
     * [ ] Full Text Search
+    * [ ] User Profile Page
 * [ ] Image Upload/embedding
 * [ ] File Attachments (maybe)
 * [ ] Branding and Theming
