@@ -2,6 +2,91 @@
 // Setups up a default role
 //----------------------------------------------------------------------------------------------------------------------
 
+const body = `# Welcome
+
+Congratulations, you've successfully setup your Tome wiki!
+
+Here is some markdown examples to get you started:
+
+---
+
+# h1 Heading
+## h2 Heading
+### h3 Heading
+#### h4 Heading
+##### h5 Heading
+###### h6 Heading
+
+
+## Emphasis
+
+**This is bold text**
+
+__This is bold text__
+
+*This is italic text*
+
+_This is italic text_
+
+~~Strikethrough~~
+
+## Links
+
+Here we have an example of a [wiki link](/foobar), followed by an [external link](https://gitlab.com) in the same sentence.
+
+### Wiki Links
+
+Creating a wiki link is fairly easy. It works exactly the same as any normal markdown link (all versions of the link syntax are 
+supported), but the url will start with either \`'/wiki'\` or simply \`'/'\`.
+
+Ex:
+
+\`\`\`markdown
+Here is some text containing a [wiki link](/some-page). This [also](/wiki/some-other-page) works. As does [this][].
+
+However, [this link](example.com) is an external one. Also [this one][].
+
+[this]: /some-other-other-page
+[this one]: https://google.com
+\`\`\`
+
+## Blockquotes
+
+> Blockquotes can also be nested...
+>> ...by using additional greater-than signs right next to each other...
+> > > ...or with spaces between arrows.
+
+
+## Lists
+
+Unordered
+
++ Create a list by starting a line with \`+\`, \`-\`, or \`*\`
++ Sub-lists are made by indenting 2 spaces:
+  - Marker character change forces new list start:
+    * Ac tristique libero volutpat at
+    + Facilisis in pretium nisl aliquet
+    - Nulla volutpat aliquam velit
++ Very easy!
+
+Ordered
+
+1. Lorem ipsum dolor sit amet
+2. Consectetur adipiscing elit
+3. Integer molestie lorem at massa
+
+
+1. You can use sequential numbers...
+1. ...or keep all the numbers as \`1.\`
+
+Start numbering with offset:
+
+57. foo
+1. bar
+`;
+
+//----------------------------------------------------------------------------------------------------------------------
+
 exports.seed = function(knex, Promise)
 {
     return Promise.join(
@@ -22,82 +107,7 @@ exports.seed = function(knex, Promise)
                     return knex('revision')
                         .insert({
                             page_id,
-                            body: "Congratulations, you've successfully setup your Tome wiki!" +
-                            "\n\n" +
-                            "Here is some markdown examples to get you started:" +
-                            "\n\n" +
-                            "---" +
-                            "\n\n" +
-                            "# h1 Heading\n" +
-                            "## h2 Heading\n" +
-                            "### h3 Heading\n" +
-                            "#### h4 Heading\n" +
-                            "##### h5 Heading\n" +
-                            "###### h6 Heading\n" +
-                            "\n\n" +
-                            "## Emphasis" +
-                            "\n\n" +
-                            "**This is bold text**" +
-                            "\n\n" +
-                            "__This is bold text__" +
-                            "\n\n" +
-                            "*This is italic text*" +
-                            "\n\n" +
-                            "_This is italic text_" +
-                            "\n\n" +
-                            "~~Strikethrough~~\n" +
-                            "\n\n" +
-                            "## Links" +
-                            "\n\n" +
-                            "Here we have an example of a [wiki link](/foobar), followed by an [external link](https://gitlab.com) in the same sentence." +
-                            "\n\n" +
-                            "### Wiki Links" +
-                            "\n\n" +
-                            "Creating a wiki link is fairly easy. It works exactly the same as any normal markdown link (all versions of the link syntax are\n" +
-                            "supported), but the url will start with either `'/wiki'` or simply `'/'`." +
-                            "\n\n" +
-                            "Ex:" +
-                            "\n\n" +
-                            "```markdown\n" +
-                            "Here is some text containing a [wiki link](/some-page). This [also](/wiki/some-other-page) works. As does [this][]." +
-                            "\n\n" +
-                            "However, [this link](example.com) is an external one. Also [this one][]." +
-                            "\n\n" +
-                            "[this]: /some-other-other-page\n" +
-                            "[this one]: https://google.com\n" +
-                            "```" +
-                            "\n\n" +
-                            "## Blockquotes" +
-                            "\n\n" +
-                            "> Blockquotes can also be nested...\n" +
-                            ">> ...by using additional greater-than signs right next to each other...\n" +
-                            "> > > ...or with spaces between arrows.\n" +
-                            "\n\n" +
-                            "## Lists" +
-                            "\n\n" +
-                            "Unordered" +
-                            "\n\n" +
-                            "+ Create a list by starting a line with `+`, `-`, or `*`\n" +
-                            "+ Sub-lists are made by indenting 2 spaces:\n" +
-                            "  - Marker character change forces new list start:\n" +
-                            "    * Ac tristique libero volutpat at\n" +
-                            "    + Facilisis in pretium nisl aliquet\n" +
-                            "    - Nulla volutpat aliquam velit\n" +
-                            "+ Very easy!" +
-                            "\n\n" +
-                            "Ordered" +
-                            "\n\n" +
-                            "1. Lorem ipsum dolor sit amet\n" +
-                            "2. Consectetur adipiscing elit\n" +
-                            "3. Integer molestie lorem at massa\n" +
-                            "\n\n" +
-                            "1. You can use sequential numbers...\n" +
-                            "1. ...or keep all the numbers as `1.`" +
-                            "\n\n" +
-                            "Start numbering with offset:" +
-                            "\n\n" +
-                            "57. foo\n" +
-                            "1. bar"
+                            body
                         });
                 });
         });
