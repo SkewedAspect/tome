@@ -228,7 +228,7 @@ describe("Comment API ('/comment')", () =>
                 });
         });
 
-        it('anonymous users can not create new pages', () =>
+        it('anonymous users can not create new comments', () =>
         {
             const newComment = { title: "Test Comment", body: "Sup?" };
             app.set('user', null);
