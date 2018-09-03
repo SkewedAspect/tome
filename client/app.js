@@ -1,7 +1,5 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Main Client-side Application
-//
-// @module
 //----------------------------------------------------------------------------------------------------------------------
 
 // Overwrite the global promise with Bluebird. This makes `axios` use Bluebird promises.
@@ -39,6 +37,8 @@ import WikiLink from './components/wiki/link.vue';
 import AppComponent from './app.vue';
 
 // Pages
+import CommentPage from './pages/comment.vue';
+import HistoryPage from './pages/history.vue';
 import WikiPage from './pages/wiki.vue';
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -80,18 +80,22 @@ const router = new VueRouter({
     routes: [
         { path: '/', redirect: '/wiki/' },
         { path: '/wiki/:path*', name: 'wiki', component: WikiPage },
-        // { path: '*', redirect: '/wiki/' }
+        { path: '/history/:path*', name: 'history', component: HistoryPage },
+        { path: '/comment/:path*', name: 'comments', component: CommentPage },
     ],
     // scrollBehavior(to, from, savedPosition)
     // {
     //     console.log('sup??');
+    //
+    //     if(savedPosition)
+    //     {
+    //         return savedPosition;
+    //     } // end if
+    //
     //     if(to.hash)
     //     {
-    //         return {
-    //             selector: to.hash
-    //             // , offset: { x: 0, y: 10 }
-    //         };
-    //     } // ed if
+    //         return { selector: to.hash };
+    //     } // end if
     // }
 });
 

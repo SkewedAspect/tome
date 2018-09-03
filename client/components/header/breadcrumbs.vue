@@ -84,8 +84,16 @@
                 return pageMan.normalizePath(path);
             },
 			editing(){ return _.includes(_.keys(this.$route.query), 'edit'); },
-			historyLink(){ return { path: `/history/${ this.$route.params.path }` }; },
-			commentLink(){ return { path: `/comment/${ this.$route.params.path }` }; },
+			historyLink()
+            {
+                const path = this.$route.params.path;
+                return { path: _.isUndefined(path) ? '/history' : `/history/${ path }` };
+            },
+			commentLink()
+            {
+                const path = this.$route.params.path;
+                return { path: _.isUndefined(path) ? '/comment' : `/comment/${ path }` };
+            },
 
         	breadcrumbs()
 			{
