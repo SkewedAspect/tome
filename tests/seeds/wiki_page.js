@@ -30,6 +30,17 @@ exports.seed = function(knex, Promise)
                     .then(([ page_id ]) => knex('revision').insert({ page_id, body: "This is a _perm_ wiki sub page.", revision_id: 7 })),
                 knex('page').insert({ page_id: 6, path: '/normal/sub/perm/inherited', title: 'Inherited Perm Sub Wiki Page' })
                     .then(([ page_id ]) => knex('revision').insert({ page_id, body: "This is an inherited _perm_ wiki sub page.", revision_id: 8 })),
+                knex('page').insert({ page_id: 7, path: '/deleted', title: 'Deleted Wiki Page' })
+                    .then(([ page_id ]) =>
+                    {
+                        return knex('revision').insert({ page_id, body: "This is a _normal_ wiki page. First Revision.", revision_id: 9 })
+                            .delay(20)
+                            .then(() => knex('revision').insert({ page_id, body: "This is a _normal_ wiki page. Second Revision", revision_id: 10 }))
+                            .delay(20)
+                            .then(() => knex('revision').insert({ page_id, body: null, revision_id: 11 }));
+                    }),
+                knex('page').insert({ page_id: 8, path: '/not-deleted', title: 'Not Deleted Wiki Page' })
+                    .then(([ page_id ]) => knex('revision').insert({ page_id, body: "This is a _normal_ wiki sub page.", revision_id: 12 })),
             );
         });
 };
