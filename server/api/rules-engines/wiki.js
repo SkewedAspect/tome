@@ -95,6 +95,20 @@ class WikiRulesEngine
             resolve(true);
         });
     } // end validatePath
+
+    validateSearch(term)
+    {
+        return new Promise((resolve, reject) =>
+        {
+            if(!_.isString(term))
+            {
+                reject(new ValidationError('term', 'must be a string'));
+            } // end if
+
+            // We've successfully validated
+            resolve(true);
+        });
+    } // end validateSearch
 } // end WikiRulesEngine
 
 //----------------------------------------------------------------------------------------------------------------------

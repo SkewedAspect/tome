@@ -35,6 +35,7 @@ const accountsRoute = require('./server/routes/accounts');
 const commentRoute = require('./server/routes/comments');
 const historyRoute = require('./server/routes/history');
 const rolesRoute = require('./server/routes/roles');
+const searchRoute = require('./server/routes/search');
 const wikiRoute = require('./server/routes/wiki');
 const routeUtils = require('./server/routes/utils');
 
@@ -100,6 +101,7 @@ const loading = dbMan.getDB()
         app.use('/comment', commentRoute);
         app.use('/history', historyRoute);
         app.use('/roles', rolesRoute);
+        app.use('/search', searchRoute);
         app.use('/wiki', wikiRoute);
 
         // Serve index.html for any html requests, but 404 everything else.

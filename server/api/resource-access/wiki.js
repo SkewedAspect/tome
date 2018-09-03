@@ -115,6 +115,29 @@ class WikiResourceAccess
             }));
     } // end getPage
 
+    getPageByID(page_id)
+    {
+        return this.loading
+            .then((db) => db('current_revision')
+            .select()
+            .where({ page_id })
+            .then((pages) =>
+            {
+                if(pages.length > 1)
+                {
+                    throw new MultipleResultsError('page');
+                }
+                else if(pages.length === 0)
+                {
+                    throw new NotFoundError(`No page found for url '${ path }'.`);
+                }
+                else
+                {
+                    return this._mungeWikiPage(pages[0]);
+                } // end if
+            }));
+    } // end getPageByID
+
     getPageHistory(path)
     {
         return this.loading
@@ -152,6 +175,28 @@ class WikiResourceAccess
     {
         return this._getPermission(path, action);
     } // end getPermission
+
+    searchPages(term)
+    {
+        return this.loading
+            .then((db) => db('page_search')
+            .select('rowid as page_id')
+            .select(db.raw(`snippet(page_search, 0, '<span class="fts-match">', '</span>', '...', 3) title`))
+            .select(db.raw(`snippet(page_search, 1, '<span class="fts-match">', '</span>', '...', 5) body`))
+            .where(db.raw('page_search MATCH ?', term))
+            .orderBy('rank'))
+            .map(({ page_id, title, body }) =>
+            {
+                return this.getPageByID(page_id)
+                    .then((page) =>
+                    {
+                        return {
+                            match: { title, body },
+                            page
+                        };
+                    });
+            });
+    } // end searchPages
 
     updatePage(newPage)
     {

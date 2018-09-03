@@ -57,6 +57,12 @@ class WikiManager
             .then(() => wikiRA.getPage(newPath));
     } // end movePage
 
+    searchPages(term)
+    {
+        return wikiRE.validateSearch(term)
+            .then(() => wikiRA.searchPages(term))
+    } // end searchPages
+
     deletePage(path)
     {
         return wikiRE.validatePath(path)

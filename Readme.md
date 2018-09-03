@@ -14,7 +14,7 @@ Most of these are planned, any that have been checked off have been implemented.
     * [X] Hierarchical wiki page permissions
     * [X] Comments on pages
     * [X] Page History
-    * [ ] Full Text Search (db only)
+    * [X] Full Text Search
 * [ ] UI
     * [X] Hierarchical wiki pages
     * [ ] Hierarchical wiki page permissions
