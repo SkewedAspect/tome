@@ -24,7 +24,7 @@
         </b-navbar>
 
 		<!-- Breadcrumbs bar -->
-		<breadcrumbs></breadcrumbs>
+		<breadcrumb-bar></breadcrumb-bar>
 	</header>
 </template>
 
@@ -44,7 +44,7 @@
     //------------------------------------------------------------------------------------------------------------------
 
     // Components
-	import Breadcrumbs from './breadcrumbs.vue';
+	import BreadcrumbBar from './breadcrumbBar.vue';
 	import Login from './login.vue';
 	import SearchBar from './search.vue';
 
@@ -52,7 +52,7 @@
 
     export default {
     	components: {
-    		Breadcrumbs,
+    		BreadcrumbBar,
 			Login,
 			SearchBar
 		},

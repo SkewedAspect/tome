@@ -32,7 +32,8 @@
 				</b-btn>
 			</b-button-group>
 		</b-button-toolbar>
-		<b-breadcrumb id="site-breadcrumb-bar" class="mb-0" :items="breadcrumbs"></b-breadcrumb>
+
+        <breadcrumbs id="site-breadcrumb-bar" class="mb-0" :items="breadcrumbs"></breadcrumbs>
     </div>
 </template>
 
@@ -74,9 +75,15 @@
 	import authMan from '../../api/managers/auth';
 	import pageMan from '../../api/managers/page';
 
+	// Components
+    import Breadcrumbs from '../ui/breadcrumbs.vue';
+
     //------------------------------------------------------------------------------------------------------------------
 
     export default {
+        components: {
+            Breadcrumbs
+        },
 		computed: {
             path()
             {
@@ -97,9 +104,9 @@
 
         	breadcrumbs()
 			{
-				let breadcrumbs = [{ text: 'wiki', to: { path: '/wiki' } }];
                 let crumbPath = '/wiki';
                 const pathCrumbs = _.compact(this.path.split('/'));
+                let breadcrumbs = [{ text: 'wiki', to: { path: '/wiki' }, active: pathCrumbs.length === 0 && this.$route.name === 'wiki' }];
                 _.each(pathCrumbs, (crumb) =>
                 {
                     crumbPath += `/${ crumb }`;
@@ -126,7 +133,7 @@
 
 				return false;
 			},
-			show(){ return _.includes(['wiki', 'history', 'comments'], this.$route.name); }
+			show(){ return _.includes(['wiki', 'history', 'comments', 'search'], this.$route.name); }
 		},
 		methods: {
 			broadcast(event, ...args)
