@@ -23,6 +23,22 @@ class WikiResourceAccess
         this.$pages = {};
     } // end constructor
 
+    _buildModel(def)
+    {
+        let pageInst = this.$pages[def.path];
+        if(pageInst)
+        {
+            pageInst.update(def);
+        }
+        else
+        {
+            pageInst = new PageModel(def);
+            this.$pages[def.path] = pageInst;
+        } // end if
+
+        return pageInst;
+    } // end _buildModel
+
     createPage(path)
     {
         return Promise.resolve(new PageModel({
@@ -53,21 +69,7 @@ class WikiResourceAccess
                 } // end if
             })
             .then(({ data }) => data)
-            .then((pageDef) =>
-            {
-                let pageInst = this.$pages[path];
-                if(pageInst)
-                {
-                    pageInst.update(pageDef);
-                }
-                else
-                {
-                    pageInst = new PageModel(pageDef);
-                    this.$pages[path] = pageInst;
-                } // end if
-
-                return pageInst;
-            });
+            .then((pageDef) => this._buildModel(pageDef));
     } // end getPage
 
     savePage(page)
@@ -79,6 +81,18 @@ class WikiResourceAccess
                 page.update(data);
             });
     } // end savePage
+
+    searchPages(term)
+    {
+        return $http.get('/search', { params: { term } })
+            .then(({ data }) => data)
+            .map((result) =>
+            {
+                result.page = this._buildModel(result.page);
+
+                return result;
+            });
+    } // end searchPages
 } // end WikiResourceAccess
 
 //----------------------------------------------------------------------------------------------------------------------

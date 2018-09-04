@@ -4,9 +4,9 @@
 
 <template>
 	<b-input-group class="search-bar">
-		<b-form-input type="text" placeholder="Search..." />
+        <b-form-input type="text" placeholder="Search..." v-model="searchTerm" @keyup.enter.native="doSearch"></b-form-input>
 		<b-input-group-append>
-			<b-button>
+			<b-button @click="doSearch">
 				<font-awesome-icon icon="search" />
 			</b-button>
 		</b-input-group-append>
@@ -30,10 +30,17 @@
     //------------------------------------------------------------------------------------------------------------------
 
     export default {
+        methods: {
+            doSearch()
+            {
+                this.$router.push({ path: '/search', query: { term: this.searchTerm }});
+                this.searchTerm = undefined;
+            }
+        },
         data()
         {
             return {
-                // Data goes here
+                searchTerm: undefined
             };
         }
     }

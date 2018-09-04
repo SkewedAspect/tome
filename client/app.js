@@ -39,6 +39,7 @@ import AppComponent from './app.vue';
 // Pages
 import CommentPage from './pages/comment.vue';
 import HistoryPage from './pages/history.vue';
+import SearchPage from './pages/search.vue';
 import WikiPage from './pages/wiki.vue';
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -79,9 +80,10 @@ const router = new VueRouter({
     mode: 'history',
     routes: [
         { path: '/', redirect: '/wiki/' },
-        { path: '/wiki/:path*', name: 'wiki', component: WikiPage },
-        { path: '/history/:path*', name: 'history', component: HistoryPage },
+        { path: '/search', name: 'search', component: SearchPage },
         { path: '/comment/:path*', name: 'comments', component: CommentPage },
+        { path: '/history/:path*', name: 'history', component: HistoryPage },
+        { path: '/wiki/:path*', name: 'wiki', component: WikiPage },
     ],
     // scrollBehavior(to, from, savedPosition)
     // {

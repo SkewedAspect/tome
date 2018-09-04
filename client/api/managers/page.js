@@ -85,6 +85,18 @@ class PageManager
         return wikiRA.savePage(this.currentPage);
     } // end save
 
+    searchPages(term)
+    {
+        if(term)
+        {
+            return wikiRA.searchPages(term);
+        }
+        else
+        {
+            return Promise.resolve([]);
+        } // end if
+    } // end searchPage
+
     canView(page)
     {
         const user = authMan.account || { permissions: [], groups: [] };
