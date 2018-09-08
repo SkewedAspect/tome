@@ -10,6 +10,7 @@
 
 <style lang="scss" scoped>
     .markdown-block {
+        overflow: auto;
     }
 </style>
 

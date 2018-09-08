@@ -1,13 +1,16 @@
 <!--------------------------------------------------------------------------------------------------------------------->
-<!-- pageEdit                                                                                                         -->
+<!-- Edit Wiki Pages
 <!--------------------------------------------------------------------------------------------------------------------->
 
 <template>
     <div id="page-edit" v-if="page">
+        <!-- TODO: Finish implementing error handling. -->
 		<b-alert variant="danger">
 			<font-awesome-icon icon="exclamation-triangle"/>
 			Unable to save. (For some reason or another. Who knows. Gremlins, maybe?)
 		</b-alert>
+
+        <!-- Edit Page Form -->
 		<b-form @submit.prevent="save()" @reset.prevent="reset()" :validated="formValidated" novalidate>
 			<b-form-group id="pageTitleGroup"
 						  label="Title"
@@ -19,59 +22,135 @@
 							  placeholder="Some page title...">
 				</b-form-input>
 			</b-form-group>
-			<b-form-group id="pageBodyGroup"
-						  label="Body"
-						  label-for="pageBody">
-				<b-card no-body>
-					<code-mirror
-						id="pageBody"
-						v-model="pageBody"
-						:options="cmOptions">
-					</code-mirror>
-				</b-card>
-			</b-form-group>
-			<b-form-group id="permissionsGroup" label="Permissions">
-				<b-form-row>
-					<b-form-group horizontal
-								  class="col"
-								  label="View"
-								  label-class="text-sm-right"
-								  label-for="viewPerm">
-						<b-form-input id="viewPerm"
-									  type="text"
-									  v-model="page.actions.wikiView"
-									  required
-									  placeholder="inherited">
-						</b-form-input>
-					</b-form-group>
-					<b-form-group horizontal
-								  class="col"
-								  label="Modify"
-								  label-class="text-sm-right"
-								  label-for="modifyPerm">
-						<b-form-input id="modifyPerm"
-									  type="text"
-									  v-model="page.actions.wikiModify"
-									  required
-									  placeholder="inherited">
-						</b-form-input>
-					</b-form-group>
-				</b-form-row>
-			</b-form-group>
-			<div class="text-right mb-3">
-				<b-button type="reset" variant="secondary">
-					<font-awesome-icon icon="times"/>
-					Cancel
-				</b-button>
-				<b-button type="reset" variant="danger">
-					<font-awesome-icon icon="undo"/>
-					Reset
-				</b-button>
-				<b-button type="submit" variant="success">
-					<font-awesome-icon icon="save"/>
-					Save
-				</b-button>
-			</div>
+
+            <b-tabs @input="cmRefresh">
+                <b-tab title="Markdown" class="p-3">
+                    <b-card no-body>
+                        <code-mirror
+                            id="pageBody"
+                            ref="editor"
+                            v-model="pageBody"
+                            :options="cmOptions">
+                        </code-mirror>
+                    </b-card>
+                </b-tab>
+                <b-tab title="Preview" class="p-3">
+                    <markdown class="page-preview" style="margin-bottom: 2px;" :text="pageBody"></markdown>
+                </b-tab>
+            </b-tabs>
+
+            <!-- Advanced Editing -->
+
+            <hr>
+
+            <div class="float-right">
+                <b-btn variant="outline-secondary" class="mt-1" v-b-toggle.advCollapse style="width: 107px">
+                    <span class="when-opened">
+                        <font-awesome-icon icon="compress-alt"></font-awesome-icon>
+                        Collapse
+                    </span>
+                    <span class="when-closed">
+                        <font-awesome-icon icon="expand-alt"></font-awesome-icon>
+                        Expand
+                    </span>
+                </b-btn>
+            </div>
+
+            <h4>Advanced settings</h4>
+            <p class="text-responsive">
+                Perform advanced options, such as changing page permissions, moving or removing this page.
+            </p>
+
+            <b-collapse id="advCollapse">
+
+                <!-- Permissions -->
+                <b-card bg-variant="light" class="mb-3">
+                    <h5>Permissions</h5>
+                    <b-form-row>
+                        <b-col>
+                            <b-form-group
+                                label="View"
+                                label-for="viewPerm">
+                                <b-form-input id="viewPerm"
+                                    type="text"
+                                    v-model="page.actions.wikiView"
+                                    required
+                                    placeholder="inherited">
+                                </b-form-input>
+                            </b-form-group>
+                        </b-col>
+                        <b-col>
+                            <b-form-group
+                                label="Modify"
+                                label-for="modifyPerm">
+                                <b-form-input id="modifyPerm"
+                                    type="text"
+                                    v-model="page.actions.wikiModify"
+                                    required
+                                    placeholder="inherited">
+                                </b-form-input>
+                            </b-form-group>
+                        </b-col>
+                    </b-form-row>
+                </b-card>
+
+                <!-- Move Page -->
+                <b-card bg-variant="light" class="mb-3">
+                    <h5 class="text-warning">Move Page</h5>
+                    <p class="text-muted text-responsive">
+                        Moving a page <b>does not</b> alter the links referencing it. You will have to manually edit
+                        links to this page to point to the new url.
+                    </p>
+
+                    <b-form-group
+                        label="Path"
+                        label-for="movePage">
+                        <b-form-input id="movePage"
+                            type="text"
+                            v-model="page.path"
+                            required>
+                        </b-form-input>
+                    </b-form-group>
+
+                    <b-btn variant="warning">
+                        Move Page
+                    </b-btn>
+                </b-card>
+
+                <!-- Delete Page -->
+                <b-card bg-variant="light">
+                    <h5 class="text-danger">Delete Page</h5>
+                    <p class="text-muted text-responsive">
+                        Deleting the page will make it appear that there never was a page at this url. However, it
+                        <i>is</i> possible to recover by going to the page history, and reverting the delete revision.
+                    </p>
+
+                    <b-btn variant="danger">
+                        Delete Page
+                    </b-btn>
+                </b-card>
+            </b-collapse>
+
+            <hr>
+
+            <!-- Page Controls -->
+
+            <b-form-row>
+                <b-col sm="12" md="6" offset-md="6" class="mb-3 d-flex">
+                    <b-button class="w-100 mr-2" type="reset" variant="secondary" :to="{ query: {} }">
+                        <font-awesome-icon icon="times"/>
+                        Cancel
+                    </b-button>
+                    <b-button class="w-100 mr-2" type="reset" variant="danger" @click="reset()">
+                        <font-awesome-icon icon="undo"/>
+                        Reset
+                    </b-button>
+                    <b-button class="w-100" type="submit" variant="success" @click="save()">
+                        <font-awesome-icon icon="save"/>
+                        Save
+                    </b-button>
+                </b-col>
+            </b-form-row>
 		</b-form>
     </div>
 </template>
@@ -80,18 +159,30 @@
 
 <style lang="scss">
     #page-edit {
-		.CodeMirror {
-			height: calc(100vh - 420px);
+        .text-responsive {
+            @media (max-width: 991px) {
+                font-size: 0.85rem;
+            }
+        }
 
-			@media (max-width: 575px) {
-				height: calc(100vh - 450px);
+        .collapsed > .when-opened,
+        :not(.collapsed) > .when-closed {
+            display: none;
+        }
+
+        .page-preview,
+		.CodeMirror {
+			height: calc(100vh - 455px);
+
+			@media (max-width: 991px) {
+				height: calc(100vh - 470px);
 			}
 
 			.CodeMirror-scroll {
-				min-height: calc(100vh - 420px);
+				min-height: calc(100vh - 455px);
 
-				@media (max-width: 575px) {
-					min-height: calc(100vh - 450px);
+				@media (max-width: 991px) {
+					min-height: calc(100vh - 470px);
 				}
 			}
 		}
@@ -121,12 +212,14 @@
 
 	// Components
 	import CodeMirror from 'vue-cm'
+    import Markdown from "../ui/markdown.vue";
 
     //------------------------------------------------------------------------------------------------------------------
 
     export default {
 		components: {
-			CodeMirror
+			CodeMirror,
+            Markdown
 		},
         data()
         {
@@ -170,7 +263,14 @@
 			reset()
 			{
 				this.page.reset();
-			}
+			},
+            cmRefresh()
+            {
+                this.$nextTick(() =>
+                {
+                    this.$refs.editor.getCodeMirror().refresh();
+                });
+            }
 		},
 		subscriptions: {
 			page: pageMan.currentPage$
