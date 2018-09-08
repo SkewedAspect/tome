@@ -73,7 +73,7 @@
 
     // Managers
 	import authMan from '../../api/managers/auth';
-	import pageMan from '../../api/managers/page';
+	import wikiMan from '../../api/managers/wiki';
 
 	// Components
     import Breadcrumbs from '../ui/breadcrumbs.vue';
@@ -88,7 +88,7 @@
             path()
             {
                 let path = _.get(this.$route, 'params.path', '/');
-                return pageMan.normalizePath(path);
+                return wikiMan.normalizePath(path);
             },
 			editing(){ return _.includes(_.keys(this.$route.query), 'edit'); },
 			historyLink()
@@ -119,7 +119,7 @@
 			{
 				if(this.page)
 				{
-					return pageMan.canView(this.page);
+					return wikiMan.canView(this.page);
 				} // end if
 
 				return false;
@@ -128,7 +128,7 @@
 			{
 				if(this.page)
 				{
-                    return pageMan.canModify(this.page);
+                    return wikiMan.canModify(this.page);
 				} // end if
 
 				return false;
@@ -143,7 +143,7 @@
 		},
 		subscriptions: {
         	account: authMan.account$,
-			page: pageMan.currentPage$
+			page: wikiMan.currentPage$
 		}
     }
 </script>

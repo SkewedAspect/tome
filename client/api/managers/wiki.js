@@ -1,7 +1,5 @@
 //----------------------------------------------------------------------------------------------------------------------
-// PageManager
-//
-// @module
+// WikiManager
 //----------------------------------------------------------------------------------------------------------------------
 
 import Promise from 'bluebird';
@@ -16,7 +14,7 @@ import wikiRA from '../resource-access/wiki';
 
 //----------------------------------------------------------------------------------------------------------------------
 
-class PageManager
+class WikiManager
 {
     constructor()
     {
@@ -110,10 +108,10 @@ class PageManager
         const viewPerm = `wikiModify/${ page.actions.wikiModify }`;
         return viewPerm === 'wikiModify/*' || permsMan.hasPerm(user, viewPerm);
     } // end canModify
-} // end PageManager
+} // end WikiManager
 
 //----------------------------------------------------------------------------------------------------------------------
 
-export default new PageManager();
+export default new WikiManager();
 
 //----------------------------------------------------------------------------------------------------------------------

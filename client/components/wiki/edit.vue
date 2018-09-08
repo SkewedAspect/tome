@@ -134,7 +134,6 @@
             <hr>
 
             <!-- Page Controls -->
-
             <b-form-row>
                 <b-col sm="12" md="6" offset-md="6" class="mb-3 d-flex">
                     <b-button class="w-100 mr-2" type="reset" variant="secondary" :to="{ query: {} }">
@@ -208,7 +207,7 @@
 	import 'codemirror/mode/meta';
 
 	// Managers
-	import pageMan from '../../api/managers/page';
+	import wikiMan from '../../api/managers/wiki';
 
 	// Components
 	import CodeMirror from 'vue-cm'
@@ -254,7 +253,7 @@
         	save()
 			{
 				this.formValidated = true;
-				return pageMan.savePage(this.page)
+				return wikiMan.savePage(this.page)
 					.then(() => {
 						this.formValidated = false;
 						this.$router.push({ query: {} });
@@ -273,7 +272,7 @@
             }
 		},
 		subscriptions: {
-			page: pageMan.currentPage$
+			page: wikiMan.currentPage$
 		},
 		beforeDestroy() {
 			this.$root.$off('page reset', this.reset);

@@ -50,7 +50,7 @@
     import _ from 'lodash';
 
     // Managers
-    import pageMan from '../api/managers/page';
+    import wikiMan from '../api/managers/wiki';
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@
             {
                 if(this.searchTerm)
                 {
-                    return pageMan.searchPages(this.searchTerm)
+                    return wikiMan.searchPages(this.searchTerm)
                         .then((results) =>
                         {
                             this.$set(this, 'searchResults', results);

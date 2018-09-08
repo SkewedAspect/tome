@@ -54,7 +54,7 @@
 
 	// Managers
 	import authMan from '../api/managers/auth';
-	import pageMan from '../api/managers/page';
+	import wikiMan from '../api/managers/wiki';
 
 	//------------------------------------------------------------------------------------------------------------------
 
@@ -74,20 +74,20 @@
 			path()
 			{
 				let path = _.get(this.$route, 'params.path', '/');
-				return pageMan.normalizePath(path);
+				return wikiMan.normalizePath(path);
 			}
 		},
 		methods: {
 			selectPage()
 			{
-				return pageMan.selectPage(this.path)
+				return wikiMan.selectPage(this.path)
 					.catch({ code: 'ERR_NOT_FOUND' }, () =>
 					{
 						this.loading = false;
 
 						if(this.mode === 'edit')
 						{
-							return pageMan.createPage(this.path);
+							return wikiMan.createPage(this.path);
 						}
 						else
 						{
@@ -133,7 +133,7 @@
 		},
 		subscriptions: {
 			account: authMan.account$,
-			page: pageMan.currentPage$
+			page: wikiMan.currentPage$
 		},
 		mounted()
 		{

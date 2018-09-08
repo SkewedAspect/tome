@@ -21,7 +21,7 @@
     import _ from 'lodash';
 
 	// Managers
-	import pageMan from '../../api/managers/page';
+	import wikiMan from '../../api/managers/wiki';
 
     // Components
     import Markdown from "../ui/markdown.vue";
@@ -39,7 +39,7 @@
             }
         },
         subscriptions: {
-            page: pageMan.currentPage$
+            page: wikiMan.currentPage$
 		}
     }
 </script>
