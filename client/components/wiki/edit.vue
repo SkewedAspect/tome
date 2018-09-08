@@ -25,7 +25,7 @@
 
             <b-tabs @input="cmRefresh">
                 <b-tab title="Markdown" class="p-3">
-                    <b-card no-body>
+                    <b-card no-body style="overflow: hidden">
                         <code-mirror
                             id="pageBody"
                             ref="editor"
