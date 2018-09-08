@@ -95,7 +95,7 @@
                 </b-card>
 
                 <!-- Move Page -->
-                <b-card bg-variant="light" class="mb-3">
+                <b-card bg-variant="light" class="mb-3" v-if="page.page_id && page.body !== null">
                     <h5 class="text-warning">Move Page</h5>
                     <p class="text-muted text-responsive">
                         Moving a page <b>does not</b> alter the links referencing it. You will have to manually edit
@@ -118,7 +118,7 @@
                 </b-card>
 
                 <!-- Delete Page -->
-                <b-card bg-variant="light">
+                <b-card bg-variant="light" v-if="page.page_id && page.body !== null">
                     <h5 class="text-danger">Delete Page</h5>
                     <p class="text-muted text-responsive">
                         Deleting the page will make it appear that there never was a page at this url. However, it
