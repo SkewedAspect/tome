@@ -93,6 +93,19 @@ class WikiResourceAccess
                 return result;
             });
     } // end searchPages
+
+    deletePage(path)
+    {
+        return $http.delete(`/wiki${ path }`)
+            .then(() =>
+            {
+                let pageInst = this.$pages[path];
+                if(pageInst)
+                {
+                    delete this.$pages[path];
+                } // end if
+            });
+    } // end deletePage
 } // end WikiResourceAccess
 
 //----------------------------------------------------------------------------------------------------------------------

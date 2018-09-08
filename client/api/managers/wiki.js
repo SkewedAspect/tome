@@ -64,18 +64,11 @@ class WikiManager
 
     selectPage(path)
     {
-        if(!this.currentPage || this.currentPage.path !== path)
-        {
-            return wikiRA.getPage(path)
-                .tap((page) =>
-                {
-                    this._currentPageSubject.next(page);
-                });
-        }
-        else
-        {
-            return Promise.resolve(this.currentPage);
-        } // end if
+        return wikiRA.getPage(path)
+            .tap((page) =>
+            {
+                this._currentPageSubject.next(page);
+            });
     } // end selectPage
 
     savePage()
@@ -94,6 +87,11 @@ class WikiManager
             return Promise.resolve([]);
         } // end if
     } // end searchPage
+
+    deletePage(path)
+    {
+        return wikiRA.deletePage(path);
+    } // end deletePage
 
     canView(page)
     {

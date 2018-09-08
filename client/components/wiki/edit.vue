@@ -125,7 +125,7 @@
                         <i>is</i> possible to recover by going to the page history, and reverting the delete revision.
                     </p>
 
-                    <b-btn variant="danger">
+                    <b-btn variant="danger" v-b-modal.delModal>
                         Delete Page
                     </b-btn>
                 </b-card>
@@ -151,6 +151,26 @@
                 </b-col>
             </b-form-row>
 		</b-form>
+
+        <!-- Modals -->
+        <b-modal id="delModal" size="lg" ok-variant="danger" ok-title="Delete" @ok="deletePage">
+            <template slot="modal-title">
+                <font-awesome-icon class="text-danger" icon="exclamation-triangle"></font-awesome-icon>
+                Delete page "{{ page.title }}"
+            </template>
+
+            <p>
+                <b>Are you sure you want to delete this page?</b>
+            </p>
+            <p class="text-muted">
+                Generally, it is not recommended to delete pages; instead you can simply remove the contents and
+                replace it with explanatory text about why the page was deleted.
+            </p>
+            <p>
+                While it is possible to undo this operation, you will need to remember that a page existed at the url
+                <code>/wiki{{ page.path }}</code> and then check the page history to revert.
+            </p>
+        </b-modal>
     </div>
 </template>
 
@@ -269,6 +289,15 @@
                 {
                     this.$refs.editor.getCodeMirror().refresh();
                 });
+            },
+            deletePage()
+            {
+                const path = this.page.path;
+                return wikiMan.deletePage(path)
+                    .then(() =>
+                    {
+                        this.$router.push({ path: `/wiki${ path }`, query: {} });
+                    });
             }
 		},
 		subscriptions: {
