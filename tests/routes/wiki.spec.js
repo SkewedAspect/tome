@@ -538,6 +538,196 @@ describe("Wiki API ('/wiki')", () =>
         });
     });
 
+    describe('POST /wiki/:path/move', () =>
+    {
+        it('passing in a valid path moves the page', () =>
+        {
+            const newPath = { path: '/normal/moved' };
+            return request.post('/wiki/normal/move')
+                .set('Accept', 'application/json')
+                .send(newPath)
+                .then((response) =>
+                {
+                    expect(response).to.be.json;
+
+                    const page = response.body;
+                    expect(page).to.be.an('object');
+                    expect(page).to.not.be.empty;
+
+                    expect(page).to.have.property('page_id');
+                    expect(page).to.have.property('title');
+                    expect(page).to.have.property('body');
+                    expect(page).to.have.property('path', newPath.path);
+
+                    // Attempt to look up the page we just created
+                    return request.get('/wiki/normal/moved')
+                        .set('Accept', 'application/json')
+                        .then((response) =>
+                        {
+                            expect(response).to.be.json;
+
+                            const movedPage = response.body;
+                            expect(movedPage).to.be.an('object');
+                            expect(movedPage).to.not.be.empty;
+
+                            expect(movedPage).to.have.property('page_id', page.page_id);
+                            expect(movedPage).to.have.property('title', page.title);
+                            expect(movedPage).to.have.property('body', page.body);
+                            expect(movedPage).to.have.property('path', newPath.path);
+                            expect(movedPage).to.have.property('revision_id', page.revision_id);
+                        });
+                })
+                .then(() =>
+                {
+                    return request.head('/wiki/normal')
+                        .set('Accept', 'application/json')
+                        .catch(({ response }) => response)
+                        .then((response) =>
+                        {
+                            expect(response).to.have.status(404);
+                        });
+                });
+        });
+
+        it('does not allow you to move a page to an existing path', () =>
+        {
+            const newPath = { path: '/normal/sub' };
+            return request.post('/wiki/normal/move')
+                .set('Accept', 'application/json')
+                .send(newPath)
+                .catch(({ response }) => response)
+                .then((response) =>
+                {
+                    expect(response).to.be.json;
+                    expect(response).to.have.status(409);
+
+                    const error = response.body;
+                    expect(error).to.be.an('object');
+                    expect(error).to.not.be.empty;
+                    expect(error).to.have.property('code', 'ERR_PAGE_EXISTS');
+                });
+        });
+
+        it("move is refused for pages that don't exist", () =>
+        {
+            const newPath = { path: '/normal/moved' };
+            return request.post('/wiki/dne/move')
+                .set('Accept', 'application/json')
+                .send(newPath)
+                .catch(({ response }) => response)
+                .then((response) =>
+                {
+                    expect(response).to.be.json;
+                    expect(response).to.have.status(404);
+
+                    const error = response.body;
+                    expect(error).to.be.an('object');
+                    expect(error).to.not.be.empty;
+                    expect(error).to.have.property('code', 'ERR_NOT_FOUND');
+                });
+        });
+
+        it('move is refused for deleted pages', () =>
+        {
+            const newPath = { path: '/normal/moved' };
+            return request.post('/wiki/deleted/move')
+                .set('Accept', 'application/json')
+                .send(newPath)
+                .catch(({ response }) => response)
+                .then((response) =>
+                {
+                    expect(response).to.be.json;
+                    expect(response).to.have.status(404);
+
+                    const error = response.body;
+                    expect(error).to.be.an('object');
+                    expect(error).to.not.be.empty;
+                    expect(error).to.have.property('code', 'ERR_NOT_FOUND');
+                });
+        });
+
+        describe('Permissions', () =>
+        {
+            it('only allows move if the user has the appropriate permission', () =>
+            {
+                const newPath = { path: '/normal/moved' };
+                return accountMan.getAccountByUsername('normalUser')
+                    .then((user) => app.set('user', user))
+                    .then(() =>
+                    {
+                        return request.post('/wiki/normal/sub/perm/move')
+                            .set('Accept', 'application/json')
+                            .send(newPath)
+                            .catch(({ response }) => response)
+                            .then((response) =>
+                            {
+                                expect(response).to.have.status(403);
+                            });
+                    })
+                    .then(() => accountMan.getAccountByUsername('specialUser').then((user) => app.set('user', user)))
+                    .then(() =>
+                    {
+                        return request.post('/wiki/normal/sub/perm/move')
+                            .set('Accept', 'application/json')
+                            .send(newPath)
+                            .then((response) =>
+                            {
+                                expect(response).to.be.json;
+
+                                const movedPage = response.body;
+                                expect(movedPage).to.be.an('object');
+                                expect(movedPage).to.not.be.empty;
+
+                                expect(movedPage).to.have.property('page_id');
+                                expect(movedPage).to.have.property('title');
+                                expect(movedPage).to.have.property('body');
+                                expect(movedPage).to.have.property('path', newPath.path);
+                                expect(movedPage).to.have.property('revision_id');
+                            });
+                    });
+            });
+
+            it("inherits the permissions from it's parent page", () =>
+            {
+                const newPath = { path: '/normal/moved' };
+                return accountMan.getAccountByUsername('normalUser')
+                    .then((user) => app.set('user', user))
+                    .then(() =>
+                    {
+                        return request.post('/wiki/normal/sub/perm/inherited/move')
+                            .set('Accept', 'application/json')
+                            .send(newPath)
+                            .catch(({ response }) => response)
+                            .then((response) =>
+                            {
+                                expect(response).to.have.status(403);
+                            });
+                    })
+                    .then(() => accountMan.getAccountByUsername('specialUser').then((user) => app.set('user', user)))
+                    .then(() =>
+                    {
+                        return request.post('/wiki/normal/sub/perm/inherited/move')
+                            .set('Accept', 'application/json')
+                            .send(newPath)
+                            .then((response) =>
+                            {
+                                expect(response).to.be.json;
+
+                                const movedPage = response.body;
+                                expect(movedPage).to.be.an('object');
+                                expect(movedPage).to.not.be.empty;
+
+                                expect(movedPage).to.have.property('page_id');
+                                expect(movedPage).to.have.property('title');
+                                expect(movedPage).to.have.property('body');
+                                expect(movedPage).to.have.property('path', newPath.path);
+                                expect(movedPage).to.have.property('revision_id');
+                            });
+                    });
+            });
+        });
+    });
+
     describe('PATCH /wiki/:path', () =>
     {
         it('editing a page generates a new revision', () =>

@@ -117,6 +117,52 @@ router.options('*', promisify((req, resp) =>
         .then(([viewPerm, modifyPerm]) => ({ actions: { wikiView: viewPerm, wikiModify: modifyPerm } }));
 }));
 
+router.post('*/move', ensureAuthenticated, promisify((req, resp) =>
+{
+    const path = getPath(req);
+    const newPath = _.get(req.body, 'path');
+
+    // First, we need to get the page, so we can check the permissions.
+    return wikiMan.getPage(path)
+        .then((page) =>
+        {
+            return wikiMan.getPermission(path, 'modify')
+                .then((perm) =>
+                {
+                    const user = getUser(req);
+                    const viewPerm = `wikiModify/${ perm }`;
+                    if(viewPerm !== 'wikiModify/*' && !permsMan.hasPerm(user, viewPerm))
+                    {
+                        resp.status(403).json({
+                            name: 'Permission Denied',
+                            code: 'ERR_PERMISSION',
+                            message: `User '${ user.username }' does not have required permission.`
+                        });
+                    }
+                    else
+                    {
+                        return wikiMan.movePage(path, newPath)
+                            .catch({ code: 'ERR_VALIDATION_FAILED' }, (error) =>
+                            {
+                                resp.status(409).json({
+                                    name: 'Page Already Exists',
+                                    code: 'ERR_PAGE_EXISTS',
+                                    message: `A page already exists at path '${ newPath }'.`
+                                });
+                            });
+                    } // end if
+                });
+        })
+        .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+        {
+            resp.status(404).json({
+                name: 'Page not found',
+                code: 'ERR_NOT_FOUND',
+                message: `No page found for path '${ path }'.`
+            });
+        });
+}));
+
 router.post('*', ensureAuthenticated, promisify((req, resp) =>
 {
     const path = getPath(req);

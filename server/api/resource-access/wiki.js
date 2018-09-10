@@ -266,11 +266,28 @@ class WikiResourceAccess
 
     movePage(oldPath, newPath)
     {
-        return this.loading
-            .then((db) => db('page')
-            .where({ path: oldPath })
-            .update({ path: newPath })
-            .then((rows) => ({ rowsAffected: rows })));
+        return Promise.join(
+                this.getPage(oldPath).catch({ code: 'ERR_NOT_FOUND' }, () => null),
+                this.getPage(newPath).catch({ code: 'ERR_NOT_FOUND' }, () => null)
+            )
+            .then(([ oldPage, newPage ]) =>
+            {
+                if(newPage)
+                {
+                    throw new ValidationError('path', 'Cannot move page to a path with an existing page.');
+                } // end if
+
+                if(!oldPage || oldPage.body === null)
+                {
+                    throw new NotFoundError(`No page found for url '${ oldPath }'.`);
+                } // end if
+
+                return this.loading
+                    .then((db) => db('page')
+                        .where({ path: oldPath })
+                        .update({ path: newPath })
+                        .then((rows) => ({ rowsAffected: rows })));
+            });
     } // end movePage
 
     deletePage(path)

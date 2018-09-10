@@ -86,7 +86,7 @@ class WikiRulesEngine
                 reject(new ValidationError('newPath', 'must be a string'));
             } // end if
 
-            if(oldPath === new Path)
+            if(oldPath === newPath)
             {
                 reject(new ValidationError('newPath', "must not the the same as 'oldPath'"));
             } // end if
