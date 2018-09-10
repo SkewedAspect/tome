@@ -72,6 +72,15 @@ class WikiResourceAccess
             .then((pageDef) => this._buildModel(pageDef));
     } // end getPage
 
+    movePage(page, newPath)
+    {
+        return $http.put(`/wiki${ page.path }/move`, { path: newPath })
+            .then(({ data }) =>
+            {
+                page.update(data);
+            });
+    } // end movePage
+
     savePage(page)
     {
         const verb = !!page.page_id ? 'patch' : 'post';

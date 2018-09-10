@@ -88,6 +88,11 @@ class WikiManager
         } // end if
     } // end searchPage
 
+    movePage(page, newPath)
+    {
+        return wikiRA.movePage(page, newPath);
+    } // end movePage
+
     deletePage(path)
     {
         return wikiRA.deletePage(path);

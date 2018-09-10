@@ -112,7 +112,7 @@
                         </b-form-input>
                     </b-form-group>
 
-                    <b-btn variant="warning">
+                    <b-btn variant="warning" :disabled="page.path === page._ref.path" @click="movePage">
                         Move Page
                     </b-btn>
                 </b-card>
@@ -289,6 +289,21 @@
                 {
                     this.$refs.editor.getCodeMirror().refresh();
                 });
+            },
+            movePage()
+            {
+                // Pull out the new path
+                const newPath = this.page.path;
+
+                // Reset any other changes to the page, including the path change.
+                this.page.reset();
+
+                // Move the page
+                return wikiMan.movePage(this.page, newPath)
+                    .then(() =>
+                    {
+                        this.$router.push({ path: `/wiki${ newPath }`, query: {} });
+                    });
             },
             deletePage()
             {
