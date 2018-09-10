@@ -117,7 +117,46 @@ router.options('*', promisify((req, resp) =>
         .then(([viewPerm, modifyPerm]) => ({ actions: { wikiView: viewPerm, wikiModify: modifyPerm } }));
 }));
 
-router.post('*/move', ensureAuthenticated, promisify((req, resp) =>
+router.post('*', ensureAuthenticated, promisify((req, resp) =>
+{
+    const path = getPath(req);
+
+    // First, we need to get the page, so we can check the permissions.
+    return wikiMan.getPage(path)
+        .then((page) =>
+        {
+            resp.status(409).json({
+                name: 'Page Already Exists',
+                code: 'ERR_PAGE_EXISTS',
+                message: `A page already exists at path '${ path }'.`,
+                page
+            });
+        })
+        .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+        {
+            return wikiMan.getPermission(path, 'modify')
+                .then((perm) =>
+                {
+                    const user = getUser(req);
+                    const viewPerm = `wikiModify/${ perm }`;
+                    if(viewPerm !== 'wikiModify/*' && !permsMan.hasPerm(user, viewPerm))
+                    {
+                        resp.status(403).json({
+                            name: 'Permission Denied',
+                            code: 'ERR_PERMISSION',
+                            message: `User '${ user.username }' does not have required permission.`
+                        });
+                    }
+                    else
+                    {
+                        const newPage = _.merge({}, req.body, { path });
+                        return wikiMan.createPage(newPage);
+                    } // end if
+                });
+        });
+}));
+
+router.put('*/move', ensureAuthenticated, promisify((req, resp) =>
 {
     const path = getPath(req);
     const newPath = _.get(req.body, 'path');
@@ -160,45 +199,6 @@ router.post('*/move', ensureAuthenticated, promisify((req, resp) =>
                 code: 'ERR_NOT_FOUND',
                 message: `No page found for path '${ path }'.`
             });
-        });
-}));
-
-router.post('*', ensureAuthenticated, promisify((req, resp) =>
-{
-    const path = getPath(req);
-
-    // First, we need to get the page, so we can check the permissions.
-    return wikiMan.getPage(path)
-        .then((page) =>
-        {
-            resp.status(409).json({
-                name: 'Page Already Exists',
-                code: 'ERR_PAGE_EXISTS',
-                message: `A page already exists at path '${ path }'.`,
-                page
-            });
-        })
-        .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
-        {
-            return wikiMan.getPermission(path, 'modify')
-                .then((perm) =>
-                {
-                    const user = getUser(req);
-                    const viewPerm = `wikiModify/${ perm }`;
-                    if(viewPerm !== 'wikiModify/*' && !permsMan.hasPerm(user, viewPerm))
-                    {
-                        resp.status(403).json({
-                            name: 'Permission Denied',
-                            code: 'ERR_PERMISSION',
-                            message: `User '${ user.username }' does not have required permission.`
-                        });
-                    }
-                    else
-                    {
-                        const newPage = _.merge({}, req.body, { path });
-                        return wikiMan.createPage(newPage);
-                    } // end if
-                });
         });
 }));
 

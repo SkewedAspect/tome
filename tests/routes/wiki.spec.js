@@ -538,12 +538,12 @@ describe("Wiki API ('/wiki')", () =>
         });
     });
 
-    describe('POST /wiki/:path/move', () =>
+    describe('PUT /wiki/:path/move', () =>
     {
         it('passing in a valid path moves the page', () =>
         {
             const newPath = { path: '/normal/moved' };
-            return request.post('/wiki/normal/move')
+            return request.put('/wiki/normal/move')
                 .set('Accept', 'application/json')
                 .send(newPath)
                 .then((response) =>
@@ -592,7 +592,7 @@ describe("Wiki API ('/wiki')", () =>
         it('does not allow you to move a page to an existing path', () =>
         {
             const newPath = { path: '/normal/sub' };
-            return request.post('/wiki/normal/move')
+            return request.put('/wiki/normal/move')
                 .set('Accept', 'application/json')
                 .send(newPath)
                 .catch(({ response }) => response)
@@ -611,7 +611,7 @@ describe("Wiki API ('/wiki')", () =>
         it("move is refused for pages that don't exist", () =>
         {
             const newPath = { path: '/normal/moved' };
-            return request.post('/wiki/dne/move')
+            return request.put('/wiki/dne/move')
                 .set('Accept', 'application/json')
                 .send(newPath)
                 .catch(({ response }) => response)
@@ -630,7 +630,7 @@ describe("Wiki API ('/wiki')", () =>
         it('move is refused for deleted pages', () =>
         {
             const newPath = { path: '/normal/moved' };
-            return request.post('/wiki/deleted/move')
+            return request.put('/wiki/deleted/move')
                 .set('Accept', 'application/json')
                 .send(newPath)
                 .catch(({ response }) => response)
@@ -655,7 +655,7 @@ describe("Wiki API ('/wiki')", () =>
                     .then((user) => app.set('user', user))
                     .then(() =>
                     {
-                        return request.post('/wiki/normal/sub/perm/move')
+                        return request.put('/wiki/normal/sub/perm/move')
                             .set('Accept', 'application/json')
                             .send(newPath)
                             .catch(({ response }) => response)
@@ -667,7 +667,7 @@ describe("Wiki API ('/wiki')", () =>
                     .then(() => accountMan.getAccountByUsername('specialUser').then((user) => app.set('user', user)))
                     .then(() =>
                     {
-                        return request.post('/wiki/normal/sub/perm/move')
+                        return request.put('/wiki/normal/sub/perm/move')
                             .set('Accept', 'application/json')
                             .send(newPath)
                             .then((response) =>
@@ -694,7 +694,7 @@ describe("Wiki API ('/wiki')", () =>
                     .then((user) => app.set('user', user))
                     .then(() =>
                     {
-                        return request.post('/wiki/normal/sub/perm/inherited/move')
+                        return request.put('/wiki/normal/sub/perm/inherited/move')
                             .set('Accept', 'application/json')
                             .send(newPath)
                             .catch(({ response }) => response)
@@ -706,7 +706,7 @@ describe("Wiki API ('/wiki')", () =>
                     .then(() => accountMan.getAccountByUsername('specialUser').then((user) => app.set('user', user)))
                     .then(() =>
                     {
-                        return request.post('/wiki/normal/sub/perm/inherited/move')
+                        return request.put('/wiki/normal/sub/perm/inherited/move')
                             .set('Accept', 'application/json')
                             .send(newPath)
                             .then((response) =>
