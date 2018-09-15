@@ -18,18 +18,30 @@ const logger = logging.loggerFor(module);
 
 //----------------------------------------------------------------------------------------------------------------------
 
+const ADMINS = _.compact(_.map(_.get(process.env, 'ADMINS', '').split(','), _.trim));
+
+if(ADMINS.length > 0)
+{
+    logger.warn('The following accounts will be granted super user permissions on login:', ADMINS);
+} // end if
+
+//----------------------------------------------------------------------------------------------------------------------
+
 passport.use(new GoogleStrategy((token, profile, done) =>
     {
+        const isAdminOverride = _.includes(ADMINS, profile.email);
         const accountDef = {
             google_id: profile.id,
             avatar: profile.picture,
             email: profile.email,
-            full_name: profile.givenName
+            full_name: profile.givenName,
+            permissions: isAdminOverride ? [ '*/*' ] : []
         };
 
         return accountMan.getAccount(accountDef)
             .then((account) =>
             {
+                accountDef.permissions = _.uniq(_.concat(account.permissions, accountDef.permissions));
                 return accountMan.updateAccount(_.merge(account, accountDef));
             })
             .catch({ code: 'ERR_NOT_FOUND' }, () =>
