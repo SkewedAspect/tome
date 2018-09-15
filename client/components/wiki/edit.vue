@@ -92,6 +92,10 @@
                             </b-form-group>
                         </b-col>
                     </b-form-row>
+
+                    <b-btn variant="success" :disabled="permsChanged" @click="savePerms">
+                        Save Permissions
+                    </b-btn>
                 </b-card>
 
                 <!-- Move Page -->
@@ -258,6 +262,13 @@
 			};
 		},
         computed: {
+		    permsChanged()
+            {
+                const actions = _.get(this.page, 'actions', {});
+                const actionsRef = _.get(this.page._ref, 'actions', {});
+
+                return _.isEqual(actions, actionsRef);
+            },
 		    pageBody: {
 		        get()
                 {
@@ -272,7 +283,6 @@
 		methods: {
         	save()
 			{
-			    console.log('saving!!!');
 				this.formValidated = true;
 				return wikiMan.savePage(this.page)
 					.then(() => {
@@ -280,6 +290,26 @@
 						this.$router.push({ query: {} });
 					});
 			},
+            savePerms()
+            {
+                this.formValidated = true;
+
+                // Copy the changed to the actions
+                const actions = _.get(this.page, 'actions');
+
+                // We reset the page, to reset any other changes.
+                this.page.reset();
+
+                // Reset the permissions
+                _.assign(this.page.actions, actions);
+
+                // Save the page
+                return wikiMan.savePage(this.page)
+                    .then(() => {
+                        this.formValidated = false;
+                        this.$router.push({ query: {} });
+                    });
+            },
 			reset()
 			{
 				this.page.reset();

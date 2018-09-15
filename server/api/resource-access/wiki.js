@@ -64,6 +64,14 @@ class WikiResourceAccess
 
     createPage(page)
     {
+        // Go from the display version of the actions to what the database needs.
+        const actions = _.get(page, 'actions', {});
+        delete page.actions;
+
+        // Here we set the right values.
+        page.action_view = _.get(actions, 'wikiView');
+        page.action_modify = _.get(actions, 'wikiModify');
+
         return this.loading
             .then((db) => db.transaction((trans) =>
                 {
@@ -200,6 +208,14 @@ class WikiResourceAccess
 
     updatePage(newPage)
     {
+        // Go from the display version of the actions to what the database needs.
+        const actions = _.get(newPage, 'actions', {});
+        delete newPage.actions;
+
+        // Here we set the right values.
+        newPage.action_view = _.get(actions, 'wikiView');
+        newPage.action_modify = _.get(actions, 'wikiModify');
+
         return this.loading
             .then((db) => db('current_revision')
             .select('page_id', 'path', 'title', 'revision_id')
