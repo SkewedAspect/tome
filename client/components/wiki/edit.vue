@@ -140,11 +140,11 @@
                         <font-awesome-icon icon="times"/>
                         Cancel
                     </b-button>
-                    <b-button class="w-100 mr-2" type="reset" variant="danger" @click="reset()">
+                    <b-button class="w-100 mr-2" type="reset" variant="danger">
                         <font-awesome-icon icon="undo"/>
                         Reset
                     </b-button>
-                    <b-button class="w-100" type="submit" variant="success" @click="save()">
+                    <b-button class="w-100" type="submit" variant="success">
                         <font-awesome-icon icon="save"/>
                         Save
                     </b-button>
@@ -272,6 +272,7 @@
 		methods: {
         	save()
 			{
+			    console.log('saving!!!');
 				this.formValidated = true;
 				return wikiMan.savePage(this.page)
 					.then(() => {
