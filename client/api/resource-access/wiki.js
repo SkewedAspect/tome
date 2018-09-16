@@ -47,7 +47,7 @@ class WikiResourceAccess
             body: undefined,
             created: new Date(),
             edited: new Date(),
-            actions: { wikiView: '*', wikiModify: '*' }
+            actions: { wikiView: 'inherit', wikiModify: 'inherit' }
         }));
     } // end createPage
 
