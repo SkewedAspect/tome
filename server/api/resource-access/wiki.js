@@ -69,8 +69,8 @@ class WikiResourceAccess
         delete page.actions;
 
         // Here we set the right values.
-        page.action_view = _.get(actions, 'wikiView');
-        page.action_modify = _.get(actions, 'wikiModify');
+        page.action_view = _.get(actions, 'wikiView', 'inherit');
+        page.action_modify = _.get(actions, 'wikiModify', 'inherit');
 
         return this.loading
             .then((db) => db.transaction((trans) =>
