@@ -148,7 +148,7 @@
                         <font-awesome-icon icon="undo"/>
                         Reset
                     </b-button>
-                    <b-button class="w-100" type="submit" variant="success">
+                    <b-button class="w-100" type="submit" variant="success" :disabled="!page.dirty">
                         <font-awesome-icon icon="save"/>
                         Save
                     </b-button>
