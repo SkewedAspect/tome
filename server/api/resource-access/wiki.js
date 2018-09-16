@@ -31,8 +31,8 @@ class WikiResourceAccess
             wikiModify: page.action_modify === 'inherit' ? this._getPermission(page.path, 'modify') : page.action_modify,
         };
 
-        delete page.action_view;
-        delete page.action_modify;
+        // delete page.action_view;
+        // delete page.action_modify;
 
         return Promise.props(page.actions)
             .then((actions) =>
@@ -64,13 +64,8 @@ class WikiResourceAccess
 
     createPage(page)
     {
-        // Go from the display version of the actions to what the database needs.
-        const actions = _.get(page, 'actions', {});
-        delete page.actions;
-
-        // Here we set the right values.
-        page.action_view = _.get(actions, 'wikiView', 'inherit');
-        page.action_modify = _.get(actions, 'wikiModify', 'inherit');
+        page.action_view = _.get(page, 'action_view', 'inherit');
+        page.action_modify = _.get(page, 'action_modify', 'inherit');
 
         return this.loading
             .then((db) => db.transaction((trans) =>
@@ -208,13 +203,8 @@ class WikiResourceAccess
 
     updatePage(newPage)
     {
-        // Go from the display version of the actions to what the database needs.
-        const actions = _.get(newPage, 'actions', {});
-        delete newPage.actions;
-
-        // Here we set the right values.
-        newPage.action_view = _.get(actions, 'wikiView');
-        newPage.action_modify = _.get(actions, 'wikiModify');
+        newPage.action_view = _.get(newPage, 'action_view', 'inherit');
+        newPage.action_modify = _.get(newPage, 'action_modify', 'inherit');
 
         return this.loading
             .then((db) => db('current_revision')

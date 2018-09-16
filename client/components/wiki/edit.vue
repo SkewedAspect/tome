@@ -73,7 +73,7 @@
                                 label-for="viewPerm">
                                 <b-form-input id="viewPerm"
                                     type="text"
-                                    v-model="page.actions.wikiView"
+                                    v-model="page.action_view"
                                     required
                                     placeholder="inherited">
                                 </b-form-input>
@@ -85,7 +85,7 @@
                                 label-for="modifyPerm">
                                 <b-form-input id="modifyPerm"
                                     type="text"
-                                    v-model="page.actions.wikiModify"
+                                    v-model="page.action_modify"
                                     required
                                     placeholder="inherited">
                                 </b-form-input>
@@ -264,10 +264,12 @@
         computed: {
 		    permsChanged()
             {
-                const actions = _.get(this.page, 'actions', {});
-                const actionsRef = _.get(this.page._ref, 'actions', {});
+                const action_view = _.get(this.page, 'action_view', {});
+                const action_modify = _.get(this.page, 'action_modify', {});
+                const action_view_ref = _.get(this.page._ref, 'action_modify', {});
+                const action_modify_ref = _.get(this.page._ref, 'action_modify', {});
 
-                return _.isEqual(actions, actionsRef);
+                return _.isEqual(action_view, action_view_ref) || _.isEqual(action_modify, action_modify_ref);
             },
 		    pageBody: {
 		        get()
