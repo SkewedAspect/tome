@@ -211,8 +211,17 @@ router.patch('*', ensureAuthenticated, promisify((req, resp) =>
         .then((page) =>
         {
             const user = getUser(req);
-            const viewPerm = `wikiModify/${ page.actions.wikiModify }`;
-            if(viewPerm !== 'wikiModify/*' && !permsMan.hasPerm(user, viewPerm))
+
+            // Build different permissions
+            const modifyPerm = `wikiModify/${ page.actions.wikiModify }`;
+            const updatedViewPerm = `wikiView/${ _.get(req.body, 'action_view', page.actions.wikiView) }`;
+            const updatedModifyPerm = `wikiModify/${ _.get(req.body, 'action_modify', page.actions.wikiModify) }`;
+
+            // Build Perms Checks
+            const userNotHasPerm = modifyPerm !== 'wikiModify/*' && !permsMan.hasPerm(user, modifyPerm);
+            const userNotHasUpViewPerm = updatedViewPerm !== 'wikiView/*' && !permsMan.hasPerm(user, updatedViewPerm);
+            const userNotHasUpModPerm = updatedModifyPerm !== 'wikiModify/*' && !permsMan.hasPerm(user, updatedModifyPerm);
+            if(userNotHasPerm || userNotHasUpViewPerm || userNotHasUpModPerm)
             {
                 resp.status(403).json({
                     name: 'Permission Denied',
