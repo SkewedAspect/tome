@@ -8,7 +8,7 @@
     "copy": "cp -r client/static dist/",
     "build": "npm run clean && npm run copy && parcel build client/index.html",
     "watch": "npm run clean && npm run copy && parcel watch client/index.html",
-    "test": "LOG_LEVEL=ERROR UNIT_TESTS=TRUE mocha tests/ --recursive --exit --delay",
+    "test": "LOG_LEVEL=ERROR UNIT_TESTS=TRUE nyc --reporter=text-summary mocha tests/ --recursive --exit --delay",
     "start": "DEBUG=TRUE node server.js"
   },
   "author": "Christopher S. Case <chris.case@g33xnexus.com>",
@@ -58,6 +58,7 @@
     "markdown-it-task-lists": "^2.1.0",
     "mocha": "^5.0.1",
     "node-sass": "^4.9.3",
+    "nyc": "^13.1.0",
     "parcel": "^1.9.7",
     "popper.js": "^1.14.4",
     "precss": "^3.1.1",

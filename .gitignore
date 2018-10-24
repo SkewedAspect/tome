@@ -5,6 +5,7 @@
 
 # Build artifacts
 .cache
+.nyc_output
 dist
 
 # DB artifacts

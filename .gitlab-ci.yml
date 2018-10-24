@@ -8,6 +8,7 @@ Unit Tests:
     - yarn run test
   stage: test
   image: node:carbon-alpine
+  coverage: '/Statements.*?(\d+(?:\.\d+)?)%/'
 
 Build Docker:
   image: docker:latest
