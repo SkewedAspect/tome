@@ -6,7 +6,7 @@
     <div id="page-edit" v-if="page">
         <!-- TODO: Finish implementing error handling. -->
 		<b-alert variant="danger">
-			<font-awesome-icon icon="exclamation-triangle"/>
+            <font-awesome-icon icon="exclamation-triangle"></font-awesome-icon>
 			Unable to save. (For some reason or another. Who knows. Gremlins, maybe?)
 		</b-alert>
 
@@ -141,15 +141,15 @@
             <b-form-row>
                 <b-col sm="12" md="6" offset-md="6" class="mb-3 d-flex">
                     <b-button class="w-100 mr-2" type="reset" variant="secondary" :to="{ query: {} }">
-                        <font-awesome-icon icon="times"/>
+                        <font-awesome-icon icon="times"></font-awesome-icon>
                         Cancel
                     </b-button>
                     <b-button class="w-100 mr-2" type="reset" variant="danger">
-                        <font-awesome-icon icon="undo"/>
+                        <font-awesome-icon icon="undo"></font-awesome-icon>
                         Reset
                     </b-button>
                     <b-button class="w-100" type="submit" variant="success" :disabled="!page.dirty">
-                        <font-awesome-icon icon="save"/>
+                        <font-awesome-icon icon="save"></font-awesome-icon>
                         Save
                     </b-button>
                 </b-col>

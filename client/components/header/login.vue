@@ -7,7 +7,7 @@
 		<!-- Profile dropdown -->
         <b-nav-item-dropdown v-if="account" id="profile-dropdown" :title="account.username" right no-caret>
             <template slot="button-content">
-				<b-img v-if="account.avatar" rounded="circle" width="32" height="32" blank-color="#777" :src="account.avatar" />
+                <b-img v-if="account.avatar" rounded="circle" width="32" height="32" blank-color="#777" :src="account.avatar"></b-img>
                 <font-awesome-icon v-else icon="user-circle" size="2x"></font-awesome-icon>
             </template>
             <b-dropdown-item :disabled="true">
@@ -31,7 +31,7 @@
 
 		<!-- Sign In Button -->
 		<b-button v-else id="google-signin-btn" variant="danger">
-			<font-awesome-icon :icon="['fab', 'google']" />
+            <font-awesome-icon :icon="['fab', 'google']"></font-awesome-icon>
 			Sign In
 		</b-button>
     </div>

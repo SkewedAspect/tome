@@ -7,7 +7,7 @@
         <b-form-input type="text" placeholder="Search..." v-model="searchTerm" @keyup.enter.native="doSearch"></b-form-input>
 		<b-input-group-append>
 			<b-button @click="doSearch">
-				<font-awesome-icon icon="search" />
+                <font-awesome-icon icon="search"></font-awesome-icon>
 			</b-button>
 		</b-input-group-append>
 	</b-input-group>
