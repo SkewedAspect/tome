@@ -4,7 +4,9 @@
 
 <template>
     <div v-if="show" class="breadcrumb-area">
-		<b-button-toolbar id="breadcrumb-buttons">
+
+        <!-- Wiki Toolbar Buttons -->
+		<b-button-toolbar id="breadcrumb-buttons" v-if="routeName === 'wiki'">
 			<b-button-group class="mx-1" v-if="canView">
 
                 <!-- Edit / Cancel  -->
@@ -32,6 +34,17 @@
 				</b-btn>
 			</b-button-group>
 		</b-button-toolbar>
+
+        <!-- Comments Toolbar Buttons -->
+        <b-button-toolbar id="breadcrumb-buttons" v-else-if="routeName === 'comments'">
+            <b-button-group class="mx-1" v-if="canView">
+
+                <!-- Wiki -->
+                <b-btn v-if="canView" variant="link" size="sm" :to="wikiLink">
+                    <font-awesome-icon icon="file-alt"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Wiki</span>
+                </b-btn>
+            </b-button-group>
+        </b-button-toolbar>
 
         <breadcrumbs id="site-breadcrumb-bar" class="mb-0" :items="breadcrumbs"></breadcrumbs>
     </div>
@@ -101,6 +114,11 @@
                 const path = this.$route.params.path;
                 return { path: _.isUndefined(path) ? '/comment' : `/comment/${ path }` };
             },
+            wikiLink()
+            {
+                const path = this.$route.params.path;
+                return { path: _.isUndefined(path) ? '/wiki' : `/wiki/${ path }` };
+            },
 
         	breadcrumbs()
 			{
@@ -133,6 +151,7 @@
 
 				return false;
 			},
+            routeName(){ return this.$route.name; },
 			show(){ return _.includes(['wiki', 'history', 'comments', 'search'], this.$route.name); }
 		},
 		methods: {
