@@ -57,6 +57,7 @@ describe("Comment API ('/comment')", () =>
                     const comment = commentList[0];
                     expect(comment).to.have.property('comment_id');
                     expect(comment).to.have.property('page_id', 3);
+                    expect(comment).to.have.property('path', '/normal');
                     expect(comment).to.have.property('title', 'First Topic');
                     expect(comment).to.have.property('body');
                     expect(comment).to.have.property('created');

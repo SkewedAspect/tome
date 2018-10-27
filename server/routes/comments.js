@@ -64,7 +64,12 @@ router.get('*', (request, response) =>
             return getPage(path, user)
                 .then(() =>
                 {
-                    return wikiMan.getComments(path);
+                    return wikiMan.getComments(path)
+                        .map((comment) =>
+                        {
+                            comment.path = path;
+                            return comment;
+                        });
                 })
                 .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
                 {
