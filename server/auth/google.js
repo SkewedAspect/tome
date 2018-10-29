@@ -32,7 +32,7 @@ passport.use(new GoogleStrategy((token, profile, done) =>
         const isAdminOverride = _.includes(ADMINS, profile.email);
         const accountDef = {
             google_id: profile.id,
-            avatar: profile.picture,
+            avatar: profile.picture + '?sz=512',
             email: profile.email,
             full_name: profile.givenName,
             permissions: isAdminOverride ? [ '*/*' ] : []
