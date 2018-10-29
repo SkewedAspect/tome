@@ -6,6 +6,9 @@ import _ from 'lodash';
 import Promise from 'bluebird';
 import $http from 'axios';
 
+// Resource Access
+import accountRA from './account';
+
 // Models
 import CommentModel from '../models/comment';
 
@@ -21,6 +24,8 @@ class CommentResourceAccess
         this.$comments = {};
     } // end constructor
 
+    //------------------------------------------------------------------------------------------------------------------
+
     _buildModel(def)
     {
         let commentInst = this.$comments[def.comment_id];
@@ -31,11 +36,13 @@ class CommentResourceAccess
         else
         {
             commentInst = new CommentModel(def);
-            this.$comments[def.path] = commentInst;
+            this.$comments[def.comment_id] = commentInst;
         } // end if
 
         return commentInst;
     } // end _buildModel
+
+    //------------------------------------------------------------------------------------------------------------------
 
     createComment(path, account_id)
     {
@@ -53,7 +60,7 @@ class CommentResourceAccess
     getComments(path)
     {
         // We always attempt to get the latest comments, and update our in-memory models, or make new ones.
-        return $http.get(`/comments${ path }`)
+        return $http.get(`/comment${ path }`)
             .catch((error) =>
             {
                 const contentType = error.response.headers['content-type'].toLowerCase();
@@ -68,7 +75,15 @@ class CommentResourceAccess
                 } // end if
             })
             .then(({ data }) => data)
-            .then((commentDefs) => _.map(commentDefs, (def) => this._buildModel(def)));
+            .map((def) =>
+            {
+                return accountRA.getAccount(def.account_id)
+                    .then((account) =>
+                    {
+                        def.$account = account;
+                        return this._buildModel(def);
+                    });
+            });
     } // end getComments
 
     saveComment(comment)

@@ -8,6 +8,7 @@ import BaseModel from './base';
 
 class CommentModel extends BaseModel
 {
+    get account(){ return this.$account; }
 } // end CommentModel
 
 //----------------------------------------------------------------------------------------------------------------------
