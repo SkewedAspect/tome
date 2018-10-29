@@ -58,8 +58,8 @@ router.post('/', ensureAuthenticated, promisify((req, resp) =>
 
 router.get('/:accountID', promisify((req, resp) =>
 {
-    const sameAccount = `${ req.params.accountID }` === `${ req.user.account_id }`;
-    const accountAdmin = permsMan.hasPerm(req.user, 'Accounts/addAccount');
+    const sameAccount = `${ req.params.accountID }` === `${ _.get(req, 'user.account_id') }`;
+    const accountAdmin = permsMan.hasPerm(req.user || {}, 'Accounts/addAccount');
     return accountMan.getAccountByID(req.params.accountID)
         .then((account) =>
         {
