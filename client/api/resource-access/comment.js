@@ -3,7 +3,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 import _ from 'lodash';
-import Promise from 'bluebird';
 import $http from 'axios';
 
 // Resource Access
@@ -46,15 +45,15 @@ class CommentResourceAccess
 
     createComment(path, account_id)
     {
-        return Promise.resolve(new CommentModel({
-            title: undefined,
-            body: undefined,
+        return new CommentModel({
+            title: '',
+            body: '',
             created: new Date(),
             edited: new Date(),
             page_id: undefined,
             account_id,
             path
-        }));
+        });
     } // end createComment
 
     getComments(path)

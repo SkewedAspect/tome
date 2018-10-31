@@ -41,7 +41,7 @@ class CommentManager
 
     createComment(path)
     {
-        return commentRA.createPage(path, authMan.account.account_id);
+        return commentRA.createComment(path, authMan.account.account_id);
     } // end createComment
 
     selectPage(path)
@@ -56,7 +56,11 @@ class CommentManager
 
     saveComment(comment)
     {
-        return commentRA.saveComment(comment);
+        return commentRA.saveComment(comment)
+            .then(() =>
+            {
+                return this.selectPage(this.currentPath);
+            });
     } // end saveComment
 
     deleteComment(comment)

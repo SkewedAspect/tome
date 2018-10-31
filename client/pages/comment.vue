@@ -44,6 +44,7 @@
                 <hr class="mt-0 mb-3">
             </header>
 
+            <!-- Comments List -->
             <h3 v-if="comments.length === 0" class="text-center mt-4">No Comments.</h3>
             <ul v-else class="list-unstyled">
                 <b-media tag="li" class="comment-block mt-3" v-for="comment in sortedComments" :key="comment.id">
@@ -63,6 +64,9 @@
                     </div>
                 </b-media>
             </ul>
+
+            <!-- New Comment -->
+            <add-edit-comment :comment="comment" @saved="createNewComment"></add-edit-comment>
         </div>
     </b-container>
 </template>
@@ -96,7 +100,7 @@
 <script>
 	//------------------------------------------------------------------------------------------------------------------
 
-	import _ from 'lodash';
+    import _ from 'lodash';
 	import moment from 'moment';
 
 	// Managers
@@ -105,23 +109,15 @@
     import commentMan from '../api/managers/comment';
 
     // Components
-    import markdown from '../components/ui/markdown.vue';
+    import Markdown from '../components/ui/markdown.vue';
+    import AddEditComment from '../components/comment/addEditComment.vue';
 
 	//------------------------------------------------------------------------------------------------------------------
 
     export default {
 		components: {
-		    markdown
-		},
-		data()
-		{
-			return {
-				loading: true,
-				notFound: false,
-				noPerm: false,
-				errorMessage: undefined,
-                sort: 'asc'
-			};
+            AddEditComment,
+		    Markdown
 		},
 		computed: {
 			path()
@@ -141,7 +137,11 @@
             },
 			selectPage()
 			{
-				return commentMan.selectPage(this.path)
+			    return wikiMan.selectPage(this.path)
+                    .then(() =>
+                    {
+                        return commentMan.selectPage(this.path)
+                    })
 					.catch({ code: 'ERR_NOT_FOUND' }, () =>
 					{
 						this.loading = false;
@@ -169,6 +169,17 @@
 				this.noPerm = false;
 				this.errorMessage = undefined;
 			},
+            reset()
+            {
+                this.comment.reset();
+            },
+            cmRefresh()
+            {
+                this.$nextTick(() =>
+                {
+                    this.$refs.editor.getCodeMirror().refresh();
+                });
+            },
             fromNow(date)
             {
                 return moment(date).fromNow();
@@ -176,28 +187,53 @@
             formatDate(date)
             {
                 return moment(date).format('MMMM Do YYYY,<br> h:mm a');
+            },
+            createNewComment()
+            {
+                if(this.account)
+                {
+                    this.comment = commentMan.createComment(this.path);
+                }
+                else
+                {
+                    this.comment = undefined;
+                } // end if
             }
 		},
-		// watch: {
-		// 	'$route'(to, from)
-		// 	{
-		// 		if(to.path !== from.path || !_.isEqual(to.query, from.query))
-		// 		{
-		// 			this.clearPageVars();
-		// 			if(to.name === 'comment')
-		// 			{
-		// 				this.selectPage();
-		// 			} // end if
-		// 		} // end if
-		// 	}
-		// },
 		subscriptions: {
 			account: authMan.account$,
 			comments: commentMan.currentComments$
 		},
+        data()
+        {
+            return {
+                loading: true,
+                notFound: false,
+                noPerm: false,
+                errorMessage: undefined,
+                sort: 'asc',
+                comment: undefined,
+                formValidated: false,
+                cmOptions: {
+                    mode: {
+                        name: "gfm",
+                        gitHubSpice: false,
+                        tokenTypeOverrides: {
+                            emoji: "emoji"
+                        }
+                    },
+                    lineNumbers: true,
+                    theme: "default"
+                }
+            };
+        },
 		mounted()
         {
 			this.selectPage();
+
+			// Watch for changes to account.
+			this.$watch('account', this.createNewComment.bind(this));
+			this.createNewComment();
 		}
     }
 </script>
