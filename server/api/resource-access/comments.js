@@ -85,11 +85,10 @@ class CommentResourceAccess
     {
         const comment_id = comment.comment_id;
         comment = _.pick(comment, 'page_id', 'title', 'body', 'account_id');
-        comment.edited = new Date();
 
         return this.loading
             .then((db) => db('comment')
-            .update(comment)
+            .update({ ...comment, edited: db.fn.now() })
             .where({ comment_id }));
     } // end updateComment
 

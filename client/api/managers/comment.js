@@ -6,6 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 
 // Managers
 import authMan from './auth.js';
+import permsMan from './permissions';
 
 // Resource Access
 import commentRA from '../resource-access/comment';
@@ -39,6 +40,19 @@ class CommentManager
     // Public
     //------------------------------------------------------------------------------------------------------------------
 
+    canEdit(comment)
+    {
+        const account = authMan.account;
+        if(account)
+        {
+            return comment.account_id === account.account_id || permsMan.hasPerm(account, 'Comments/canEditAny');
+        }
+        else
+        {
+            return false
+        } // end if
+    } // end canEdit
+
     createComment(path)
     {
         return commentRA.createComment(path, authMan.account.account_id);
@@ -65,7 +79,11 @@ class CommentManager
 
     deleteComment(comment)
     {
-        return commentRA.deleteComment(comment);
+        return commentRA.deleteComment(comment)
+            .then(() =>
+            {
+                return this.selectPage(this.currentPath);
+            });
     } // end deleteComment
 } // end CommentManager
 

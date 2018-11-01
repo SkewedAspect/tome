@@ -56,7 +56,17 @@
                         </div>
                     </template>
                     <div class="body-container pl-3">
-                        <div class="edited float-right" v-if="isEdited(comment)">
+                        <b-button-toolbar class="float-right" v-if="canEdit(comment)">
+                            <b-btn size="sm" @click="edit(comment)">
+                                <font-awesome-icon icon="edit"></font-awesome-icon>
+                                Edit
+                            </b-btn>
+                            <b-btn class="ml-2" size="sm" @click="del(comment)">
+                                <font-awesome-icon icon="trash-alt"></font-awesome-icon>
+                                Delete
+                            </b-btn>
+                        </b-button-toolbar>
+                        <div class="edited float-right" v-if="isEdited(comment)" style="clear: right">
                             <small class="text-muted" v-b-tooltip.html.hover :title="formatDate(comment.edited)">Edited {{ fromNow(comment.edited) }}</small>
                         </div>
                         <h5 class="mt-0 mb-1">{{ comment.title }}</h5>
@@ -66,7 +76,7 @@
             </ul>
 
             <!-- New Comment -->
-            <add-edit-comment :comment="comment" @saved="createNewComment"></add-edit-comment>
+            <add-edit-comment v-if="canPost()" :comment="comment" @saved="createNewComment"></add-edit-comment>
         </div>
     </b-container>
 </template>
@@ -169,10 +179,25 @@
 				this.noPerm = false;
 				this.errorMessage = undefined;
 			},
-            reset()
+
+            edit(comment)
             {
-                this.comment.reset();
+                this.comment = comment;
             },
+            del(comment)
+            {
+                return commentMan.deleteComment(comment);
+            },
+
+            canPost()
+            {
+                return wikiMan.canModify(this.page);
+            },
+            canEdit(comment)
+            {
+                return commentMan.canEdit(comment);
+            },
+
             cmRefresh()
             {
                 this.$nextTick(() =>
@@ -202,6 +227,7 @@
 		},
 		subscriptions: {
 			account: authMan.account$,
+            page: wikiMan.currentPage$,
 			comments: commentMan.currentComments$
 		},
         data()

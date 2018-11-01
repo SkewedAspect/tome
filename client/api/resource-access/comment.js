@@ -88,7 +88,7 @@ class CommentResourceAccess
     saveComment(comment)
     {
         const verb = !!comment.comment_id ? 'patch' : 'post';
-        return $http[verb](`/comment${ comment.path }`, comment)
+        return $http[verb](`/comment${ comment.path }/${ comment.comment_id || '' }`, comment)
             .then(({ data }) =>
             {
                 comment.update(data);
@@ -97,7 +97,7 @@ class CommentResourceAccess
 
     deleteComment(comment)
     {
-        return $http.delete(`/comment${ comment.path }`)
+        return $http.delete(`/comment${ comment.path }/${ comment.comment_id }`)
             .then(() =>
             {
                 let commentInst = this.$comments[comment.id];

@@ -115,7 +115,7 @@
         },
         computed: {
             isNew(){ return !this.comment.comment_id; },
-            isValid(){ return !!this.comment.title && !!this.comment.body; }
+            isValid(){ return this.comment.dirty && !!this.comment.title && !!this.comment.body; }
         },
         methods: {
             cmRefresh()
