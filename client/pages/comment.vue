@@ -77,6 +77,30 @@
 
             <!-- New Comment -->
             <add-edit-comment v-if="canPost()" :comment="comment" @saved="createNewComment"></add-edit-comment>
+
+            <!-- Modal Component -->
+            <b-modal ref="delModal" id="delModal" ok-variant="danger" @cancel="onCancel" @ok="onOk">
+                <template slot="modal-title">
+                    <font-awesome-icon icon="trash-alt"></font-awesome-icon>
+                    Delete Comment.
+                </template>
+
+                <div v-if="delComment">
+                    Are you sure you want to delete the comment with the title: <i>"{{ delComment.title }}"</i>?
+                </div>
+                <div>
+                    <small class="text-muted">This operation cannot be undone.</small>
+                </div>
+
+                <template slot="modal-ok">
+                    <font-awesome-icon icon="trash-alt"></font-awesome-icon>
+                    Delete
+                </template>
+                <template slot="modal-cancel">
+                    <font-awesome-icon icon="times"></font-awesome-icon>
+                    Cancel
+                </template>
+            </b-modal>
         </div>
     </b-container>
 </template>
@@ -145,6 +169,18 @@
             {
                 return comment.created !== comment.edited;
             },
+            onCancel()
+            {
+                this.delComment = undefined;
+            },
+            onOk()
+            {
+                return commentMan.deleteComment(this.delComment)
+                    .then(() =>
+                    {
+                        this.delComment = undefined;
+                    });
+            },
 			selectPage()
 			{
 			    return wikiMan.selectPage(this.path)
@@ -186,7 +222,8 @@
             },
             del(comment)
             {
-                return commentMan.deleteComment(comment);
+                this.delComment = comment;
+                this.$refs.delModal.show();
             },
 
             canPost()
@@ -239,7 +276,7 @@
                 errorMessage: undefined,
                 sort: 'asc',
                 comment: undefined,
-                formValidated: false,
+                delComment: undefined,
                 cmOptions: {
                     mode: {
                         name: "gfm",
