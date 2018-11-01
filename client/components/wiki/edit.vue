@@ -44,7 +44,7 @@
             <hr>
 
             <div class="float-right">
-                <b-btn variant="outline-secondary" class="mt-1" v-b-toggle.advCollapse style="width: 107px">
+                <b-btn variant="outline-secondary" class="mt-1" v-b-toggle.adv-collapse style="width: 107px">
                     <span class="when-opened">
                         <font-awesome-icon icon="compress-alt"></font-awesome-icon>
                         Collapse
@@ -61,7 +61,7 @@
                 Perform advanced options, such as changing page permissions, moving or removing this page.
             </p>
 
-            <b-collapse id="advCollapse">
+            <b-collapse id="adv-collapse">
 
                 <!-- Permissions -->
                 <b-card bg-variant="light" class="mb-3">
