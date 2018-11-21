@@ -9,6 +9,25 @@ const path = require('path');
 
 //----------------------------------------------------------------------------------------------------------------------
 
+const indexErrorPage = `<html>
+    <head>
+        <title>Error</title>
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body style="background-color: #333">
+        <div class="card m-5">
+            <div class="card-body">
+                <h1 class="text-center text-danger">Error serving index.html</h1>
+                <p class="text-center text-muted">
+                    Something unexpected happened. Please try again later.
+                </p>
+            </div>
+        </div>
+    </body>
+</html>`;
+
+//----------------------------------------------------------------------------------------------------------------------
+
 // Basic request logging
 function buildBasicRequestLogger(logger)
 {
@@ -42,7 +61,17 @@ function buildBasicErrorLogger(logger)
 function serveIndex(request, response)
 {
     response.setHeader("Content-Type", "text/html");
-    fs.createReadStream(path.resolve(__dirname + '/../../' + 'dist/index.html')).pipe(response);
+
+    const stream = fs.createReadStream(path.resolve(__dirname + '/../../' + 'dist/index.html'));
+    stream.on('error', (error) =>
+    {
+        console.warn('Error serving index.html:', error.stack);
+        response.status(500)
+            .end(indexErrorPage);
+    });
+
+    // Pipe out the response
+    stream.pipe(response);
 } // end serveIndex
 
 // Either serve 'index.html', or run json handler
