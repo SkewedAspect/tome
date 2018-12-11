@@ -5,6 +5,7 @@
 import Promise from 'bluebird';
 import trivialPerms from 'trivialperms';
 
+// Resource Access
 import rolesRA from'../resource-access/roles';
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -19,7 +19,7 @@ class WikiManager
     constructor()
     {
         // Subjects
-        this._currentPageSubject = new BehaviorSubject();
+        this._currentPageSubject = new BehaviorSubject(undefined);
     } // end constructor
 
     //------------------------------------------------------------------------------------------------------------------

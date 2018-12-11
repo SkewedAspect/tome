@@ -14,7 +14,7 @@ class AuthManager
     constructor()
     {
         // Subjects
-        this._accountSubject = new BehaviorSubject();
+        this._accountSubject = new BehaviorSubject(undefined);
         this._statusSubject = new BehaviorSubject('unknown');
 
         // We have to expose this to window for Google to pick it up.

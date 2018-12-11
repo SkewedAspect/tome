@@ -18,7 +18,7 @@ class CommentManager
     constructor()
     {
         // Subjects
-        this._currentPathSubject = new BehaviorSubject();
+        this._currentPathSubject = new BehaviorSubject(undefined);
         this._currentCommentsSubject = new BehaviorSubject([]);
     } // end constructor
 
