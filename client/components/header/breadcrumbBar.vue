@@ -43,6 +43,27 @@
                 <b-btn v-if="canView" variant="link" size="sm" :to="wikiLink">
                     <font-awesome-icon icon="file-alt"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Wiki</span>
                 </b-btn>
+
+                <!-- History -->
+                <b-btn v-if="canView" variant="link" size="sm" :to="historyLink">
+                    <font-awesome-icon icon="history"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">History</span>
+                </b-btn>
+            </b-button-group>
+        </b-button-toolbar>
+
+        <!-- History Toolbar Buttons -->
+        <b-button-toolbar id="breadcrumb-buttons" v-else-if="routeName === 'history'">
+            <b-button-group class="mx-1" v-if="canView">
+
+                <!-- Wiki -->
+                <b-btn v-if="canView" variant="link" size="sm" :to="wikiLink">
+                    <font-awesome-icon icon="file-alt"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Wiki</span>
+                </b-btn>
+
+                <!-- Comments -->
+                <b-btn v-if="canView" variant="link" size="sm" :to="commentLink">
+                    <font-awesome-icon icon="comments"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Comments</span>
+                </b-btn>
             </b-button-group>
         </b-button-toolbar>
 
