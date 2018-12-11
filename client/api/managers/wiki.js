@@ -38,24 +38,6 @@ class WikiManager
     // Public
     //------------------------------------------------------------------------------------------------------------------
 
-    normalizePath(path)
-    {
-        if(path.length > 1)
-        {
-            if(path[0] !== '/')
-            {
-                path = `/${ path }`;
-            } // end if
-
-            if(path.substr(-1) === '/')
-            {
-                path = path.substr(0, path.length - 1);
-            } // end if
-        } // end if
-
-        return path
-    } // end normalizePath
-
     createPage(path)
     {
         return wikiRA.createPage(path)

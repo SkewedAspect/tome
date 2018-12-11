@@ -55,6 +55,9 @@
 	import authMan from '../api/managers/auth';
 	import wikiMan from '../api/managers/wiki';
 
+    // Utils
+    import pathUtils from '../api/utils/path';
+
 	// Components
 	import PageDisplay from '../components/wiki/display.vue';
 	import PageEdit from '../components/wiki/edit.vue';
@@ -80,7 +83,7 @@
 			path()
 			{
 				let path = _.get(this.$route, 'params.path', '/');
-				return wikiMan.normalizePath(path);
+				return pathUtils.normalizePath(path);
 			},
 			pageComponent(){ return this.mode === 'edit' ? 'page-edit' : 'page-display' }
 		},

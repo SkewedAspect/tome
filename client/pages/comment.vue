@@ -142,6 +142,9 @@
 	import wikiMan from '../api/managers/wiki';
     import commentMan from '../api/managers/comment';
 
+    // Utils
+    import pathUtils from '../api/utils/path';
+
     // Components
     import Markdown from '../components/ui/markdown.vue';
     import AddEditComment from '../components/comment/addEditComment.vue';
@@ -157,7 +160,7 @@
 			path()
 			{
 				let path = _.get(this.$route, 'params.path', '/');
-				return wikiMan.normalizePath(path);
+				return pathUtils.normalizePath(path);
 			},
             sortedComments()
             {

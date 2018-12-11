@@ -88,6 +88,9 @@
 	import authMan from '../../api/managers/auth';
 	import wikiMan from '../../api/managers/wiki';
 
+	// Utils
+    import pathUtils from '../../api/utils/path';
+
 	// Components
     import Breadcrumbs from '../ui/breadcrumbs.vue';
 
@@ -101,7 +104,7 @@
             path()
             {
                 let path = _.get(this.$route, 'params.path', '/');
-                return wikiMan.normalizePath(path);
+                return pathUtils.normalizePath(path);
             },
 			editing(){ return _.includes(_.keys(this.$route.query), 'edit'); },
 			historyLink()
