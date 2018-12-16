@@ -1,6 +1,6 @@
-<!--------------------------------------------------------------------------------------------------------------------->
-<!-- Add or Edit Comment Component
-<!--------------------------------------------------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------------------------------------------------
+  -- Add or Edit Comment Component
+  --------------------------------------------------------------------------------------------------------------------->
 
 <template>
     <b-card id="add-edit-comment" class="mb-4" v-if="comment">
@@ -77,20 +77,6 @@
 
 <script>
     //------------------------------------------------------------------------------------------------------------------
-
-    import _ from 'lodash';
-    import moment from 'moment';
-
-    // Codemirror
-    import 'codemirror/addon/mode/overlay';
-    import 'codemirror/mode/xml/xml';
-    import 'codemirror/mode/markdown/markdown';
-    import 'codemirror/mode/gfm/gfm';
-    import 'codemirror/mode/javascript/javascript';
-    import 'codemirror/mode/css/css';
-    import 'codemirror/mode/htmlmixed/htmlmixed';
-    import 'codemirror/mode/clike/clike';
-    import 'codemirror/mode/meta';
 
     // Managers
     import authMan from '../../api/managers/auth';

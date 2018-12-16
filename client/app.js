@@ -10,7 +10,7 @@ window.Promise = Promise;
 
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import BootstrapVue from 'bootstrap-vue'
+import BootstrapVue from 'bootstrap-vue';
 
 // VueRX
 import VueRx from 'vue-rx'
@@ -25,6 +25,15 @@ import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome
 
 // CodeMirror
 import "codemirror/lib/codemirror.css";
+import 'codemirror/addon/mode/overlay';
+import 'codemirror/mode/xml/xml';
+import 'codemirror/mode/markdown/markdown';
+import 'codemirror/mode/gfm/gfm';
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/css/css';
+import 'codemirror/mode/htmlmixed/htmlmixed';
+import 'codemirror/mode/clike/clike';
+import 'codemirror/mode/meta';
 
 // Highlight JS
 import "highlightjs/styles/github.css";

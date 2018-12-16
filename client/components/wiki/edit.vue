@@ -219,17 +219,6 @@
 
     import _ from 'lodash';
 
-	// Codemirror
-	import 'codemirror/addon/mode/overlay';
-	import 'codemirror/mode/xml/xml';
-	import 'codemirror/mode/markdown/markdown';
-	import 'codemirror/mode/gfm/gfm';
-	import 'codemirror/mode/javascript/javascript';
-	import 'codemirror/mode/css/css';
-	import 'codemirror/mode/htmlmixed/htmlmixed';
-	import 'codemirror/mode/clike/clike';
-	import 'codemirror/mode/meta';
-
 	// Managers
 	import wikiMan from '../../api/managers/wiki';
 
