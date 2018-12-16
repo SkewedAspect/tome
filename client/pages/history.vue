@@ -11,7 +11,7 @@
 		<div v-else-if="notFound">
 			<h4 class="text-center">Page Not Found</h4>
 			<p class="text-center">
-				The page at path <code>{{ path }}</code> was not found.
+				No wiki page found at path <code>{{ path }}</code>.
 			</p>
 		</div>
 		<div v-else-if="noPerm">
@@ -33,7 +33,22 @@
             </b-alert>
 		</div>
         <div v-else>
-            <i>Page History goes here...</i>
+            <header>
+                <b-dropdown id="comment-sort-order" class="float-right"
+                    :text="`${ sort === 'asc' ? 'Ascending' : 'Descending' }`" class="m-md-2" size="sm" right>
+                    <b-dropdown-item :active="sort === 'asc'" @click="sort = 'asc'">Ascending</b-dropdown-item>
+                    <b-dropdown-item :active="sort === 'desc'" @click="sort = 'desc'">Descending</b-dropdown-item>
+                </b-dropdown>
+
+                <h4>Page History</h4>
+                <hr class="mt-0 mb-3">
+            </header>
+            <b-list-group>
+                <history-item v-for="(revision, index) in sortedRevisions"
+                    :revision="revision"
+                    :prev-revision="getPrevRev(index)">
+                </history-item>
+            </b-list-group>
         </div>
 	</b-container>
 </template>
@@ -54,15 +69,19 @@
 
 	// Managers
 	import authMan from '../api/managers/auth';
-	import wikiMan from '../api/managers/wiki';
+	import historyMan from '../api/managers/history';
 
     // Utils
     import pathUtils from '../api/utils/path';
+
+    // Components
+    import HistoryItem from '../components/history/historyItem.vue';
 
 	//------------------------------------------------------------------------------------------------------------------
 
     export default {
 		components: {
+		    HistoryItem
 		},
 		data()
 		{
@@ -70,7 +89,8 @@
 				loading: true,
 				notFound: false,
 				noPerm: false,
-				errorMessage: undefined
+				errorMessage: undefined,
+                sort: 'desc',
 			};
 		},
 		computed: {
@@ -78,24 +98,39 @@
 			{
 				let path = _.get(this.$route, 'params.path', '/');
 				return pathUtils.normalizePath(path);
-			}
+			},
+            sortedRevisions()
+            {
+                return _(this.pageHistory.revisions)
+                    .orderBy('revision_id', ['asc'])
+                    .map((rev, index) =>
+                    {
+                        rev.revNumber = index + 1;
+                        return rev;
+                    })
+                    .orderBy('revision_id', [ this.sort ])
+                    .value();
+            }
 		},
 		methods: {
+		    getPrevRev(index)
+            {
+                if(this.sort === 'desc')
+                {
+                    return this.sortedRevisions[ index + 1 ];
+                }
+                else
+                {
+                    return this.sortedRevisions[ index - 1 ];
+                } // end if
+            },
 			selectPage()
 			{
-				return wikiMan.selectPage(this.path)
+				return historyMan.selectPage(this.path)
 					.catch({ code: 'ERR_NOT_FOUND' }, () =>
 					{
 						this.loading = false;
-
-						if(this.mode === 'edit')
-						{
-							return wikiMan.createPage(this.path);
-						}
-						else
-						{
-							this.notFound = true;
-						} // end if
+                        this.notFound = true;
 					})
 					.catch({ code: 'ERR_PERMISSION' }, () =>
 					{
@@ -121,22 +156,9 @@
 				this.errorMessage = undefined;
 			}
 		},
-		watch: {
-			'$route'(to, from)
-			{
-				if(to.path !== from.path || !_.isEqual(to.query, from.query))
-				{
-					this.clearPageVars();
-					if(to.name === 'wiki')
-					{
-						this.selectPage();
-					} // end if
-				} // end if
-			}
-		},
 		subscriptions: {
 			account: authMan.account$,
-			page: wikiMan.currentPage$
+			pageHistory: historyMan.currentPageHistory$
 		},
 		mounted()
 		{

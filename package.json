@@ -51,6 +51,7 @@
     "codemirror": "^5.40.0",
     "commander": "^2.17.1",
     "cpr": "^3.0.1",
+    "diff": "^3.5.0",
     "highlightjs": "^9.10.0",
     "jquery": "^3.2.1",
     "markdown-it": "^8.4.2",
