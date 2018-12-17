@@ -7,9 +7,13 @@
         <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">Revision {{ revision.revNumber }}</h5>
             <b-button-toolbar>
-                <b-btn size="sm" v-if="page.revision_id !== revision.revision_id">
+                <b-btn size="sm" style="width: 85px" v-if="page.revision_id !== revision.revision_id">
                     <font-awesome-icon icon="undo"></font-awesome-icon>
                     Revert
+                </b-btn>
+                <b-btn variant="outline-primary" size="sm" style="width: 85px" v-else disabled>
+                    <font-awesome-icon icon="check"></font-awesome-icon>
+                    Current
                 </b-btn>
                 <b-btn class="ml-2" variant="outline-secondary" size="sm" v-b-toggle="`diff-collapse-${ revision.revision_id }`" style="width: 100px">
                     <span class="when-opened">
@@ -35,8 +39,12 @@
                 <small class="text-muted" v-b-tooltip.html.hover :title="editedDate">{{ editedFromNow }}</small>
             </div>
         </div>
-        <b-collapse :id="`diff-collapse-${ revision.revision_id }`">
-            <h4>DIFF GOES HERE!!!!</h4>
+        <b-collapse :id="`diff-collapse-${ revision.revision_id }`" @shown="onShown" @hidden="onHidden">
+            <cm-diff ref="cm" :left="revision.body" :right="prevBody" v-if="shown"></cm-diff>
+            <div class="cm-placeholder text-center" v-else>
+                <h4>Loading...</h4>
+                <b-progress variant="primary" :value="100" animated></b-progress>
+            </div>
         </b-collapse>
     </b-list-group-item>
 </template>
@@ -48,6 +56,10 @@
         .collapsed > .when-opened,
         :not(.collapsed) > .when-closed {
             display: none;
+        }
+
+        .cm-placeholder {
+            height: 350px;
         }
     }
 </style>
@@ -64,10 +76,16 @@
     // Managers
     import wikiMan from '../../api/managers/wiki';
 
+    // Components
+    import CmDiff from '../ui/cmDiff.vue';
+
     //------------------------------------------------------------------------------------------------------------------
 
     export default {
         name: 'HistoryItem',
+        components: {
+            CmDiff
+        },
         props: {
             revision: {
                 type: Object,
@@ -107,8 +125,28 @@
                 }, 0)
             }
         },
+        methods: {
+            onShown()
+            {
+                this.shown = true;
+            },
+            onHidden()
+            {
+                this.shown = false;
+            },
+            refresh()
+            {
+                this.$refs.cm.cmRefresh();
+            }
+        },
         subscriptions: {
             page: wikiMan.currentPage$
+        },
+        data()
+        {
+            return {
+                shown: false
+            };
         }
     }
 </script>

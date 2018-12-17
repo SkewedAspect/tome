@@ -25,7 +25,9 @@ import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome
 
 // CodeMirror
 import "codemirror/lib/codemirror.css";
+import 'codemirror/addon/merge/merge.css';
 import 'codemirror/addon/mode/overlay';
+import 'codemirror/addon/merge/merge.js';
 import 'codemirror/mode/xml/xml';
 import 'codemirror/mode/markdown/markdown';
 import 'codemirror/mode/gfm/gfm';
