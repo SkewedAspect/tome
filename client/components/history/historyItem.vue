@@ -7,13 +7,18 @@
         <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">Revision {{ revision.revNumber }}</h5>
             <b-button-toolbar>
-                <b-btn size="sm" style="width: 85px" v-if="page.revision_id !== revision.revision_id">
-                    <font-awesome-icon icon="undo"></font-awesome-icon>
-                    Revert
-                </b-btn>
-                <b-btn variant="outline-primary" size="sm" style="width: 85px" v-else disabled>
+                <b-btn variant="outline-primary" size="sm" style="width: 85px" v-if="page.revision_id === revision.revision_id" disabled>
                     <font-awesome-icon icon="check"></font-awesome-icon>
                     Current
+                </b-btn>
+                <b-btn variant="outline-secondary" size="sm" style="width: 85px" v-else-if="page.body === revision.body" disabled>
+                    <font-awesome-icon icon="ban"></font-awesome-icon>
+                    No Diff
+                </b-btn>
+                <b-btn size="sm" style="width: 85px" v-else @click="revert(revision)" :disabled="!!savingRevision">
+                    <font-awesome-icon icon="undo" v-if="this.savingRevision !== revision.revision_id"></font-awesome-icon>
+                    <font-awesome-icon icon="spinner" spin v-else></font-awesome-icon>
+                    Revert
                 </b-btn>
                 <b-btn class="ml-2" variant="outline-secondary" size="sm" v-b-toggle="`diff-collapse-${ revision.revision_id }`" style="width: 100px">
                     <span class="when-opened">
@@ -123,6 +128,11 @@
 
                     return accum;
                 }, 0)
+            },
+            wikiLink()
+            {
+                const path = this.$route.params.path;
+                return { path: _.isUndefined(path) ? '/wiki' : `/wiki/${ path }` };
             }
         },
         methods: {
@@ -137,6 +147,22 @@
             refresh()
             {
                 this.$refs.cm.cmRefresh();
+            },
+            revert(revision)
+            {
+                this.savingRevision = revision.revision_id;
+
+                this.page.body = revision.body;
+                return wikiMan.savePage(this.page)
+                    .then(() => {
+                        this.$router.push(this.wikiLink);
+                        this.savingRevision = undefined;
+                    })
+                    .catch((error) =>
+                    {
+                        console.error('Error reverting revision.', error);
+                        this.savingRevision = undefined;
+                    });
             }
         },
         subscriptions: {
@@ -145,7 +171,8 @@
         data()
         {
             return {
-                shown: false
+                shown: false,
+                savingRevision: undefined
             };
         }
     }
