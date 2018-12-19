@@ -40,7 +40,7 @@
             </div>
         </div>
         <b-collapse :id="`diff-collapse-${ revision.revision_id }`" @shown="onShown" @hidden="onHidden">
-            <cm-diff ref="cm" :left="revision.body" :right="prevBody" v-if="shown"></cm-diff>
+            <cm-diff class="mt-2" ref="cm" :left="revision.body" :right="prevBody" v-if="shown"></cm-diff>
             <div class="cm-placeholder text-center" v-else>
                 <h4>Loading...</h4>
                 <b-progress variant="primary" :value="100" animated></b-progress>

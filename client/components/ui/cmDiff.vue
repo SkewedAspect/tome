@@ -3,15 +3,19 @@
   --------------------------------------------------------------------------------------------------------------------->
 
 <template>
-    <div class="cm-diff">
+    <b-card class="cm-diff" no-body style="overflow: hidden">
         <codemirror ref="editor" :merge="true" :options="cmOption"></codemirror>
-    </div>
+    </b-card>
 </template>
 
 <!--------------------------------------------------------------------------------------------------------------------->
 
 <style lang="scss">
     .cm-diff {
+        .CodeMirror-merge {
+            border: none !important;
+        }
+
         .CodeMirror-merge-r-chunk-start {
             border-top: 1px solid #dadcdf;
         }
