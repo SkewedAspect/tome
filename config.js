@@ -28,7 +28,7 @@ module.exports = {
 
     database:
     {
-        connection: { filename: './server/db/tome.db' }
+        connection: { filename: './db/tome.db' }
     }
 }; // end exports
 

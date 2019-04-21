@@ -88,6 +88,24 @@
 			pageComponent(){ return this.mode === 'edit' ? 'page-edit' : 'page-display' }
 		},
 		methods: {
+            anchorHashCheck()
+            {
+                // FIXME: This is a hack to work around broken vue-router behavior. On page load, it does not scroll
+                // the page to the hash link. So, instead, we need to check for that case, and scroll manually.
+                setTimeout(() =>
+                {
+                    if(window.location.hash === this.$route.hash)
+                    {
+                        console.log('maybe?');
+                        const el = document.getElementById(this.$route.hash.slice(1));
+                        if(el)
+                        {
+                            console.log('scrolling!');
+                            window.scrollTo(0, el.offsetTop)
+                        } // end if
+                    } // end if
+                }, 1000);
+            },
 			selectPage()
 			{
 				return wikiMan.selectPage(this.path)
@@ -208,6 +226,9 @@
 			} // end if
 
 			this.selectPage();
+
+			// Check to see if there's a hash link we should scroll too.
+            this.anchorHashCheck();
 		}
     }
 </script>
