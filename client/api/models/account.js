@@ -12,7 +12,7 @@ class AccountModel extends BaseModel
     // Properties
     //------------------------------------------------------------------------------------------------------------------
 
-    get displayName(){ return this.$state.full_name || this.$state.username; }
+    get displayName() { return this.$state.full_name || this.$state.username; }
 } // end AccountModel
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 
 class AppError extends Error
 {
-    constructor (message, code, name)
+    constructor(message, code, name)
     {
         // Calling parent constructor of base Error class.
         super(message);
@@ -19,7 +19,7 @@ class AppError extends Error
         } // end if
 
         // Set a code property to allow the error to be easily identified. This is in keeping with current nodejs.
-        this.code = !!code ? code : 'ERR_APPLICATION_ERROR';
+        this.code = code ? code : 'ERR_APPLICATION_ERROR';
     } // end constructor
 
     static fromJSON({ name, message, code })
@@ -49,7 +49,7 @@ class NotImplementedError extends AppError
 {
     constructor(api)
     {
-        super(`'${api}' is not implemented.`, 'ERR_NOT_IMPLEMENTED');
+        super(`'${ api }' is not implemented.`, 'ERR_NOT_IMPLEMENTED');
     } // end constructor
 } // end NotImplemented Error
 

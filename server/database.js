@@ -46,9 +46,9 @@ class DatabaseManager
                         return db;
                     });
             })
-            .catch({ code: 'SQLITE_ERROR' }, (error) =>
+            .catch({ code: 'SQLITE_ERROR' }, () =>
             {
-                logger.warn("No existing database, creating one. Options:", options);
+                logger.warn('No existing database, creating one. Options:', options);
 
                 return db.migrate.latest(options.migrate)
                     .then(() => db.seed.run(options.seed))
@@ -73,10 +73,11 @@ class DatabaseManager
                 if(this.dbConfig.traceQueries)
                 {
                     const afterCreate = _.get(this.dbConfig, 'pool.afterCreate');
-                    _.set(this.dbConfig, 'pool.afterCreate', function(db, done)
+                    _.set(this.dbConfig, 'pool.afterCreate', (db, done) =>
                     {
                         // Turn on tracing
-                        db.on('trace', (queryString) => {
+                        db.on('trace', (queryString) =>
+                        {
                             logger.debug('QUERY TRACE:', queryString);
                         });
 
@@ -125,7 +126,7 @@ class DatabaseManager
                 }
             });
 
-            return this.loadingTest = this._setupDB(this.testDB, { migrate: { directory: './server/knex/migrations' },  seed: { directory: './tests/seeds' } });
+            return this.loadingTest = this._setupDB(this.testDB, { migrate: { directory: './server/knex/migrations' }, seed: { directory: './tests/seeds' } });
         }
         else
         {

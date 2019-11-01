@@ -12,6 +12,8 @@ const wikiRA = require('../resource-access/wiki');
 
 //----------------------------------------------------------------------------------------------------------------------
 
+/* eslint-disable camelcase */
+
 class WikiManager
 {
     //------------------------------------------------------------------------------------------------------------------
@@ -60,7 +62,7 @@ class WikiManager
     searchPages(term)
     {
         return wikiRE.validateSearch(term)
-            .then(() => wikiRA.searchPages(term))
+            .then(() => wikiRA.searchPages(term));
     } // end searchPages
 
     deletePage(path)
@@ -73,7 +75,7 @@ class WikiManager
     {
         return wikiRE.validatePath(path)
             .then(() => wikiRA.fullDeletePage(path));
-    } //end fullDeletePage
+    } // end fullDeletePage
 
     //------------------------------------------------------------------------------------------------------------------
     // Comments

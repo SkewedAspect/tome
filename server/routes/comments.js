@@ -17,6 +17,8 @@ const { AppError } = require('../api/errors');
 
 const router = express.Router();
 
+/* eslint-disable camelcase */
+
 //----------------------------------------------------------------------------------------------------------------------
 
 function getUser(req)
@@ -32,10 +34,10 @@ function getPath(req)
         path = path.substr(0, path.length - 1);
     } // end if
 
-    return path
+    return path;
 } // end getPath
 
-function getPage(path, user, perm='wikiView')
+function getPage(path, user, perm = 'wikiView')
 {
     return wikiMan.getPage(path)
         .tap((page) =>
@@ -58,36 +60,36 @@ function getPage(path, user, perm='wikiView')
 router.get('*', (request, response) =>
 {
     interceptHTML(response, promisify((req, resp) =>
-        {
-            const path = getPath(req);
-            const user = getUser(req);
-            return getPage(path, user)
-                .then(() =>
-                {
-                    return wikiMan.getComments(path)
-                        .map((comment) =>
-                        {
-                            comment.path = path;
-                            return comment;
-                        });
-                })
-                .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
-                {
-                    resp.status(404).json({
-                        name: 'Page not found',
-                        code: 'ERR_NOT_FOUND',
-                        message: error.message
+    {
+        const path = getPath(req);
+        const user = getUser(req);
+        return getPage(path, user)
+            .then(() =>
+            {
+                return wikiMan.getComments(path)
+                    .map((comment) =>
+                    {
+                        comment.path = path;
+                        return comment;
                     });
-                })
-                .catch({ code: 'ERR_PERMISSION' }, (error) =>
-                {
-                    resp.status(403).json({
-                        name: 'Permission Denied',
-                        code: 'ERR_PERMISSION',
-                        message: error.message
-                    });
+            })
+            .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+            {
+                resp.status(404).json({
+                    name: 'Page not found',
+                    code: 'ERR_NOT_FOUND',
+                    message: error.message
                 });
-        }));
+            })
+            .catch({ code: 'ERR_PERMISSION' }, (error) =>
+            {
+                resp.status(403).json({
+                    name: 'Permission Denied',
+                    code: 'ERR_PERMISSION',
+                    message: error.message
+                });
+            });
+    }));
 });
 
 router.post('*', ensureAuthenticated, promisify((req, resp) =>
@@ -179,7 +181,6 @@ router.patch('*/:commentID', ensureAuthenticated, promisify((req, resp) =>
                 message: error.message
             });
         });
-
 }));
 
 router.delete('*/:commentID', ensureAuthenticated, promisify((req, resp) =>

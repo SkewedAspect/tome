@@ -2,7 +2,7 @@
 // Set us up a default role
 //----------------------------------------------------------------------------------------------------------------------
 
-exports.seed = function(knex, Promise)
+exports.seed = function(knex)
 {
     return knex('role')
         .del()

@@ -8,6 +8,8 @@ const { AppError, MultipleResultsError, NotFoundError } = require('../errors');
 
 //----------------------------------------------------------------------------------------------------------------------
 
+/* eslint-disable camelcase */
+
 class AccountResourceAccess
 {
     constructor()
@@ -21,7 +23,7 @@ class AccountResourceAccess
 
     _parseAccount(account)
     {
-        account.created = Date.parse(account.created + ' GMT');
+        account.created = Date.parse(`${ account.created } GMT`);
         account.permissions = JSON.parse(_.get(account, 'permissions', []));
         account.settings = JSON.parse(_.get(account, 'settings', {}));
 
@@ -36,23 +38,23 @@ class AccountResourceAccess
     {
         return this.loading
             .then((db) => db('account')
-            .select()
-            .where(filter)
-            .then((accounts) =>
-            {
-                if(accounts.length > 1)
+                .select()
+                .where(filter)
+                .then((accounts) =>
                 {
-                    throw new MultipleResultsError('account');
-                }
-                else if(accounts.length === 0)
-                {
-                    throw new NotFoundError('No account found.');
-                }
-                else
-                {
-                    return this._parseAccount(accounts[0]);
-                } // end if
-            }));
+                    if(accounts.length > 1)
+                    {
+                        throw new MultipleResultsError('account');
+                    }
+                    else if(accounts.length === 0)
+                    {
+                        throw new NotFoundError('No account found.');
+                    }
+                    else
+                    {
+                        return this._parseAccount(accounts[0]);
+                    } // end if
+                }));
     } // end $getAccount
 
     //------------------------------------------------------------------------------------------------------------------
@@ -63,17 +65,17 @@ class AccountResourceAccess
     {
         return this.loading
             .then((db) => db('account')
-            .select()
-            .map(this._parseAccount));
+                .select()
+                .map(this._parseAccount));
     } // end getAccounts
 
     getAccountsByUsername(username)
     {
         return this.loading
             .then((db) => db('account')
-            .select()
-            .where({ username })
-            .map(this._parseAccount));
+                .select()
+                .where({ username })
+                .map(this._parseAccount));
     } // end getAccountsByUsername
 
     getAccount({ account_id, google_id, email })
@@ -116,7 +118,7 @@ class AccountResourceAccess
         }
         else
         {
-            throw new AppError("You may only look up an account by `account_id`, `google_id`, or `email`.");
+            throw new AppError('You may only look up an account by `account_id`, `google_id`, or `email`.');
         } // end if
     } // end getAccount
 
@@ -124,8 +126,8 @@ class AccountResourceAccess
     {
         return this.loading
             .then((db) => db('account')
-            .insert(account)
-            .then(([ id ]) => ({ id })));
+                .insert(account)
+                .then(([ id ]) => ({ id })));
     } // end addAccount
 
     updateAccount(account)
@@ -137,16 +139,16 @@ class AccountResourceAccess
 
         return this.loading
             .then((db) => db('account')
-            .update(account)
-            .where({ account_id }));
+                .update(account)
+                .where({ account_id }));
     } // end updateAccount
 
     deleteAccount(account_id)
     {
         return this.loading
             .then((db) => db('account')
-            .where({ account_id })
-            .delete());
+                .where({ account_id })
+                .delete());
     } // end deleteAccount
 } // end AccountResourceAccess
 

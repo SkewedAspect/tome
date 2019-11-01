@@ -19,7 +19,7 @@ const router = express.Router();
 
 //----------------------------------------------------------------------------------------------------------------------
 
-router.get('/', ensureAuthenticated, promisify((req, resp) =>
+router.get('/', ensureAuthenticated, promisify((req) =>
 {
     const accountAdmin = permsMan.hasPerm(req.user, 'Accounts/addAccount');
     return accountMan.getAllAccounts()
@@ -35,15 +35,15 @@ router.post('/', ensureAuthenticated, promisify((req, resp) =>
     if(accountAdmin)
     {
         // We never allow you to pick your id.
-        let newAccount = _.omit(req.body, 'account_id');
+        const newAccount = _.omit(req.body, 'account_id');
         return accountMan.createAccount(newAccount)
-            .catch({ code: 'SQLITE_CONSTRAINT' }, (error) =>
+            .catch({ code: 'SQLITE_CONSTRAINT' }, () =>
             {
                 resp.status(409).json({
                     name: 'Duplicate Account',
                     code: 'ERR_DUPLICATE',
                     message: "One or more of this account's properties duplicate an existing account's."
-                })
+                });
             });
     }
     else
@@ -65,7 +65,7 @@ router.get('/:accountID', promisify((req, resp) =>
         {
             return (accountAdmin || sameAccount) ? account : _.omit(account, 'settings', 'permissions', 'google_id');
         })
-        .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+        .catch({ code: 'ERR_NOT_FOUND' }, () =>
         {
             resp.status(404).json({
                 name: 'Account not found',
@@ -86,6 +86,7 @@ router.patch('/:accountID', ensureAuthenticated, promisify((req, resp) =>
         let newAccount = _.cloneDeep(req.body);
 
         // Set the account id to be the one in the request parameter.
+        // eslint-disable-next-line camelcase
         newAccount.account_id = req.params.accountID;
 
         // If we're not an account admin, we don't allow changes to permissions.

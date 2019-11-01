@@ -13,7 +13,7 @@ import VueRouter from 'vue-router';
 import BootstrapVue from 'bootstrap-vue';
 
 // VueRX
-import VueRx from 'vue-rx'
+import VueRx from 'vue-rx';
 import { Observable, Subject, Subscription } from 'rxjs';
 
 // Font Awesome
@@ -24,7 +24,7 @@ import { fab } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
 
 // CodeMirror
-import "codemirror/lib/codemirror.css";
+import 'codemirror/lib/codemirror.css';
 import 'codemirror/addon/merge/merge.css';
 import 'codemirror/addon/mode/overlay';
 import 'codemirror/addon/merge/merge.js';
@@ -38,7 +38,7 @@ import 'codemirror/mode/clike/clike';
 import 'codemirror/mode/meta';
 
 // Highlight JS
-import "highlightjs/styles/github.css";
+import 'highlightjs/styles/github.css';
 
 // Package.json
 import pkg from '../package.json';
@@ -80,7 +80,6 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 Vue.use(BootstrapVue);
 
-
 //----------------------------------------------------------------------------------------------------------------------
 // Vue Router
 //----------------------------------------------------------------------------------------------------------------------
@@ -94,8 +93,8 @@ const router = new VueRouter({
         { path: '/search', name: 'search', component: SearchPage },
         { path: '/comment/:path*', name: 'comments', component: CommentPage },
         { path: '/history/:path*', name: 'history', component: HistoryPage },
-        { path: '/wiki/:path*', name: 'wiki', component: WikiPage },
-    ],
+        { path: '/wiki/:path*', name: 'wiki', component: WikiPage }
+    ]
     // scrollBehavior(to, from, savedPosition)
     // {
     //     console.log('sup??');
@@ -125,9 +124,9 @@ Vue.component('wiki-link', WikiLink);
 Vue.config.debug = true;
 
 const App = Vue.component('app', AppComponent);
-const app = new App({
+new App({
     el: '#tome-app',
-    router,
+    router
 });
 
 // ---------------------------------------------------------------------------------------------------------------------

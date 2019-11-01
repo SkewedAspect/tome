@@ -30,7 +30,7 @@ function getPath(req)
         path = path.substr(0, path.length - 1);
     } // end if
 
-    return path
+    return path;
 } // end getPath
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -38,45 +38,45 @@ function getPath(req)
 router.get('*', (request, response) =>
 {
     interceptHTML(response, promisify((req, resp) =>
-        {
-            const path = getPath(req);
+    {
+        const path = getPath(req);
 
-            return wikiMan.getHistory(path)
-                .then((page) =>
+        return wikiMan.getHistory(path)
+            .then((page) =>
+            {
+                const user = getUser(req);
+                const viewPerm = `wikiView/${ page.actions.wikiView }`;
+                if(viewPerm !== 'wikiView/*' && !permsMan.hasPerm(user, viewPerm))
                 {
-                    const user = getUser(req);
-                    const viewPerm = `wikiView/${ page.actions.wikiView }`;
-                    if(viewPerm !== 'wikiView/*' && !permsMan.hasPerm(user, viewPerm))
-                    {
-                        resp.status(403).json({
-                            name: 'Permission Denied',
-                            code: 'ERR_PERMISSION',
-                            message: `User '${ user.username }' does not have required permission.`
-                        });
-                    }
-                    else if(page.body === null)
-                    {
-                        // Treat null body as deleted.
-                        resp.status(404).json({
-                            name: 'Page not found',
-                            code: 'ERR_NOT_FOUND',
-                            message: `No page found for path '${ path }'.`
-                        });
-                    }
-                    else
-                    {
-                        return page;
-                    } // end if
-                })
-                .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+                    resp.status(403).json({
+                        name: 'Permission Denied',
+                        code: 'ERR_PERMISSION',
+                        message: `User '${ user.username }' does not have required permission.`
+                    });
+                }
+                else if(page.body === null)
                 {
+                    // Treat null body as deleted.
                     resp.status(404).json({
                         name: 'Page not found',
                         code: 'ERR_NOT_FOUND',
                         message: `No page found for path '${ path }'.`
                     });
+                }
+                else
+                {
+                    return page;
+                } // end if
+            })
+            .catch({ code: 'ERR_NOT_FOUND' }, () =>
+            {
+                resp.status(404).json({
+                    name: 'Page not found',
+                    code: 'ERR_NOT_FOUND',
+                    message: `No page found for path '${ path }'.`
                 });
-        }));
+            });
+    }));
 });
 
 //----------------------------------------------------------------------------------------------------------------------

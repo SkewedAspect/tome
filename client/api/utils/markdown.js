@@ -16,22 +16,26 @@ class MarkdownUtil
     constructor()
     {
         const mdRenderer = new MarkdownIt({
-                html: true,
-                linkify: true,
-                typographer: true,
-                highlight(str, lang)
+            html: true,
+            linkify: true,
+            typographer: true,
+            highlight(str, lang)
+            {
+                if(lang && hljs.getLanguage(lang))
                 {
-                    if (lang && hljs.getLanguage(lang))
+                    try
                     {
-                        try
-                        {
-                            return `<pre class="hljs card bg-light"><code>${ hljs.highlight(lang, str, true).value }</code></pre>`;
-                        } catch (_) {}
-                    } // end if
+                        return `<pre class="hljs card bg-light"><code>${ hljs.highlight(lang, str, true).value }</code></pre>`;
+                    }
+                    catch (_)
+                    {
+                        /* Do nothing */
+                    }
+                } // end if
 
-                    return `<pre class="hljs card bg-light"><code>${ mdRenderer.utils.escapeHtml(str) }</code></pre>`;
-                }
-            });
+                return `<pre class="hljs card bg-light"><code>${ mdRenderer.utils.escapeHtml(str) }</code></pre>`;
+            }
+        });
 
         // Save on the class
         this.mdRenderer = mdRenderer;
@@ -40,7 +44,7 @@ class MarkdownUtil
         this.mdRenderer
             .use(anchor, { permalink: true, permalinkClass: 'tome-anchor-link', permalinkSymbol: '#' })
             .use(taskLists)
-            .use(toc, { includeLevel: [1, 2, 3, 4], containerClass: 'card bg-light tome-toc' });
+            .use(toc, { includeLevel: [ 1, 2, 3, 4 ], containerClass: 'card bg-light tome-toc' });
 
         // Modify the rendering rules
         this.$modifyRules();
@@ -52,12 +56,14 @@ class MarkdownUtil
 
     $modifyRules()
     {
-        this.mdRenderer.renderer.rules.table_open = function(tokens, idx)
+        // eslint-disable-next-line camelcase
+        this.mdRenderer.renderer.rules.table_open = function(/* tokens, idx */)
         {
-            //TODO: Make the table classes configurable.
+            // TODO: Make the table classes configurable.
             return '<table class="table table-bordered table-striped">';
         };
 
+        // eslint-disable-next-line camelcase
         this.mdRenderer.renderer.rules.link_open = function(tokens, idx, options, env, renderer)
         {
             const token = tokens[idx];

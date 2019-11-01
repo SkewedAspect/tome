@@ -26,13 +26,13 @@ class WikiManager
     // Observables
     //------------------------------------------------------------------------------------------------------------------
 
-    get currentPage$(){ return this._currentPageSubject.asObservable(); }
+    get currentPage$() { return this._currentPageSubject.asObservable(); }
 
     //------------------------------------------------------------------------------------------------------------------
     // Properties
     //------------------------------------------------------------------------------------------------------------------
 
-    get currentPage(){ return this._currentPageSubject.getValue(); }
+    get currentPage() { return this._currentPageSubject.getValue(); }
 
     //------------------------------------------------------------------------------------------------------------------
     // Public
@@ -41,7 +41,7 @@ class WikiManager
     createPage(path)
     {
         return wikiRA.createPage(path)
-            .then((page) => this._currentPageSubject.next(page))
+            .then((page) => this._currentPageSubject.next(page));
     } // end createPage
 
     selectPage(path)

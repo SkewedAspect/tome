@@ -7,6 +7,8 @@ const dbMan = require('../../database');
 
 //----------------------------------------------------------------------------------------------------------------------
 
+/* eslint-disable camelcase */
+
 class RoleResourceAccess
 {
     constructor()
@@ -22,14 +24,14 @@ class RoleResourceAccess
     {
         return this.loading
             .then((db) => db('role')
-            .select()
-            .map((role) =>
-            {
+                .select()
+                .map((role) =>
+                {
                 // We store the permissions as a JSON string, because that's way easier than doing crazy joins.
                 // And this doesn't add much overhead at all.
-                role.permissions = JSON.parse(role.permissions);
-                return role;
-            }));
+                    role.permissions = JSON.parse(role.permissions);
+                    return role;
+                }));
     } // end getRoles
 
     addRole(role)
@@ -43,8 +45,8 @@ class RoleResourceAccess
         // Insert the role, and then unwrap the new id
         return this.loading
             .then((db) => db('role')
-            .insert(role)
-            .then(([ id ]) => ({ id })));
+                .insert(role)
+                .then(([ id ]) => ({ id })));
     } // end addRole
 
     deleteRole(role_id)
@@ -56,9 +58,9 @@ class RoleResourceAccess
 
         return this.loading
             .then((db) => db('role')
-            .where({ role_id })
-            .delete()
-            .then((rows) => ({ rowsAffected: rows })));
+                .where({ role_id })
+                .delete()
+                .then((rows) => ({ rowsAffected: rows })));
     } // end deleteRole
 } // end RoleResourceAccess
 

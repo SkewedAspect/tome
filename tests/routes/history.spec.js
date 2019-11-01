@@ -2,7 +2,7 @@
 // Unit Tests for the history module.
 // ---------------------------------------------------------------------------------------------------------------------
 
-let { expect } = require('chai');
+const { expect } = require('chai');
 
 // Managers
 const dbMan = require('../../server/database');
@@ -11,7 +11,6 @@ const accountMan = require('../../server/api/managers/account');
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-let db;
 let app;
 let request;
 
@@ -29,7 +28,6 @@ describe("History API ('/history')", () =>
 
         // Setup db and users
         return dbMan.getDB()
-            .then((testDB) => db = testDB)
             .then(() => accountMan.getAccountByUsername('globalAdmin').then((user) => app.set('user', user)));
     });
 

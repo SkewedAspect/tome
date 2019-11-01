@@ -5,7 +5,7 @@
 const _ = require('lodash');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-web');
-const serialization = require('./serialization');
+require('./serialization');
 
 // Managers
 const accountMan = require('../api/managers/account');
@@ -28,44 +28,48 @@ if(ADMINS.length > 0)
 //----------------------------------------------------------------------------------------------------------------------
 
 passport.use(new GoogleStrategy((token, profile, done) =>
-    {
-        const isAdminOverride = _.includes(ADMINS, profile.email);
-        const accountDef = {
-            google_id: profile.id,
-            avatar: profile.picture + '?sz=512',
-            email: profile.email,
-            full_name: profile.givenName,
-            permissions: isAdminOverride ? [ '*/*' ] : []
-        };
+{
+    /* eslint-disable camelcase */
 
-        return accountMan.getAccount(accountDef)
-            .then((account) =>
+    const isAdminOverride = _.includes(ADMINS, profile.email);
+    const accountDef = {
+        google_id: profile.id,
+        avatar: `${ profile.picture }?sz=512`,
+        email: profile.email,
+        full_name: profile.givenName,
+        permissions: isAdminOverride ? [ '*/*' ] : []
+    };
+
+    /* eslint-enable camelcase */
+
+    return accountMan.getAccount(accountDef)
+        .then((account) =>
+        {
+            accountDef.permissions = _.uniq(_.concat(account.permissions, accountDef.permissions));
+            return accountMan.updateAccount(_.merge(account, accountDef));
+        })
+        .catch({ code: 'ERR_NOT_FOUND' }, () =>
+        {
+            if(configMan.get('allowRegistration', true))
             {
-                accountDef.permissions = _.uniq(_.concat(account.permissions, accountDef.permissions));
-                return accountMan.updateAccount(_.merge(account, accountDef));
-            })
-            .catch({ code: 'ERR_NOT_FOUND' }, () =>
+                accountDef.username = accountDef.email.split('@')[0];
+                return accountMan.createAccount(accountDef);
+            }
+            else
             {
-                if(configMan.get('allowRegistration', true))
-                {
-                    accountDef.username = accountDef.email.split('@')[0];
-                    return accountMan.createAccount(accountDef);
-                }
-                else
-                {
-                    throw new NotFound('User not found.');
-                } // end if
-            })
-            .then((account) =>
-            {
-                done(null, account);
-            })
-            .catch(function(error)
-            {
-                logger.error(`Encountered error during authentication:\n${ error.stack }`, error);
-                done(error);
-            });
-    }));
+                throw new NotFound('User not found.');
+            } // end if
+        })
+        .then((account) =>
+        {
+            done(null, account);
+        })
+        .catch((error) =>
+        {
+            logger.error(`Encountered error during authentication:\n${ error.stack }`, error);
+            done(error);
+        });
+}));
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -74,9 +78,9 @@ module.exports = {
     {
         // Authenticate
         app.post('/auth/google', passport.authenticate('google-signin'), (req, resp) =>
-            {
-                resp.json(req.user);
-            });
+        {
+            resp.json(req.user);
+        });
 
         // Logout endpoint
         app.post('/auth/logout', (req, res) =>

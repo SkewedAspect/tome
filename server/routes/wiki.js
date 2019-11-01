@@ -31,7 +31,7 @@ function getPath(req)
         path = path.substr(0, path.length - 1);
     } // end if
 
-    return path
+    return path;
 } // end getPath
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ router.head('*', promisify((req, resp) =>
                 resp.status(200).end();
             } // end if
         })
-        .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+        .catch({ code: 'ERR_NOT_FOUND' }, () =>
         {
             resp.status(404).end();
         });
@@ -68,53 +68,53 @@ router.head('*', promisify((req, resp) =>
 router.get('*', (request, response) =>
 {
     interceptHTML(response, promisify((req, resp) =>
-        {
-            const path = getPath(req);
+    {
+        const path = getPath(req);
 
-            return wikiMan.getPage(path)
-                .then((page) =>
+        return wikiMan.getPage(path)
+            .then((page) =>
+            {
+                const user = getUser(req);
+                const viewPerm = `wikiView/${ page.actions.wikiView }`;
+                if(viewPerm !== 'wikiView/*' && !permsMan.hasPerm(user, viewPerm))
                 {
-                    const user = getUser(req);
-                    const viewPerm = `wikiView/${ page.actions.wikiView }`;
-                    if(viewPerm !== 'wikiView/*' && !permsMan.hasPerm(user, viewPerm))
-                    {
-                        resp.status(403).json({
-                            name: 'Permission Denied',
-                            code: 'ERR_PERMISSION',
-                            message: `User '${ user.username }' does not have required permission.`
-                        });
-                    }
-                    else if(page.body === null)
-                    {
-                        // Treat null body as deleted.
-                        resp.status(404).json({
-                            name: 'Page not found',
-                            code: 'ERR_NOT_FOUND',
-                            message: `No page found for path '${ path }'.`
-                        });
-                    }
-                    else
-                    {
-                        return page;
-                    } // end if
-                })
-                .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+                    resp.status(403).json({
+                        name: 'Permission Denied',
+                        code: 'ERR_PERMISSION',
+                        message: `User '${ user.username }' does not have required permission.`
+                    });
+                }
+                else if(page.body === null)
                 {
+                    // Treat null body as deleted.
                     resp.status(404).json({
                         name: 'Page not found',
                         code: 'ERR_NOT_FOUND',
                         message: `No page found for path '${ path }'.`
                     });
+                }
+                else
+                {
+                    return page;
+                } // end if
+            })
+            .catch({ code: 'ERR_NOT_FOUND' }, () =>
+            {
+                resp.status(404).json({
+                    name: 'Page not found',
+                    code: 'ERR_NOT_FOUND',
+                    message: `No page found for path '${ path }'.`
                 });
-        }));
+            });
+    }));
 });
 
 // Yeah, I know I'm abusing `OPTIONS`, but it's the easiest path forward.
-router.options('*', promisify((req, resp) =>
+router.options('*', promisify((req) =>
 {
     const path = getPath(req);
     return Promise.join(wikiMan.getPermission(path, 'view'), wikiMan.getPermission(path, 'modify'))
-        .then(([viewPerm, modifyPerm]) => ({ actions: { wikiView: viewPerm, wikiModify: modifyPerm } }));
+        .then(([ viewPerm, modifyPerm ]) => ({ actions: { wikiView: viewPerm, wikiModify: modifyPerm } }));
 }));
 
 router.post('*', ensureAuthenticated, promisify((req, resp) =>
@@ -132,7 +132,7 @@ router.post('*', ensureAuthenticated, promisify((req, resp) =>
                 page
             });
         })
-        .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+        .catch({ code: 'ERR_NOT_FOUND' }, () =>
         {
             return wikiMan.getPermission(path, 'modify')
                 .then((perm) =>
@@ -163,7 +163,7 @@ router.put('*/move', ensureAuthenticated, promisify((req, resp) =>
 
     // First, we need to get the page, so we can check the permissions.
     return wikiMan.getPage(path)
-        .then((page) =>
+        .then(() =>
         {
             return wikiMan.getPermission(path, 'modify')
                 .then((perm) =>
@@ -181,7 +181,7 @@ router.put('*/move', ensureAuthenticated, promisify((req, resp) =>
                     else
                     {
                         return wikiMan.movePage(path, newPath)
-                            .catch({ code: 'ERR_VALIDATION_FAILED' }, (error) =>
+                            .catch({ code: 'ERR_VALIDATION_FAILED' }, () =>
                             {
                                 resp.status(409).json({
                                     name: 'Page Already Exists',
@@ -192,7 +192,7 @@ router.put('*/move', ensureAuthenticated, promisify((req, resp) =>
                     } // end if
                 });
         })
-        .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+        .catch({ code: 'ERR_NOT_FOUND' }, () =>
         {
             resp.status(404).json({
                 name: 'Page not found',
@@ -231,6 +231,7 @@ router.patch('*', ensureAuthenticated, promisify((req, resp) =>
             }
             else
             {
+                // eslint-disable-next-line camelcase
                 const newPage = _.merge({}, req.body, { path, page_id: page.page_id });
                 if(newPage.revision_id !== page.revision_id)
                 {
@@ -247,7 +248,7 @@ router.patch('*', ensureAuthenticated, promisify((req, resp) =>
                 } // end if
             } // end if
         })
-        .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+        .catch({ code: 'ERR_NOT_FOUND' }, () =>
         {
             resp.status(404).json({
                 name: 'Page not found',
@@ -290,7 +291,7 @@ router.delete('*', ensureAuthenticated, promisify((req, resp) =>
                     .then(() => ({ status: 'success' }));
             } // end if
         })
-        .catch({ code: 'ERR_NOT_FOUND' }, (error) =>
+        .catch({ code: 'ERR_NOT_FOUND' }, () =>
         {
             resp.status(404).json({
                 name: 'Page not found',

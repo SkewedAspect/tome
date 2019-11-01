@@ -24,13 +24,13 @@ class HistoryManager
     // Observables
     //------------------------------------------------------------------------------------------------------------------
 
-    get currentPageHistory$(){ return this._currentPageHistorySubject.asObservable(); }
+    get currentPageHistory$() { return this._currentPageHistorySubject.asObservable(); }
 
     //------------------------------------------------------------------------------------------------------------------
     // Properties
     //------------------------------------------------------------------------------------------------------------------
 
-    get currentPageHistory(){ return this._currentPageHistorySubject.getValue(); }
+    get currentPageHistory() { return this._currentPageHistorySubject.getValue(); }
 
     //------------------------------------------------------------------------------------------------------------------
     // Public

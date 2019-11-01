@@ -16,6 +16,8 @@ import { AppError } from '../../../server/api/errors';
 
 //----------------------------------------------------------------------------------------------------------------------
 
+/* eslint-disable camelcase */
+
 class CommentResourceAccess
 {
     constructor()
@@ -87,7 +89,7 @@ class CommentResourceAccess
 
     saveComment(comment)
     {
-        const verb = !!comment.comment_id ? 'patch' : 'post';
+        const verb = comment.comment_id ? 'patch' : 'post';
         return $http[verb](`/comment${ comment.path }/${ comment.comment_id || '' }`, comment)
             .then(({ data }) =>
             {
@@ -100,7 +102,7 @@ class CommentResourceAccess
         return $http.delete(`/comment${ comment.path }/${ comment.comment_id }`)
             .then(() =>
             {
-                let commentInst = this.$comments[comment.id];
+                const commentInst = this.$comments[comment.id];
                 if(commentInst)
                 {
                     delete this.$comments[comment.id];

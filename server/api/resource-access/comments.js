@@ -5,9 +5,11 @@
 const _ = require('lodash');
 const dbMan = require('../../database');
 
-const { NotFoundError } = require('../errors');
+const { MultipleResultsError, NotFoundError } = require('../errors');
 
 //----------------------------------------------------------------------------------------------------------------------
+
+/* eslint-disable camelcase */
 
 class CommentResourceAccess
 {
@@ -22,8 +24,8 @@ class CommentResourceAccess
 
     _mungeComment(comment)
     {
-        comment.created = Date.parse(comment.created + ' GMT');
-        comment.edited = Date.parse(comment.edited + ' GMT');
+        comment.created = Date.parse(`${ comment.created } GMT`);
+        comment.edited = Date.parse(`${ comment.edited } GMT`);
 
         return comment;
     } // end _mungeWikiPage
@@ -36,8 +38,8 @@ class CommentResourceAccess
     {
         return this.loading
             .then((db) => db('comment')
-            .select()
-            .where({ comment_id }))
+                .select()
+                .where({ comment_id }))
             .then((comments) =>
             {
                 if(comments.length > 1)
@@ -59,26 +61,27 @@ class CommentResourceAccess
     {
         return this.loading
             .then((db) => db('comment')
-            .select(
-                'comment.comment_id',
-                'comment.title',
-                'comment.body',
-                'comment.created',
-                'comment.edited',
-                'comment.account_id',
-                'comment.page_id')
-            .innerJoin('page', 'comment.page_id', 'page.page_id')
-            .where('page.path', '=', path)
-            .orderBy('comment.created')
-            .map(this._mungeComment));
+                .select(
+                    'comment.comment_id',
+                    'comment.title',
+                    'comment.body',
+                    'comment.created',
+                    'comment.edited',
+                    'comment.account_id',
+                    'comment.page_id'
+                )
+                .innerJoin('page', 'comment.page_id', 'page.page_id')
+                .where('page.path', '=', path)
+                .orderBy('comment.created')
+                .map(this._mungeComment));
     } // end getComments
 
     addComment(comment)
     {
         return this.loading
             .then((db) => db('comment')
-            .insert(_.pick(comment, 'page_id', 'title', 'body', 'account_id'))
-            .then(([ id ]) => ({ id })));
+                .insert(_.pick(comment, 'page_id', 'title', 'body', 'account_id'))
+                .then(([ id ]) => ({ id })));
     } // end addComment
 
     updateComment(comment)
@@ -88,16 +91,16 @@ class CommentResourceAccess
 
         return this.loading
             .then((db) => db('comment')
-            .update({ ...comment, edited: db.fn.now() })
-            .where({ comment_id }));
+                .update({ ...comment, edited: db.fn.now() })
+                .where({ comment_id }));
     } // end updateComment
 
     deleteComment(page_id, comment_id)
     {
         return this.loading
             .then((db) => db('comment')
-            .where({ page_id, comment_id })
-            .delete())
+                .where({ page_id, comment_id })
+                .delete())
             .then((rowsAffected) =>
             {
                 if(rowsAffected === 0)

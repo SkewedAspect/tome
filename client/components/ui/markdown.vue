@@ -1,6 +1,6 @@
-<!--------------------------------------------------------------------------------------------------------------------->
-<!-- Markdown Component - Allows for both text and vue components to be used.
-<!--------------------------------------------------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------------------------------------------------
+  -- Markdown Component - Allows for both text and vue components to be used.
+  --------------------------------------------------------------------------------------------------------------------->
 
 <template>
     <v-runtime-template :template="template"></v-runtime-template>
@@ -20,7 +20,7 @@
     //------------------------------------------------------------------------------------------------------------------
 
     // Components
-    import VRuntimeTemplate from "v-runtime-template";
+    import VRuntimeTemplate from 'v-runtime-template';
 
     // Utils
     import markdown from '../../api/utils/markdown';
@@ -28,23 +28,23 @@
     //------------------------------------------------------------------------------------------------------------------
 
     export default {
+        components: {
+            VRuntimeTemplate
+        },
         props: {
             text: {
                 type: String,
                 required: true
             }
         },
-        components: {
-            VRuntimeTemplate
-        },
         computed: {
             template()
             {
-                const htmlTxt = !!this.text ? markdown.render(this.text) : '';
-                return `<div class="markdown-block">${ htmlTxt }</div>`
+                const htmlTxt = this.text ? markdown.render(this.text) : '';
+                return `<div class="markdown-block">${ htmlTxt }</div>`;
             }
         }
-    }
+    };
 </script>
 
 <!--------------------------------------------------------------------------------------------------------------------->

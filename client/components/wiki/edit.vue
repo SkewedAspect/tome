@@ -1,27 +1,31 @@
-<!--------------------------------------------------------------------------------------------------------------------->
-<!-- Edit Wiki Pages
-<!--------------------------------------------------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------------------------------------------------
+  -- Edit Wiki Pages
+  --------------------------------------------------------------------------------------------------------------------->
 
 <template>
-    <div id="page-edit" v-if="page">
+    <div v-if="page" id="page-edit">
         <!-- TODO: Finish implementing error handling. -->
-		<b-alert variant="danger">
+        <b-alert variant="danger">
             <font-awesome-icon icon="exclamation-triangle"></font-awesome-icon>
-			Unable to save. (For some reason or another. Who knows. Gremlins, maybe?)
-		</b-alert>
+            Unable to save. (For some reason or another. Who knows. Gremlins, maybe?)
+        </b-alert>
 
         <!-- Edit Page Form -->
-		<b-form @submit.prevent="save()" @reset.prevent="reset()" :validated="formValidated" novalidate>
-			<b-form-group id="pageTitleGroup"
-						  label="Title"
-						  label-for="pageTitle">
-				<b-form-input id="pageTitle"
-							  type="text"
-							  v-model="page.title"
-							  required
-							  placeholder="Some page title...">
-				</b-form-input>
-			</b-form-group>
+        <b-form :validated="formValidated" novalidate @submit.prevent="save()" @reset.prevent="reset()">
+            <b-form-group
+                id="pageTitleGroup"
+                label="Title"
+                label-for="pageTitle"
+            >
+                <b-form-input
+                    id="pageTitle"
+                    v-model="page.title"
+                    type="text"
+                    required
+                    placeholder="Some page title..."
+                >
+                </b-form-input>
+            </b-form-group>
 
             <b-tabs @input="cmRefresh">
                 <b-tab title="Markdown" class="p-3">
@@ -30,7 +34,8 @@
                             id="pageBody"
                             ref="editor"
                             v-model="pageBody"
-                            :options="cmOptions">
+                            :options="cmOptions"
+                        >
                         </code-mirror>
                     </b-card>
                 </b-tab>
@@ -41,10 +46,10 @@
 
             <!-- Advanced Editing -->
 
-            <hr>
+            <hr />
 
             <div class="float-right">
-                <b-btn variant="outline-secondary" class="mt-1" v-b-toggle.adv-collapse style="width: 107px">
+                <b-btn v-b-toggle.adv-collapse variant="outline-secondary" class="mt-1" style="width: 107px">
                     <span class="when-opened">
                         <font-awesome-icon icon="compress-alt"></font-awesome-icon>
                         Collapse
@@ -62,7 +67,6 @@
             </p>
 
             <b-collapse id="adv-collapse">
-
                 <!-- Permissions -->
                 <b-card bg-variant="light" class="mb-3">
                     <h5>Permissions</h5>
@@ -70,24 +74,30 @@
                         <b-col>
                             <b-form-group
                                 label="View"
-                                label-for="viewPerm">
-                                <b-form-input id="viewPerm"
-                                    type="text"
+                                label-for="viewPerm"
+                            >
+                                <b-form-input
+                                    id="viewPerm"
                                     v-model="page.action_view"
+                                    type="text"
                                     required
-                                    placeholder="inherited">
+                                    placeholder="inherited"
+                                >
                                 </b-form-input>
                             </b-form-group>
                         </b-col>
                         <b-col>
                             <b-form-group
                                 label="Modify"
-                                label-for="modifyPerm">
-                                <b-form-input id="modifyPerm"
-                                    type="text"
+                                label-for="modifyPerm"
+                            >
+                                <b-form-input
+                                    id="modifyPerm"
                                     v-model="page.action_modify"
+                                    type="text"
                                     required
-                                    placeholder="inherited">
+                                    placeholder="inherited"
+                                >
                                 </b-form-input>
                             </b-form-group>
                         </b-col>
@@ -99,8 +109,10 @@
                 </b-card>
 
                 <!-- Move Page -->
-                <b-card bg-variant="light" class="mb-3" v-if="page.page_id && page.body !== null">
-                    <h5 class="text-warning">Move Page</h5>
+                <b-card v-if="page.page_id && page.body !== null" bg-variant="light" class="mb-3">
+                    <h5 class="text-warning">
+                        Move Page
+                    </h5>
                     <p class="text-muted text-responsive">
                         Moving a page <b>does not</b> alter the links referencing it. You will have to manually edit
                         links to this page to point to the new url.
@@ -108,11 +120,14 @@
 
                     <b-form-group
                         label="Path"
-                        label-for="movePage">
-                        <b-form-input id="movePage"
-                            type="text"
+                        label-for="movePage"
+                    >
+                        <b-form-input
+                            id="movePage"
                             v-model="page.path"
-                            required>
+                            type="text"
+                            required
+                        >
                         </b-form-input>
                     </b-form-group>
 
@@ -122,20 +137,22 @@
                 </b-card>
 
                 <!-- Delete Page -->
-                <b-card bg-variant="light" v-if="page.page_id && page.body !== null">
-                    <h5 class="text-danger">Delete Page</h5>
+                <b-card v-if="page.page_id && page.body !== null" bg-variant="light">
+                    <h5 class="text-danger">
+                        Delete Page
+                    </h5>
                     <p class="text-muted text-responsive">
                         Deleting the page will make it appear that there never was a page at this url. However, it
                         <i>is</i> possible to recover by going to the page history, and reverting the delete revision.
                     </p>
 
-                    <b-btn variant="danger" v-b-modal.delModal>
+                    <b-btn v-b-modal.delModal variant="danger">
                         Delete Page
                     </b-btn>
                 </b-card>
             </b-collapse>
 
-            <hr>
+            <hr />
 
             <!-- Page Controls -->
             <b-form-row>
@@ -154,7 +171,7 @@
                     </b-button>
                 </b-col>
             </b-form-row>
-		</b-form>
+        </b-form>
 
         <!-- Modals -->
         <b-modal id="delModal" size="lg" ok-variant="danger" ok-title="Delete" @ok="deletePage">
@@ -219,49 +236,49 @@
 
     import _ from 'lodash';
 
-	// Managers
-	import wikiMan from '../../api/managers/wiki';
+    // Managers
+    import wikiMan from '../../api/managers/wiki';
 
-	// Components
-	import CodeMirror from 'vue-cm'
-    import Markdown from "../ui/markdown.vue";
+    // Components
+    import CodeMirror from 'vue-cm';
+    import Markdown from '../ui/markdown.vue';
 
     //------------------------------------------------------------------------------------------------------------------
 
     export default {
-		components: {
-			CodeMirror,
+        components: {
+            CodeMirror,
             Markdown
-		},
+        },
         data()
         {
             return {
-            	formValidated: false,
-				cmOptions: {
-					mode: {
-						name: "gfm",
-						gitHubSpice: false,
-						tokenTypeOverrides: {
-							emoji: "emoji"
-						}
-					},
-					lineNumbers: true,
-					theme: "default"
-				}
-			};
-		},
+                formValidated: false,
+                cmOptions: {
+                    mode: {
+                        name: 'gfm',
+                        gitHubSpice: false,
+                        tokenTypeOverrides: {
+                            emoji: 'emoji'
+                        }
+                    },
+                    lineNumbers: true,
+                    theme: 'default'
+                }
+            };
+        },
         computed: {
-		    permsChanged()
+            permsChanged()
             {
-                const action_view = _.get(this.page, 'action_view', {});
-                const action_modify = _.get(this.page, 'action_modify', {});
-                const action_view_ref = _.get(this.page._ref, 'action_modify', {});
-                const action_modify_ref = _.get(this.page._ref, 'action_modify', {});
+                const actionView = _.get(this.page, 'action_view', {});
+                const actionModify = _.get(this.page, 'action_modify', {});
+                const actionViewRef = _.get(this.page._ref, 'action_modify', {});
+                const actionModifyRef = _.get(this.page._ref, 'action_modify', {});
 
-                return _.isEqual(action_view, action_view_ref) || _.isEqual(action_modify, action_modify_ref);
+                return _.isEqual(actionView, actionViewRef) || _.isEqual(actionModify, actionModifyRef);
             },
-		    pageBody: {
-		        get()
+            pageBody: {
+                get()
                 {
                     return _.get(this.page, 'body', '');
                 },
@@ -271,16 +288,27 @@
                 }
             }
         },
-		methods: {
-        	save()
-			{
-				this.formValidated = true;
-				return wikiMan.savePage(this.page)
-					.then(() => {
-						this.formValidated = false;
-						this.$router.push({ query: {} });
-					});
-			},
+        beforeDestroy()
+        {
+            this.$root.$off('page reset', this.reset);
+            this.$root.$off('page save', this.save);
+        },
+        created()
+        {
+            this.$root.$on('page reset', this.reset);
+            this.$root.$on('page save', this.save);
+        },
+        methods: {
+            save()
+            {
+                this.formValidated = true;
+                return wikiMan.savePage(this.page)
+                    .then(() =>
+                    {
+                        this.formValidated = false;
+                        this.$router.push({ query: {} });
+                    });
+            },
             savePerms()
             {
                 this.formValidated = true;
@@ -296,15 +324,16 @@
 
                 // Save the page
                 return wikiMan.savePage(this.page)
-                    .then(() => {
+                    .then(() =>
+                    {
                         this.formValidated = false;
                         this.$router.push({ query: {} });
                     });
             },
-			reset()
-			{
-				this.page.reset();
-			},
+            reset()
+            {
+                this.page.reset();
+            },
             cmRefresh()
             {
                 this.$nextTick(() =>
@@ -336,20 +365,11 @@
                         this.$router.push({ path: `/wiki${ path }`, query: {} });
                     });
             }
-		},
-		subscriptions: {
-			page: wikiMan.currentPage$
-		},
-		beforeDestroy() {
-			this.$root.$off('page reset', this.reset);
-			this.$root.$off('page save', this.save);
-		},
-		created()
-		{
-			this.$root.$on('page reset', this.reset);
-			this.$root.$on('page save', this.save);
-		}
-    }
+        },
+        subscriptions: {
+            page: wikiMan.currentPage$
+        }
+    };
 </script>
 
 <!--------------------------------------------------------------------------------------------------------------------->

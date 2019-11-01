@@ -3,7 +3,7 @@
   --------------------------------------------------------------------------------------------------------------------->
 
 <template>
-    <b-card id="add-edit-comment" class="mb-4" v-if="comment">
+    <b-card v-if="comment" id="add-edit-comment" class="mb-4">
         <template slot="header">
             <h4 class="m-0">
                 <span v-if="isNew">New</span>
@@ -11,15 +11,19 @@
                 Comment
             </h4>
         </template>
-        <b-form @submit.prevent="save()" @reset.prevent="reset()" novalidate>
-            <b-form-group id="commentTitleGroup"
+        <b-form novalidate @submit.prevent="save()" @reset.prevent="reset()">
+            <b-form-group
+                id="commentTitleGroup"
                 label="Title"
-                label-for="commentTitle">
-                <b-form-input id="commentTitle"
-                    type="text"
+                label-for="commentTitle"
+            >
+                <b-form-input
+                    id="commentTitle"
                     v-model="comment.title"
+                    type="text"
                     required
-                    placeholder="Some comment title...">
+                    placeholder="Some comment title..."
+                >
                 </b-form-input>
             </b-form-group>
 
@@ -30,7 +34,8 @@
                             id="commentBody"
                             ref="editor"
                             v-model="comment.body"
-                            :options="cmOptions">
+                            :options="cmOptions"
+                        >
                         </code-mirror>
                     </b-card>
                 </b-tab>
@@ -49,7 +54,7 @@
                 <font-awesome-icon icon="undo"></font-awesome-icon>
                 Clear
             </b-btn>
-            <b-btn variant="success" class="ml-2" @click="save" :disabled="!isValid">
+            <b-btn variant="success" class="ml-2" :disabled="!isValid" @click="save">
                 <font-awesome-icon icon="save"></font-awesome-icon>
                 <span v-if="isNew">Post</span>
                 <span v-else>Save</span>
@@ -83,25 +88,42 @@
     import commentMan from '../../api/managers/comment';
 
     // Components
-    import CodeMirror from 'vue-cm'
+    import CodeMirror from 'vue-cm';
     import Markdown from '../ui/markdown.vue';
 
     //------------------------------------------------------------------------------------------------------------------
 
     export default {
         name: 'AddEditComment',
-        props: {
-            comment: {
-                type: Object
-            }
-        },
         components: {
             CodeMirror,
             Markdown
         },
+        props: {
+            comment: {
+                type: Object,
+                required: true
+            }
+        },
+        data()
+        {
+            return {
+                cmOptions: {
+                    mode: {
+                        name: 'gfm',
+                        gitHubSpice: false,
+                        tokenTypeOverrides: {
+                            emoji: 'emoji'
+                        }
+                    },
+                    lineNumbers: true,
+                    theme: 'default'
+                }
+            };
+        },
         computed: {
-            isNew(){ return !this.comment.comment_id; },
-            isValid(){ return this.comment.dirty && !!this.comment.title && !!this.comment.body; }
+            isNew() { return !this.comment.comment_id; },
+            isValid() { return this.comment.dirty && !!this.comment.title && !!this.comment.body; }
         },
         methods: {
             cmRefresh()
@@ -126,24 +148,8 @@
         },
         subscriptions: {
             account: authMan.account$
-        },
-        data()
-        {
-            return {
-                cmOptions: {
-                    mode: {
-                        name: "gfm",
-                        gitHubSpice: false,
-                        tokenTypeOverrides: {
-                            emoji: "emoji"
-                        }
-                    },
-                    lineNumbers: true,
-                    theme: "default"
-                }
-            };
         }
-    }
+    };
 </script>
 
 <!--------------------------------------------------------------------------------------------------------------------->

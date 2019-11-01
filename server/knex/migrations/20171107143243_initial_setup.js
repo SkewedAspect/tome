@@ -10,13 +10,20 @@ exports.up = function(knex, Promise)
         knex.schema.createTable('account', (table) =>
         {
             table.increments('account_id').primary();
-            table.string('username').notNullable().unique().index();
-            table.text('email').notNullable().unique().index();
+            table.string('username').notNullable()
+                .unique()
+                .index();
+            table.text('email').notNullable()
+                .unique()
+                .index();
             table.text('full_name');
             table.text('avatar');
-            table.string('google_id').unique().index();
-            table.specificType('permissions', 'JSON').notNullable().defaultTo("[]");
-            table.specificType('settings', 'JSON').notNullable().defaultTo("{}");
+            table.string('google_id').unique()
+                .index();
+            table.specificType('permissions', 'JSON').notNullable()
+                .defaultTo('[]');
+            table.specificType('settings', 'JSON').notNullable()
+                .defaultTo('{}');
             table.timestamp('created').defaultTo(knex.fn.now());
         }),
 
@@ -24,26 +31,34 @@ exports.up = function(knex, Promise)
         knex.schema.createTable('role', (table) =>
         {
             table.increments('role_id').primary();
-            table.text('name').notNullable().unique();
-            table.specificType('permissions', 'JSON').notNullable().defaultTo("[]");
+            table.text('name').notNullable()
+                .unique();
+            table.specificType('permissions', 'JSON').notNullable()
+                .defaultTo('[]');
         }),
 
         // The `account_role` table
         knex.schema.createTable('account_role', (table) =>
         {
-            table.integer('account_id').references('account.account_id').notNullable();
-            table.integer('role_id').references('role.role_id').notNullable();
-            table.unique(['account_id', 'role_id']);
+            table.integer('account_id').references('account.account_id')
+                .notNullable();
+            table.integer('role_id').references('role.role_id')
+                .notNullable();
+            table.unique([ 'account_id', 'role_id' ]);
         }),
 
         // The `page` table
         knex.schema.createTable('page', (table) =>
         {
             table.increments('page_id').primary();
-            table.text('path').notNullable().unique().index();
+            table.text('path').notNullable()
+                .unique()
+                .index();
             table.text('title').notNullable();
-            table.string('action_view').notNullable().defaultTo('inherit');
-            table.string('action_modify').notNullable().defaultTo('inherit');
+            table.string('action_view').notNullable()
+                .defaultTo('inherit');
+            table.string('action_modify').notNullable()
+                .defaultTo('inherit');
         }),
 
         // The `revision` table
@@ -51,8 +66,11 @@ exports.up = function(knex, Promise)
         {
             table.increments('revision_id').primary();
             table.text('body');
-            table.integer('page_id').notNullable().references('page.page_id').onDelete('CASCADE');
-            table.timestamp('edited').notNullable().defaultTo(knex.fn.now());
+            table.integer('page_id').notNullable()
+                .references('page.page_id')
+                .onDelete('CASCADE');
+            table.timestamp('edited').notNullable()
+                .defaultTo(knex.fn.now());
         }),
 
         // The `comment` table
@@ -61,10 +79,15 @@ exports.up = function(knex, Promise)
             table.increments('comment_id').primary();
             table.text('title').notNullable();
             table.text('body');
-            table.integer('page_id').notNullable().references('page.page_id').onDelete('CASCADE');
-            table.integer('account_id').notNullable().references('account.account_id');
-            table.timestamp('created').notNullable().defaultTo(knex.fn.now());
-            table.timestamp('edited').notNullable().defaultTo(knex.fn.now());
+            table.integer('page_id').notNullable()
+                .references('page.page_id')
+                .onDelete('CASCADE');
+            table.integer('account_id').notNullable()
+                .references('account.account_id');
+            table.timestamp('created').notNullable()
+                .defaultTo(knex.fn.now());
+            table.timestamp('edited').notNullable()
+                .defaultTo(knex.fn.now());
         }),
 
         // Setup the `current_revisions` view...
@@ -76,8 +99,7 @@ exports.up = function(knex, Promise)
                 ) AS curr 
                 NATURAL JOIN revision AS r
                 NATURAL JOIN page AS p 
-                ORDER BY p.path`
-        ),
+                ORDER BY p.path`),
 
         // Setup FTS on pages
         knex.raw(`CREATE VIRTUAL TABLE page_search 
@@ -87,69 +109,62 @@ exports.up = function(knex, Promise)
                 content = 'current_revision', 
                 content_rowid = page_id, 
                 tokenize = 'porter unicode61 remove_diacritics 1'
-            );`
-        ),
+            );`)
 
     ])
-    .then(() =>
-    {
+        .then(() =>
+        {
         // Setup Trigger for tables
-        return Promise.all([
+            return Promise.all([
             // `page` FTS triggers
-            knex.raw(`CREATE TRIGGER page_ai AFTER INSERT ON page BEGIN
+                knex.raw(`CREATE TRIGGER page_ai AFTER INSERT ON page BEGIN
                     INSERT INTO page_search(rowid, title) VALUES (new.page_id, new.title);
-                END;`
-            ),
+                END;`),
 
-            knex.raw(`CREATE TRIGGER page_ad AFTER DELETE ON page BEGIN
+                knex.raw(`CREATE TRIGGER page_ad AFTER DELETE ON page BEGIN
                     INSERT INTO page_search(page_search, rowid, title) VALUES('delete', old.page_id, old.title);
-                END;`
-            ),
+                END;`),
 
-            knex.raw(`CREATE TRIGGER page_au AFTER UPDATE ON page BEGIN
+                knex.raw(`CREATE TRIGGER page_au AFTER UPDATE ON page BEGIN
                     INSERT INTO page_search(page_search, rowid, title) VALUES('delete', old.page_id, old.title);
                     INSERT INTO page_search(rowid, title) VALUES (new.page_id, new.title);
-                END;`
-            ),
+                END;`),
 
-            // `revision` FTS triggers
-            knex.raw(`CREATE TRIGGER revision_ai AFTER INSERT ON revision BEGIN
+                // `revision` FTS triggers
+                knex.raw(`CREATE TRIGGER revision_ai AFTER INSERT ON revision BEGIN
                     INSERT INTO page_search(rowid, body) VALUES (new.page_id, new.body);
-                END;`
-            ),
+                END;`),
 
-            knex.raw(`CREATE TRIGGER revision_ad AFTER DELETE ON revision BEGIN
+                knex.raw(`CREATE TRIGGER revision_ad AFTER DELETE ON revision BEGIN
                     INSERT INTO page_search(page_search, rowid, body) VALUES('delete', old.page_id, old.body);
-                END;`
-            ),
+                END;`),
 
-            knex.raw(`CREATE TRIGGER revision_au AFTER UPDATE ON revision BEGIN
+                knex.raw(`CREATE TRIGGER revision_au AFTER UPDATE ON revision BEGIN
                     INSERT INTO page_search(page_search, rowid, body) VALUES('delete', old.page_id, old.body);
                     INSERT INTO page_search(rowid, body) VALUES (new.page_id, new.body);
-                END;`
-            )
-        ])
-    });
+                END;`)
+            ]);
+        });
 }; // end exports.up
 
 //----------------------------------------------------------------------------------------------------------------------
 
 exports.down = function(knex, Promise)
 {
-  return Promise.all([
-      knex.schema.dropTable('account'),
-      knex.schema.dropTable('role'),
-      knex.schema.dropTable('account_role'),
-      knex.schema.dropTable('page'),
-      knex.schema.dropTable('revision'),
-      knex.schema.dropTable('comments'),
+    return Promise.all([
+        knex.schema.dropTable('account'),
+        knex.schema.dropTable('role'),
+        knex.schema.dropTable('account_role'),
+        knex.schema.dropTable('page'),
+        knex.schema.dropTable('revision'),
+        knex.schema.dropTable('comments'),
 
-      // Drop FTS Tables
-      knex.schema.dropTable('page_search'),
+        // Drop FTS Tables
+        knex.schema.dropTable('page_search'),
 
-      // Drop the `current_revisions` view...
-      knex.raw('drop view if exists current_revision')
-  ]);
+        // Drop the `current_revisions` view...
+        knex.raw('drop view if exists current_revision')
+    ]);
 }; // end exports.down
 
 //----------------------------------------------------------------------------------------------------------------------

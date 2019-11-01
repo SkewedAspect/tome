@@ -8,7 +8,7 @@ import _ from 'lodash';
 
 class BaseDataModel
 {
-    constructor(def, idPropName='id', isRef=false)
+    constructor(def, idPropName = 'id', isRef = false)
     {
         this.$privateVars = [];
         this.$idPropName = idPropName;
@@ -33,13 +33,14 @@ class BaseDataModel
      * @param {boolean} readOnly - Should this property be created read-only.
      *
      * @private
+     * @returns {void}
      */
     $buildProp(prop, readOnly)
     {
         const propConfig = {
             configurable: false,
             enumerable: true,
-            get(){ return this.$state[prop]; },
+            get() { return this.$state[prop]; }
         };
 
         if(!readOnly)
@@ -58,6 +59,7 @@ class BaseDataModel
      * @param {boolean} readOnly - True if this object is considered read-only.
      *
      * @private
+     * @returns {void}
      */
     $buildProps(readOnly)
     {
@@ -100,10 +102,10 @@ class BaseDataModel
     //------------------------------------------------------------------------------------------------------------------
 
     // The reference state of the object; i.e. what was last retrieved from the database
-    get ref(){ return this._ref; }
+    get ref() { return this._ref; }
 
     // `_.isEqual` is very performant: `https://www.measurethat.net/Benchmarks/Show/1854/0/lodash-isequal-test`
-    get dirty(){ return !_.isEqual(this.$state, this._ref.$state); }
+    get dirty() { return !_.isEqual(this.$state, this._ref.$state); }
 
     //------------------------------------------------------------------------------------------------------------------
     // Public Functions
@@ -112,7 +114,7 @@ class BaseDataModel
     /**
      * Makes an exact state clone of the object, breaking any references to the original.
      *
-     * @returns {Object}
+     * @returns {object} - Returns a clone of the model object.
      */
     clone()
     {
@@ -142,7 +144,7 @@ class BaseDataModel
      * Makes a copy of the 'live' state of the object, and removed the id property, making it safe to save as a new
      * object.
      *
-     * @returns {Object}
+     * @returns {object} - Returns a copy of the object.
      */
     copy()
     {
@@ -170,6 +172,7 @@ class BaseDataModel
 
     /**
      * Resets the model's state to match that of the reference state, i.e. the last state retrieved from the database.
+     * @returns {void}
      */
     reset()
     {
@@ -185,7 +188,7 @@ class BaseDataModel
     /**
      * Returns a JSON serializable version of the model.
      *
-     * @returns {Object}
+     * @returns {object} - Returns an object that represents this object as a json object.
      */
     toJSON()
     {

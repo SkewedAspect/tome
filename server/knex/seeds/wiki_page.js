@@ -2,6 +2,8 @@
 // Setups up a default role
 //----------------------------------------------------------------------------------------------------------------------
 
+/* eslint-disable camelcase */
+
 const body = `# Welcome
 
 Congratulations, you've successfully setup your Tome wiki!
@@ -90,9 +92,9 @@ Start numbering with offset:
 exports.seed = function(knex, Promise)
 {
     return Promise.join(
-            knex('page').del(),
-            knex('revision').del(),
-        )
+        knex('page').del(),
+        knex('revision').del()
+    )
         .then(() =>
         {
             return knex('page')

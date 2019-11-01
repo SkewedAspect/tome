@@ -40,9 +40,9 @@ class AccountResourceAccess
 
     //------------------------------------------------------------------------------------------------------------------
 
-    getAccount(account_id)
+    getAccount(accountID)
     {
-        return $http.get(`/account/${ account_id }`)
+        return $http.get(`/account/${ accountID }`)
             .catch((error) =>
             {
                 const contentType = error.response.headers['content-type'].toLowerCase();

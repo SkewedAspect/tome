@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 const _ = require('lodash');
-let { expect } = require('chai');
+const { expect } = require('chai');
 
 // Managers
 const dbMan = require('../../server/database');
@@ -12,7 +12,6 @@ const accountMan = require('../../server/api/managers/account');
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-let db;
 let app;
 let request;
 
@@ -30,7 +29,6 @@ describe("Search API ('/search')", () =>
 
         // Setup db and users
         return dbMan.getDB()
-            .then((testDB) => db = testDB)
             .then(() => accountMan.getAccountByUsername('globalAdmin').then((user) => app.set('user', user)));
     });
 

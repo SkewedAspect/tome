@@ -2,10 +2,9 @@
 // Account REST API
 //----------------------------------------------------------------------------------------------------------------------
 
-const _ = require('lodash');
 const express = require('express');
 
-const { ensureAuthenticated, promisify } = require('./utils');
+const { promisify } = require('./utils');
 
 // Managers
 const permsMan = require('../api/managers/permissions');
@@ -16,7 +15,7 @@ const router = express.Router();
 
 //----------------------------------------------------------------------------------------------------------------------
 
-router.get('/', promisify((req, resp) =>
+router.get('/', promisify(() =>
 {
     return permsMan.getRoles();
 }));

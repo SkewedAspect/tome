@@ -3,24 +3,26 @@
 <!--------------------------------------------------------------------------------------------------------------------->
 
 <template>
-    <b-list-group-item class="history-item" class="flex-column align-items-start">
+    <b-list-group-item class="history-item flex-column align-items-start">
         <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1">Revision {{ revision.revNumber }}</h5>
+            <h5 class="mb-1">
+                Revision {{ revision.revNumber }}
+            </h5>
             <b-button-toolbar>
-                <b-btn variant="outline-primary" size="sm" style="width: 85px" v-if="page.revision_id === revision.revision_id" disabled>
+                <b-btn v-if="page.revision_id === revision.revision_id" variant="outline-primary" size="sm" style="width: 85px" disabled>
                     <font-awesome-icon icon="check"></font-awesome-icon>
                     Current
                 </b-btn>
-                <b-btn variant="outline-secondary" size="sm" style="width: 85px" v-else-if="page.body === revision.body" disabled>
+                <b-btn v-else-if="page.body === revision.body" variant="outline-secondary" size="sm" style="width: 85px" disabled>
                     <font-awesome-icon icon="ban"></font-awesome-icon>
                     No Diff
                 </b-btn>
-                <b-btn size="sm" style="width: 85px" v-else @click="revert(revision)" :disabled="!!savingRevision">
-                    <font-awesome-icon icon="undo" v-if="this.savingRevision !== revision.revision_id"></font-awesome-icon>
-                    <font-awesome-icon icon="spinner" spin v-else></font-awesome-icon>
+                <b-btn v-else size="sm" style="width: 85px" :disabled="!!savingRevision" @click="revert(revision)">
+                    <font-awesome-icon v-if="savingRevision !== revision.revision_id" icon="undo"></font-awesome-icon>
+                    <font-awesome-icon v-else icon="spinner" spin></font-awesome-icon>
                     Revert
                 </b-btn>
-                <b-btn class="ml-2" variant="outline-secondary" size="sm" v-b-toggle="`diff-collapse-${ revision.revision_id }`" style="width: 100px">
+                <b-btn v-b-toggle="`diff-collapse-${ revision.revision_id }`" class="ml-2" variant="outline-secondary" size="sm" style="width: 100px">
                     <span class="when-opened">
                         <font-awesome-icon icon="compress-alt"></font-awesome-icon>
                         Hide Diff
@@ -41,12 +43,12 @@
                 </small>
             </div>
             <div>
-                <small class="text-muted" v-b-tooltip.html.hover :title="editedDate">{{ editedFromNow }}</small>
+                <small v-b-tooltip.html.hover class="text-muted" :title="editedDate">{{ editedFromNow }}</small>
             </div>
         </div>
         <b-collapse :id="`diff-collapse-${ revision.revision_id }`" @shown="onShown" @hidden="onHidden">
-            <cm-diff class="mt-2" ref="cm" :left="revision.body" :right="prevBody" v-if="shown"></cm-diff>
-            <div class="cm-placeholder text-center" v-else>
+            <cm-diff v-if="shown" ref="cm" class="mt-2" :left="revision.body" :right="prevBody"></cm-diff>
+            <div v-else class="cm-placeholder text-center">
                 <h4>Loading...</h4>
                 <b-progress variant="primary" :value="100" animated></b-progress>
             </div>
@@ -97,14 +99,22 @@
                 required: true
             },
             prevRevision: {
-                type: Object
+                type: Object,
+                default: undefined
             }
         },
+        data()
+        {
+            return {
+                shown: false,
+                savingRevision: undefined
+            };
+        },
         computed: {
-            editedDate(){ return moment(this.revision.edited).format('MMMM Do YYYY,<br> h:mm a'); },
-            editedFromNow(){ return moment(this.revision.edited).fromNow(); },
-            prevBody(){ return _.get(this.prevRevision, 'body', ''); },
-            diff(){ return diffTrimmedLines(this.prevBody, this.revision.body); },
+            editedDate() { return moment(this.revision.edited).format('MMMM Do YYYY,<br> h:mm a'); },
+            editedFromNow() { return moment(this.revision.edited).fromNow(); },
+            prevBody() { return _.get(this.prevRevision, 'body', ''); },
+            diff() { return diffTrimmedLines(this.prevBody, this.revision.body); },
             diffAdditions()
             {
                 return _.reduce(this.diff, (accum, change) =>
@@ -115,7 +125,7 @@
                     } // end if
 
                     return accum;
-                }, 0)
+                }, 0);
             },
             diffDeletions()
             {
@@ -127,7 +137,7 @@
                     } // end if
 
                     return accum;
-                }, 0)
+                }, 0);
             },
             wikiLink()
             {
@@ -154,7 +164,8 @@
 
                 this.page.body = revision.body;
                 return wikiMan.savePage(this.page)
-                    .then(() => {
+                    .then(() =>
+                    {
                         this.$router.push(this.wikiLink);
                         this.savingRevision = undefined;
                     })
@@ -167,15 +178,8 @@
         },
         subscriptions: {
             page: wikiMan.currentPage$
-        },
-        data()
-        {
-            return {
-                shown: false,
-                savingRevision: undefined
-            };
         }
-    }
+    };
 </script>
 
 <!--------------------------------------------------------------------------------------------------------------------->

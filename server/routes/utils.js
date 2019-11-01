@@ -44,14 +44,14 @@ function buildBasicErrorLogger(logger)
     return function(error, request, response, next)
     {
         logger.child({
-                request: {
-                    id: request.id,
-                    method: request.method,
-                    url: request.url,
-                    body: request.body,
-                    query: request.query
-                }
-            }).error(`${ request.method } ${ response.statusCode } '${ request.url }': Error encountered: \n${ error.stack }`, error);
+            request: {
+                id: request.id,
+                method: request.method,
+                url: request.url,
+                body: request.body,
+                query: request.query
+            }
+        }).error(`${ request.method } ${ response.statusCode } '${ request.url }': Error encountered: \n${ error.stack }`, error);
 
         next(error);
     }; // end loggerFunc
@@ -60,9 +60,9 @@ function buildBasicErrorLogger(logger)
 // Serve index
 function serveIndex(request, response)
 {
-    response.setHeader("Content-Type", "text/html");
+    response.setHeader('Content-Type', 'text/html');
 
-    const stream = fs.createReadStream(path.resolve(__dirname + '/../../' + 'dist/index.html'));
+    const stream = fs.createReadStream(path.resolve(`${ __dirname }/../../` + `dist/index.html`));
     stream.on('error', (error) =>
     {
         console.warn('Error serving index.html:', error.stack);
@@ -79,8 +79,8 @@ function interceptHTML(response, jsonHandler, authenticated)
 {
     response.format({
         html: serveIndex,
-        json: (request, response) => {
-
+        json: (request, response) => 
+        {
             if(!authenticated || request.isAuthenticated())
             {
                 jsonHandler(request, response);
@@ -140,7 +140,7 @@ function promisify(handler)
                         name: error.constructor.name,
                         message: error.message,
                         code: error.code,
-                        error: error
+                        error
                     };
                 } // end if
 

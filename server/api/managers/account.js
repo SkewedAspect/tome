@@ -7,6 +7,8 @@ const accountRA = require('../resource-access/accounts');
 
 //----------------------------------------------------------------------------------------------------------------------
 
+/* eslint-disable camelcase */
+
 class AccountManager
 {
     getAllAccounts()

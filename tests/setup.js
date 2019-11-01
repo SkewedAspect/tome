@@ -30,6 +30,7 @@ loading
     {
         // This is added to the global context by running mocha with `--delay`.
         // See: https://mochajs.org/#delayed-root-suite
+        // eslint-disable-next-line no-undef
         run();
     });
 

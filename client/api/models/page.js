@@ -10,7 +10,7 @@ import BaseModel from './base';
 
 class PageModel extends BaseModel
 {
-    get breadcrumbs(){ return _.compact(this.$state.path.split('/')); }
+    get breadcrumbs() { return _.compact(this.$state.path.split('/')); }
 } // end WikiModel
 
 //----------------------------------------------------------------------------------------------------------------------

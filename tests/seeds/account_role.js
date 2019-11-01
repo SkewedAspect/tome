@@ -5,10 +5,10 @@
 exports.seed = function(knex, Promise)
 {
     return Promise.join(
-            knex('account').del(),
-            knex('account_role').del(),
-            knex('role').del()
-        )
+        knex('account').del(),
+        knex('account_role').del(),
+        knex('role').del()
+    )
         .then(() =>
         {
             return Promise.join(
@@ -25,7 +25,7 @@ exports.seed = function(knex, Promise)
         {
             return Promise.join(
                 knex('account_role').insert({ account_id: 2, role_id: 1 }),
-                knex('account_role').insert({ account_id: 4, role_id: 2 }),
+                knex('account_role').insert({ account_id: 4, role_id: 2 })
             );
         });
 };

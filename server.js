@@ -25,7 +25,7 @@ const KnexSessionStore = require('connect-session-knex')(session);
 const passport = require('passport');
 
 // Managers
-const dbMan  = require('./server/database');
+const dbMan = require('./server/database');
 
 // Auth
 const GoogleAuth = require('./server/auth/google');
@@ -86,7 +86,8 @@ const loading = dbMan.getDB()
         {
             // Middleware to skip authentication, for unit testing. We only allow this if we're in debug mode /and/ we've set
             // the user on `app`, something that can't be done externally.
-            app.use((req, resp, next) => {
+            app.use((req, resp, next) =>
+            {
                 const user = app.get('user');
                 req.user = _.isUndefined(user) ? req.user : user;
                 next();
@@ -105,18 +106,20 @@ const loading = dbMan.getDB()
         app.use('/wiki', wikiRoute);
 
         // Serve index.html for any html requests, but 404 everything else.
-        app.get('*', (request, response) => {
+        app.get('*', (request, response) =>
+        {
             response.format({
                 html: routeUtils.serveIndex,
-                json: (request, response) => {
+                json: (request, response) =>
+                {
                     response.status(404)
                         .json({
-                            name: "NotFoundError",
+                            name: 'NotFoundError',
                             message: `Requested url '${ request.url }' not found`,
-                            code: "ERR_NOT_FOUND"
+                            code: 'ERR_NOT_FOUND'
                         });
                 }
-            })
+            });
         });
 
         // Start the server
@@ -131,10 +134,10 @@ const loading = dbMan.getDB()
 
         return server;
     })
-    .tap((server) =>
+    .tap((/* server */) =>
     {
         // Setup our websocket handling
-        //socketMan.setServer(io(server));
+        // socketMan.setServer(io(server));
     });
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -22,9 +22,8 @@ class PathUtils
             } // end if
         } // end if
 
-        return path
+        return path;
     } // end normalizePath
-
 } // end PathUtils
 
 //----------------------------------------------------------------------------------------------------------------------

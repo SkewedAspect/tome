@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 const _ = require('lodash');
-let { expect } = require('chai');
+const { expect } = require('chai');
 
 // Managers
 const dbMan = require('../../server/database');
@@ -12,7 +12,6 @@ const accountMan = require('../../server/api/managers/account');
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-let db;
 let app;
 let request;
 
@@ -30,7 +29,6 @@ describe("Comment API ('/comment')", () =>
 
         // Setup db and users
         return dbMan.getDB()
-            .then((testDB) => db = testDB)
             .then(() => accountMan.getAccountByUsername('globalAdmin').then((user) => app.set('user', user)));
     });
 
@@ -179,7 +177,7 @@ describe("Comment API ('/comment')", () =>
     {
         it('logged in users can create new comments', () =>
         {
-            const newComment = { title: "Test Comment", body: "Sup?" };
+            const newComment = { title: 'Test Comment', body: 'Sup?' };
 
             return accountMan.getAccountByUsername('normalUser')
                 .then((user) => app.set('user', user))
@@ -231,7 +229,7 @@ describe("Comment API ('/comment')", () =>
 
         it('anonymous users can not create new comments', () =>
         {
-            const newComment = { title: "Test Comment", body: "Sup?" };
+            const newComment = { title: 'Test Comment', body: 'Sup?' };
             app.set('user', null);
 
             return request.post('/comment/')
@@ -248,7 +246,7 @@ describe("Comment API ('/comment')", () =>
         {
             it('only allows creation of comments if the user is allowed to modify the parent page', () =>
             {
-                const newComment = { title: "Test Comment", body: "Sup?" };
+                const newComment = { title: 'Test Comment', body: 'Sup?' };
                 return accountMan.getAccountByUsername('normalUser')
                     .then((user) => app.set('user', user))
                     .then(() =>
@@ -257,7 +255,8 @@ describe("Comment API ('/comment')", () =>
                             .set('Accept', 'application/json')
                             .send(newComment)
                             .catch(({ response }) => response)
-                            .then((response) => {
+                            .then((response) =>
+                            {
                                 expect(response).to.have.status(403);
                             })
                             .then(() => accountMan.getAccountByUsername('specialUser').then((user) => app.set('user', user)))
@@ -531,7 +530,7 @@ describe("Comment API ('/comment')", () =>
 
     describe('DELETE /comment/:path/:commentID', () =>
     {
-        it("deleting a comment removes it completely", () =>
+        it('deleting a comment removes it completely', () =>
         {
             return request.delete('/comment/normal/1')
                 .set('Accept', 'application/json')
@@ -559,7 +558,7 @@ describe("Comment API ('/comment')", () =>
                             expect(comment).to.have.property('comment_id');
                             expect(comment).to.have.property('page_id', 3);
                             expect(comment).to.have.property('title', 'Second Topic');
-                            expect(comment).to.have.property('body', "This is a second comment.");
+                            expect(comment).to.have.property('body', 'This is a second comment.');
                             expect(comment).to.have.property('created');
                             expect(comment).to.have.property('edited');
                             expect(comment).to.have.property('account_id', 3);

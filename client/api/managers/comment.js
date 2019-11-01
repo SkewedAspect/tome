@@ -26,15 +26,15 @@ class CommentManager
     // Observables
     //------------------------------------------------------------------------------------------------------------------
 
-    get currentPath$(){ return this._currentPathSubject.asObservable(); }
-    get currentComments$(){ return this._currentCommentsSubject.asObservable(); }
+    get currentPath$() { return this._currentPathSubject.asObservable(); }
+    get currentComments$() { return this._currentCommentsSubject.asObservable(); }
 
     //------------------------------------------------------------------------------------------------------------------
     // Properties
     //------------------------------------------------------------------------------------------------------------------
 
-    get currentPath(){ return this._currentPathSubject.getValue(); }
-    get currentComments(){ return this._currentCommentsSubject.getValue(); }
+    get currentPath() { return this._currentPathSubject.getValue(); }
+    get currentComments() { return this._currentCommentsSubject.getValue(); }
 
     //------------------------------------------------------------------------------------------------------------------
     // Public
@@ -49,7 +49,7 @@ class CommentManager
         }
         else
         {
-            return false
+            return false;
         } // end if
     } // end canEdit
 

@@ -2,7 +2,7 @@
 // Unit Tests for the wiki module.
 // ---------------------------------------------------------------------------------------------------------------------
 
-let { expect } = require('chai');
+const { expect } = require('chai');
 
 // Managers
 const dbMan = require('../../server/database');
@@ -378,7 +378,7 @@ describe("Wiki API ('/wiki')", () =>
     {
         it('logged in users can create new pages', () =>
         {
-            const newPage = { path: "/bar", title: "Bar Page", body: "The bar page." };
+            const newPage = { path: '/bar', title: 'Bar Page', body: 'The bar page.' };
 
             return accountMan.getAccountByUsername('normalUser')
                 .then((user) => app.set('user', user))
@@ -442,7 +442,7 @@ describe("Wiki API ('/wiki')", () =>
 
         it('anonymous users can not create new pages', () =>
         {
-            const newPage = { path: "/bar", title: "Bar Page", body: "The bar page." };
+            const newPage = { path: '/bar', title: 'Bar Page', body: 'The bar page.' };
             app.set('user', null);
 
             return request.post('/wiki/bar')
@@ -457,7 +457,7 @@ describe("Wiki API ('/wiki')", () =>
 
         it('fails to create a new page if one exists', () =>
         {
-            const newPage = { path: "/normal", title: "Bar Page", body: "The bar page." };
+            const newPage = { path: '/normal', title: 'Bar Page', body: 'The bar page.' };
 
             return request.post('/wiki/normal')
                 .set('Accept', 'application/json')
@@ -473,7 +473,7 @@ describe("Wiki API ('/wiki')", () =>
         {
             it('only allows creation of pages if the user is allowed to modify the parent page', () =>
             {
-                const newPage = { path: "/normal/sub/perm/bar", title: "Bar Page", body: "The bar page." };
+                const newPage = { path: '/normal/sub/perm/bar', title: 'Bar Page', body: 'The bar page.' };
 
                 return accountMan.getAccountByUsername('normalUser')
                     .then((user) => app.set('user', user))
@@ -483,7 +483,8 @@ describe("Wiki API ('/wiki')", () =>
                             .set('Accept', 'application/json')
                             .send(newPage)
                             .catch(({ response }) => response)
-                            .then((response) => {
+                            .then((response) => 
+                            {
                                 expect(response).to.have.status(403);
                             })
                             .then(() => accountMan.getAccountByUsername('specialUser').then((user) => app.set('user', user)))
@@ -549,9 +550,9 @@ describe("Wiki API ('/wiki')", () =>
             it('allows the page to be created with non-default permissions', () =>
             {
                 const newPage = {
-                    path: "/perm-test",
-                    title: "Perm Test Page",
-                    body: "The bar page.",
+                    path: '/perm-test',
+                    title: 'Perm Test Page',
+                    body: 'The bar page.',
                     action_view: 'special',
                     action_modify: 'special'
                 };
@@ -626,9 +627,9 @@ describe("Wiki API ('/wiki')", () =>
             it("a user cannot create a page that they can't view", () =>
             {
                 const newPage = {
-                    path: "/perm-test",
-                    title: "Perm Test Page",
-                    body: "The bar page.",
+                    path: '/perm-test',
+                    title: 'Perm Test Page',
+                    body: 'The bar page.',
                     action_view: 'special',
                     action_modify: 'special'
                 };
@@ -1146,7 +1147,7 @@ describe("Wiki API ('/wiki')", () =>
 
     describe('DELETE /wiki/:path', () =>
     {
-        it("deleting a page adds an empty revision", () =>
+        it('deleting a page adds an empty revision', () =>
         {
             return request.delete('/wiki/normal')
                 .set('Accept', 'application/json')
@@ -1165,7 +1166,7 @@ describe("Wiki API ('/wiki')", () =>
                 });
         });
 
-        it("getting a deleted page returns a 404", () =>
+        it('getting a deleted page returns a 404', () =>
         {
             return request.delete('/wiki/normal')
                 .set('Accept', 'application/json')

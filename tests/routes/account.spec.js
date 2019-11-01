@@ -11,7 +11,6 @@ const accountMan = require('../../server/api/managers/account');
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-let db;
 let app;
 let request;
 
@@ -29,7 +28,6 @@ describe("Account API ('/account')", () =>
 
         // Setup db and users
         return dbMan.getDB(true)
-            .then((testDB) => db = testDB)
             .then(() => accountMan.getAccountByUsername('globalAdmin').then((user) => app.set('user', user)));
     });
 
@@ -64,7 +62,7 @@ describe("Account API ('/account')", () =>
                             expect(admin.settings).to.be.undefined;
                         });
                 })
-                .then((user) => app.set('user', null))
+                .then(() => app.set('user', null))
                 .then(() =>
                 {
                     return request.get('/account')
@@ -347,7 +345,6 @@ describe("Account API ('/account')", () =>
                             const account = response.body;
                             expect(account).to.be.an('object');
                             expect(account.permissions).to.deep.equal(accountUpdate.permissions);
-
                         });
                 });
         });

@@ -1,76 +1,99 @@
-<!--------------------------------------------------------------------------------------------------------------------->
-<!-- Comment Page
-<!--------------------------------------------------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------------------------------------------------
+  -- Comment Page
+  --------------------------------------------------------------------------------------------------------------------->
 
 <template>
-	<b-container id="comment-page">
-		<div v-if="loading">
-			<h4 class="text-center">Loading...</h4>
-			<b-progress :value="100" variant="primary" :animated="true"></b-progress>
-		</div>
-		<div v-else-if="notFound">
-			<h4 class="text-center">Page Not Found</h4>
-			<p class="text-center">
-				The page at path <code>{{ path }}</code> was not found. Comments can't be loaded.
-			</p>
-		</div>
-		<div v-else-if="noPerm">
-			<h4 class="text-center">Comment Permissions Error</h4>
-			<b-alert v-if="account" show variant="danger" class="text-center">
-				The user <code>{{ account.username }}</code> does not have permission to view comments for the page at path <code>{{ path }}</code>.
-			</b-alert>
-			<b-alert v-else show variant="danger" class="text-center">
-				The user <code>anonymous</code> does not have permission to view comments for the page at path <code>{{ path }}</code>.
-			</b-alert>
-		</div>
-		<div v-else-if="errorMessage">
-			<h4 class="text-center">Comment Error</h4>
-			<p class="text-center">
-				The comments for the page at path <code>{{ path }}</code> encountered an error while loading:
-			</p>
+    <b-container id="comment-page">
+        <div v-if="loading">
+            <h4 class="text-center">
+                Loading...
+            </h4>
+            <b-progress :value="100" variant="primary" :animated="true"></b-progress>
+        </div>
+        <div v-else-if="notFound">
+            <h4 class="text-center">
+                Page Not Found
+            </h4>
+            <p class="text-center">
+                The page at path <code>{{ path }}</code> was not found. Comments can't be loaded.
+            </p>
+        </div>
+        <div v-else-if="noPerm">
+            <h4 class="text-center">
+                Comment Permissions Error
+            </h4>
+            <b-alert v-if="account" show variant="danger" class="text-center">
+                The user <code>{{ account.username }}</code> does not have permission to view comments for the page at path <code>{{ path }}</code>.
+            </b-alert>
+            <b-alert v-else show variant="danger" class="text-center">
+                The user <code>anonymous</code> does not have permission to view comments for the page at path <code>{{ path }}</code>.
+            </b-alert>
+        </div>
+        <div v-else-if="errorMessage">
+            <h4 class="text-center">
+                Comment Error
+            </h4>
+            <p class="text-center">
+                The comments for the page at path <code>{{ path }}</code> encountered an error while loading:
+            </p>
             <b-alert show variant="danger">
                 <pre class="mb-0"><code>{{ errorMessage }}</code></pre>
             </b-alert>
-		</div>
+        </div>
         <div v-else>
             <header>
-                <b-dropdown id="comment-sort-order" class="float-right"
-                    :text="`Date ${ sort === 'asc' ? 'Ascending' : 'Descending' }`" class="m-md-2" size="sm" right>
-                    <b-dropdown-item :active="sort === 'asc'" @click="sort = 'asc'">Date Ascending</b-dropdown-item>
-                    <b-dropdown-item :active="sort === 'desc'" @click="sort = 'desc'">Date Descending</b-dropdown-item>
+                <b-dropdown
+                    id="comment-sort-order"
+                    class="float-right m-md-2"
+                    :text="`Date ${ sort === 'asc' ? 'Ascending' : 'Descending' }`"
+                    size="sm"
+                    right
+                >
+                    <b-dropdown-item :active="sort === 'asc'" @click="sort = 'asc'">
+                        Date Ascending
+                    </b-dropdown-item>
+                    <b-dropdown-item :active="sort === 'desc'" @click="sort = 'desc'">
+                        Date Descending
+                    </b-dropdown-item>
                 </b-dropdown>
 
                 <h4>Comments</h4>
-                <hr class="mt-0 mb-3">
+                <hr class="mt-0 mb-3" />
             </header>
 
             <!-- Comments List -->
-            <h3 v-if="comments.length === 0" class="text-center mt-4">No Comments.</h3>
+            <h3 v-if="comments.length === 0" class="text-center mt-4">
+                No Comments.
+            </h3>
             <ul v-else class="list-unstyled">
-                <b-media tag="li" class="comment-block mt-3" v-for="comment in sortedComments" :key="comment.id">
+                <b-media v-for="commentItem in sortedComments" :key="commentItem.id" tag="li" class="commentItem-block mt-3">
                     <template slot="aside">
                         <div class="text-center">
-                            <b-img class="img-thumbnail" :src="comment.account.avatar" blank-color="#aaa" width="96" alt="placeholder"></b-img>
-                            <h6 class="m-0"><small>{{ comment.account.username }}</small></h6>
-                            <small class="text-muted" v-b-tooltip.html.hover :title="formatDate(comment.created)">{{ fromNow(comment.created) }}</small>
+                            <b-img class="img-thumbnail" :src="commentItem.account.avatar" blank-color="#aaa" width="96" alt="placeholder"></b-img>
+                            <h6 class="m-0">
+                                <small>{{ commentItem.account.username }}</small>
+                            </h6>
+                            <small v-b-tooltip.html.hover class="text-muted" :title="formatDate(commentItem.created)">{{ fromNow(commentItem.created) }}</small>
                         </div>
                     </template>
                     <div class="body-container pl-3">
-                        <b-button-toolbar class="float-right" v-if="canEdit(comment)">
-                            <b-btn size="sm" @click="edit(comment)">
+                        <b-button-toolbar v-if="canEdit(commentItem)" class="float-right">
+                            <b-btn size="sm" @click="edit(commentItem)">
                                 <font-awesome-icon icon="edit"></font-awesome-icon>
                                 Edit
                             </b-btn>
-                            <b-btn class="ml-2" size="sm" @click="del(comment)">
+                            <b-btn class="ml-2" size="sm" @click="del(commentItem)">
                                 <font-awesome-icon icon="trash-alt"></font-awesome-icon>
                                 Delete
                             </b-btn>
                         </b-button-toolbar>
-                        <div class="edited float-right" v-if="isEdited(comment)" style="clear: right">
-                            <small class="text-muted" v-b-tooltip.html.hover :title="formatDate(comment.edited)">Edited {{ fromNow(comment.edited) }}</small>
+                        <div v-if="isEdited(commentItem)" class="edited float-right" style="clear: right">
+                            <small v-b-tooltip.html.hover class="text-muted" :title="formatDate(commentItem.edited)">Edited {{ fromNow(commentItem.edited) }}</small>
                         </div>
-                        <h5 class="mt-0 mb-1">{{ comment.title }}</h5>
-                        <markdown :text="comment.body"></markdown>
+                        <h5 class="mt-0 mb-1">
+                            {{ commentItem.title }}
+                        </h5>
+                        <markdown :text="commentItem.body"></markdown>
                     </div>
                 </b-media>
             </ul>
@@ -79,7 +102,7 @@
             <add-edit-comment v-if="canPost()" :comment="comment" @saved="createNewComment"></add-edit-comment>
 
             <!-- Modal Component -->
-            <b-modal ref="delModal" id="delModal" ok-variant="danger" @cancel="onCancel" @ok="onOk">
+            <b-modal id="delModal" ref="delModal" ok-variant="danger" @cancel="onCancel" @ok="onOk">
                 <template slot="modal-title">
                     <font-awesome-icon icon="trash-alt"></font-awesome-icon>
                     Delete Comment.
@@ -135,11 +158,11 @@
 	//------------------------------------------------------------------------------------------------------------------
 
     import _ from 'lodash';
-	import moment from 'moment';
+    import moment from 'moment';
 
-	// Managers
-	import authMan from '../api/managers/auth';
-	import wikiMan from '../api/managers/wiki';
+    // Managers
+    import authMan from '../api/managers/auth';
+    import wikiMan from '../api/managers/wiki';
     import commentMan from '../api/managers/comment';
 
     // Utils
@@ -149,26 +172,57 @@
     import Markdown from '../components/ui/markdown.vue';
     import AddEditComment from '../components/comment/addEditComment.vue';
 
-	//------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
 
     export default {
-		components: {
+        components: {
             AddEditComment,
-		    Markdown
-		},
-		computed: {
-			path()
-			{
-				let path = _.get(this.$route, 'params.path', '/');
-				return pathUtils.normalizePath(path);
-			},
+            Markdown
+        },
+        data()
+        {
+            return {
+                loading: true,
+                notFound: false,
+                noPerm: false,
+                errorMessage: undefined,
+                sort: 'asc',
+                comment: undefined,
+                delComment: undefined,
+                cmOptions: {
+                    mode: {
+                        name: 'gfm',
+                        gitHubSpice: false,
+                        tokenTypeOverrides: {
+                            emoji: 'emoji'
+                        }
+                    },
+                    lineNumbers: true,
+                    theme: 'default'
+                }
+            };
+        },
+        computed: {
+            path()
+            {
+                const path = _.get(this.$route, 'params.path', '/');
+                return pathUtils.normalizePath(path);
+            },
             sortedComments()
             {
-                return _.orderBy(this.comments, 'created', [this.sort]);
+                return _.orderBy(this.comments, 'created', [ this.sort ]);
             }
-		},
-		methods: {
-		    isEdited(comment)
+        },
+        mounted()
+        {
+            this.selectPage();
+
+            // Watch for changes to account.
+            this.$watch('account', this.createNewComment.bind(this));
+            this.createNewComment();
+        },
+        methods: {
+            isEdited(comment)
             {
                 return comment.created !== comment.edited;
             },
@@ -184,40 +238,40 @@
                         this.delComment = undefined;
                     });
             },
-			selectPage()
-			{
-			    return wikiMan.selectPage(this.path)
+            selectPage()
+            {
+                return wikiMan.selectPage(this.path)
                     .then(() =>
                     {
-                        return commentMan.selectPage(this.path)
+                        return commentMan.selectPage(this.path);
                     })
-					.catch({ code: 'ERR_NOT_FOUND' }, () =>
-					{
-						this.loading = false;
-					})
-					.catch({ code: 'ERR_PERMISSION' }, () =>
-					{
-						this.loading = false;
-						this.noPerm = true;
-					})
-					.catch((error) =>
-					{
-						this.loading = false;
-						this.errorMessage = error.message;
-						console.error('Error loading page:', error);
-					})
-					.then(() =>
-					{
-						this.loading = false;
-					});
-			},
-			clearPageVars()
-			{
-				this.loading = true;
-				this.notFound = false;
-				this.noPerm = false;
-				this.errorMessage = undefined;
-			},
+                    .catch({ code: 'ERR_NOT_FOUND' }, () =>
+                    {
+                        this.loading = false;
+                    })
+                    .catch({ code: 'ERR_PERMISSION' }, () =>
+                    {
+                        this.loading = false;
+                        this.noPerm = true;
+                    })
+                    .catch((error) =>
+                    {
+                        this.loading = false;
+                        this.errorMessage = error.message;
+                        console.error('Error loading page:', error);
+                    })
+                    .then(() =>
+                    {
+                        this.loading = false;
+                    });
+            },
+            clearPageVars()
+            {
+                this.loading = true;
+                this.notFound = false;
+                this.noPerm = false;
+                this.errorMessage = undefined;
+            },
 
             edit(comment)
             {
@@ -264,44 +318,13 @@
                     this.comment = undefined;
                 } // end if
             }
-		},
-		subscriptions: {
-			account: authMan.account$,
-            page: wikiMan.currentPage$,
-			comments: commentMan.currentComments$
-		},
-        data()
-        {
-            return {
-                loading: true,
-                notFound: false,
-                noPerm: false,
-                errorMessage: undefined,
-                sort: 'asc',
-                comment: undefined,
-                delComment: undefined,
-                cmOptions: {
-                    mode: {
-                        name: "gfm",
-                        gitHubSpice: false,
-                        tokenTypeOverrides: {
-                            emoji: "emoji"
-                        }
-                    },
-                    lineNumbers: true,
-                    theme: "default"
-                }
-            };
         },
-		mounted()
-        {
-			this.selectPage();
-
-			// Watch for changes to account.
-			this.$watch('account', this.createNewComment.bind(this));
-			this.createNewComment();
-		}
-    }
+        subscriptions: {
+            account: authMan.account$,
+            page: wikiMan.currentPage$,
+            comments: commentMan.currentComments$
+        }
+    };
 </script>
 
 <!--------------------------------------------------------------------------------------------------------------------->

@@ -10,6 +10,8 @@ const { AppError, NotFoundError, MultipleResultsError, ValidationError } = requi
 
 //----------------------------------------------------------------------------------------------------------------------
 
+/* eslint-disable camelcase */
+
 class WikiResourceAccess
 {
     constructor()
@@ -23,12 +25,12 @@ class WikiResourceAccess
 
     _mungeWikiPage(page)
     {
-        page.created = Date.parse(page.created + ' GMT');
-        page.edited = Date.parse(page.edited + ' GMT');
+        page.created = Date.parse(`${ page.created } GMT`);
+        page.edited = Date.parse(`${ page.edited } GMT`);
 
         page.actions = {
             wikiView: page.action_view === 'inherit' ? this._getPermission(page.path, 'view') : page.action_view,
-            wikiModify: page.action_modify === 'inherit' ? this._getPermission(page.path, 'modify') : page.action_modify,
+            wikiModify: page.action_modify === 'inherit' ? this._getPermission(page.path, 'modify') : page.action_modify
         };
 
         // delete page.action_view;
@@ -46,16 +48,17 @@ class WikiResourceAccess
     {
         return this.loading
             .then((db) => db
-            .with('page_ancestors',
-                db.raw('select * from page where instr(?, path) order by length(path) desc', [path])
-            )
-            .from('page_ancestors')
-            .distinct()
-            .select(`action_${ action } as ${ action }`)
-            .whereNot(`action_${ action }`, 'inherit')
-            .orderBy('path', 'desc')
-            .limit(1)
-            .then(([ permObj ]) => permObj[action]));
+                .with(
+                    'page_ancestors',
+                    db.raw('select * from page where instr(?, path) order by length(path) desc', [ path ])
+                )
+                .from('page_ancestors')
+                .distinct()
+                .select(`action_${ action } as ${ action }`)
+                .whereNot(`action_${ action }`, 'inherit')
+                .orderBy('path', 'desc')
+                .limit(1)
+                .then(([ permObj ]) => permObj[action]));
     } // end _getPermission
 
     //------------------------------------------------------------------------------------------------------------------
@@ -69,109 +72,108 @@ class WikiResourceAccess
 
         return this.loading
             .then((db) => db.transaction((trans) =>
-                {
-                    db('page')
-                        .transacting(trans)
-                        .insert(_.pick(page, 'title', 'path', 'action_view', 'action_modify'))
-                        .then(([ newPageID ]) =>
-                        {
-                            return db('revision')
-                                .transacting(trans)
-                                .insert({ page_id: newPageID, body: page.body });
-                        })
-                        .then(trans.commit)
-                        .catch((error) =>
-                        {
-                            console.error(`Failed to create page '${ page.path }':`, error.stack);
+            {
+                db('page')
+                    .transacting(trans)
+                    .insert(_.pick(page, 'title', 'path', 'action_view', 'action_modify'))
+                    .then(([ newPageID ]) =>
+                    {
+                        return db('revision')
+                            .transacting(trans)
+                            .insert({ page_id: newPageID, body: page.body });
+                    })
+                    .then(trans.commit)
+                    .catch((error) =>
+                    {
+                        console.error(`Failed to create page '${ page.path }':`, error.stack);
 
-                            // Throw a generic error, because we want the outside code to know this didn't work,
-                            // but we don't want to expose the details.
-                            const newError = new AppError(`Failed to create page '${ page.path }'.`);
+                        // Throw a generic error, because we want the outside code to know this didn't work,
+                        // but we don't want to expose the details.
+                        const newError = new AppError(`Failed to create page '${ page.path }'.`);
 
-                            // Rollback the transaction
-                            return trans.rollback(newError);
-                        });
-                })
-            );
+                        // Rollback the transaction
+                        return trans.rollback(newError);
+                    });
+            }));
     } // end createPage
 
     getPage(path)
     {
         return this.loading
             .then((db) => db('current_revision')
-            .select()
-            .where({ path })
-            .then((pages) =>
-            {
-                if(pages.length > 1)
+                .select()
+                .where({ path })
+                .then((pages) =>
                 {
-                    throw new MultipleResultsError('page');
-                }
-                else if(pages.length === 0)
-                {
-                    throw new NotFoundError(`No page found for url '${ path }'.`);
-                }
-                else
-                {
-                    return this._mungeWikiPage(pages[0]);
-                } // end if
-            }));
+                    if(pages.length > 1)
+                    {
+                        throw new MultipleResultsError('page');
+                    }
+                    else if(pages.length === 0)
+                    {
+                        throw new NotFoundError(`No page found for url '${ path }'.`);
+                    }
+                    else
+                    {
+                        return this._mungeWikiPage(pages[0]);
+                    } // end if
+                }));
     } // end getPage
 
     getPageByID(page_id)
     {
         return this.loading
             .then((db) => db('current_revision')
-            .select()
-            .where({ page_id })
-            .then((pages) =>
-            {
-                if(pages.length > 1)
+                .select()
+                .where({ page_id })
+                .then((pages) =>
                 {
-                    throw new MultipleResultsError('page');
-                }
-                else if(pages.length === 0)
-                {
-                    throw new NotFoundError(`No page found for url '${ path }'.`);
-                }
-                else
-                {
-                    return this._mungeWikiPage(pages[0]);
-                } // end if
-            }));
+                    if(pages.length > 1)
+                    {
+                        throw new MultipleResultsError('page');
+                    }
+                    else if(pages.length === 0)
+                    {
+                        throw new NotFoundError(`No page found for id '${ page_id }'.`);
+                    }
+                    else
+                    {
+                        return this._mungeWikiPage(pages[0]);
+                    } // end if
+                }));
     } // end getPageByID
 
     getPageHistory(path)
     {
         return this.loading
             .then((db) => db('page')
-            .innerJoin('revision', 'page.page_id', '=', 'revision.page_id')
-            .where({ path })
-            .orderBy('edited', 'desc')
-            .then((pages) =>
-            {
-                if(pages.length > 0)
+                .innerJoin('revision', 'page.page_id', '=', 'revision.page_id')
+                .where({ path })
+                .orderBy('edited', 'desc')
+                .then((pages) =>
                 {
-                    const page = _.omit(pages[0], 'body');
-                    const revisions = _.reduce(pages, (revs, page) =>
+                    if(pages.length > 0)
                     {
-                        page.created = new Date(page.created);
-                        page.edited = new Date(page.edited);
+                        const page = _.omit(pages[0], 'body');
+                        const revisions = _.reduce(pages, (revs, page) =>
+                        {
+                            page.created = new Date(page.created);
+                            page.edited = new Date(page.edited);
 
-                        revs.push(_.pick(page, 'revision_id', 'body', 'edited'));
-                        return revs;
-                    }, []);
+                            revs.push(_.pick(page, 'revision_id', 'body', 'edited'));
+                            return revs;
+                        }, []);
 
-                    page.revisions = revisions;
-                    page.created = _.last(revisions).edited;
+                        page.revisions = revisions;
+                        page.created = _.last(revisions).edited;
 
-                    return this._mungeWikiPage(page);
-                }
-                else
-                {
-                    throw new NotFoundError(`No page found for url '${ path }'.`);
-                } // end if
-            }));
+                        return this._mungeWikiPage(page);
+                    }
+                    else
+                    {
+                        throw new NotFoundError(`No page found for url '${ path }'.`);
+                    } // end if
+                }));
     } // end getPageHistory
 
     getPermission(path, action)
@@ -183,11 +185,11 @@ class WikiResourceAccess
     {
         return this.loading
             .then((db) => db('page_search')
-            .select('rowid as page_id')
-            .select(db.raw(`snippet(page_search, 0, '<span class="fts-match">', '</span>', '...', 3) title`))
-            .select(db.raw(`snippet(page_search, 1, '<span class="fts-match">', '</span>', '...', 5) body`))
-            .where(db.raw('page_search MATCH ?', term))
-            .orderBy('rank'))
+                .select('rowid as page_id')
+                .select(db.raw(`snippet(page_search, 0, '<span class="fts-match">', '</span>', '...', 3) title`))
+                .select(db.raw(`snippet(page_search, 1, '<span class="fts-match">', '</span>', '...', 5) body`))
+                .where(db.raw('page_search MATCH ?', term))
+                .orderBy('rank'))
             .map(({ page_id, title, body }) =>
             {
                 return this.getPageByID(page_id)
@@ -208,74 +210,75 @@ class WikiResourceAccess
 
         return this.loading
             .then((db) => db('current_revision')
-            .select('page_id', 'path', 'title', 'revision_id')
-            .where({ page_id: newPage.page_id })
-            .then(([ currentPage ]) =>
-            {
-                if(!currentPage)
+                .select('page_id', 'path', 'title', 'revision_id')
+                .where({ page_id: newPage.page_id })
+                .then(([ currentPage ]) =>
                 {
-                    throw new NotFoundError(`No page found for id '${ newPage.page_id }'.`);
-                }
-                else if(newPage.path !== currentPage.path)
-                {
-                    throw new ValidationError('path', "Updating 'path' must be done as it's own operation.");
-                }
-                else
-                {
-                    return db.transaction((trans) => {
-                        let pageQuery = Promise.resolve();
-                        const newPageObj = _.pick(newPage, 'title', 'action_view', 'action_modify');
-
-                        if(!_.isEmpty(newPageObj))
+                    if(!currentPage)
+                    {
+                        throw new NotFoundError(`No page found for id '${ newPage.page_id }'.`);
+                    }
+                    else if(newPage.path !== currentPage.path)
+                    {
+                        throw new ValidationError('path', "Updating 'path' must be done as it's own operation.");
+                    }
+                    else
+                    {
+                        return db.transaction((trans) =>
                         {
-                            pageQuery = db('page')
-                                .transacting(trans)
-                                .update(newPageObj)
-                                .where({ page_id: currentPage.page_id });
-                        } // end if
+                            let pageQuery = Promise.resolve();
+                            const newPageObj = _.pick(newPage, 'title', 'action_view', 'action_modify');
 
-                        // We don't return, or else it auto-commits.
-                        pageQuery
-                            .then(() =>
+                            if(!_.isEmpty(newPageObj))
                             {
-                                if(newPage.body && currentPage.body !== newPage.body)
+                                pageQuery = db('page')
+                                    .transacting(trans)
+                                    .update(newPageObj)
+                                    .where({ page_id: currentPage.page_id });
+                            } // end if
+
+                            // We don't return, or else it auto-commits.
+                            pageQuery
+                                .then(() =>
                                 {
-                                    if(!_.isUndefined(newPage.revision_id) && currentPage.revision_id !== newPage.revision_id)
+                                    if(newPage.body && currentPage.body !== newPage.body)
                                     {
-                                        throw new ValidationError(
-                                            'revision_id',
-                                            "this revision is not the current 'revision_id'. Your chances may be against an outdated version."
-                                        );
-                                    }
-                                    else
-                                    {
-                                        return this.addRevision(newPage.page_id, newPage.body, trans);
+                                        if(!_.isUndefined(newPage.revision_id) && currentPage.revision_id !== newPage.revision_id)
+                                        {
+                                            throw new ValidationError(
+                                                'revision_id',
+                                                "this revision is not the current 'revision_id'. Your chances may be against an outdated version."
+                                            );
+                                        }
+                                        else
+                                        {
+                                            return this.addRevision(newPage.page_id, newPage.body, trans);
+                                        } // end if
                                     } // end if
-                                } // end if
-                            })
-                            .then(trans.commit)
-                            .catch((error) =>
-                            {
-                                console.error(`Failed to update page '${ newPage.path }':`, error.stack);
+                                })
+                                .then(trans.commit)
+                                .catch((error) =>
+                                {
+                                    console.error(`Failed to update page '${ newPage.path }':`, error.stack);
 
-                                // Throw a generic error, because we want the outside code to know this didn't work,
-                                // but we don't want to expose the details.
-                                const newError = new AppError(`Failed to update page '${ newPage.path }'.`);
+                                    // Throw a generic error, because we want the outside code to know this didn't work,
+                                    // but we don't want to expose the details.
+                                    const newError = new AppError(`Failed to update page '${ newPage.path }'.`);
 
-                                // Rollback the transaction
-                                return trans.rollback(newError);
-                            });
-                    });
-                } // end if
-            }));
+                                    // Rollback the transaction
+                                    return trans.rollback(newError);
+                                });
+                        });
+                    } // end if
+                }));
     } // end updatePage
 
     movePage(oldPath, newPath)
     {
         return Promise.join(
-                this.getPage(oldPath).catch({ code: 'ERR_NOT_FOUND' }, () => null),
-                this.getPage(newPath).catch({ code: 'ERR_NOT_FOUND' }, () => null)
-            )
+            this.getPage(oldPath).catch({ code: 'ERR_NOT_FOUND' }, () => null),
+            this.getPage(newPath).catch({ code: 'ERR_NOT_FOUND' }, () => null)
+        )
             .then(([ oldPage, newPage ]) =>
             {
                 if(newPage)
@@ -300,26 +303,26 @@ class WikiResourceAccess
     {
         return this.loading
             .then((db) => db('page')
-            .select('page_id')
-            .where({ path })
-            .then((pages) =>
-            {
-                if(pages.length > 1)
+                .select('page_id')
+                .where({ path })
+                .then((pages) =>
                 {
-                    throw new MultipleResultsError('page');
-                }
-                else if(pages.length === 0)
-                {
-                    throw new NotFoundError(`No page found for url '${ path }'.`);
-                }
-                else
-                {
-                    const page = pages[0];
+                    if(pages.length > 1)
+                    {
+                        throw new MultipleResultsError('page');
+                    }
+                    else if(pages.length === 0)
+                    {
+                        throw new NotFoundError(`No page found for url '${ path }'.`);
+                    }
+                    else
+                    {
+                        const page = pages[0];
 
-                    // We will consider `null` as the text for `body` to mean the page was deleted.
-                    return this.addRevision(page.page_id, null);
-                } // end if
-            }));
+                        // We will consider `null` as the text for `body` to mean the page was deleted.
+                        return this.addRevision(page.page_id, null);
+                    } // end if
+                }));
     } // end movePage
 
     fullDeletePage(path)
@@ -327,10 +330,10 @@ class WikiResourceAccess
         // This will delete all revisions and comments.
         return this.loading
             .then((db) => db('page')
-            .where({ path })
-            .delete()
-            .then((rows) => ({ rowsAffected: rows })));
-    } //end fullDeletePage
+                .where({ path })
+                .delete()
+                .then((rows) => ({ rowsAffected: rows })));
+    } // end fullDeletePage
 
     addRevision(page_id, body, transObj)
     {

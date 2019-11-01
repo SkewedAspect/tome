@@ -26,7 +26,7 @@ function getUser(req)
 
 router.get('/', (request, response) =>
 {
-    interceptHTML(response, promisify((req, resp) =>
+    interceptHTML(response, promisify((req) =>
     {
         return wikiMan.searchPages(_.get(request.query, 'term'))
             .then((results) =>

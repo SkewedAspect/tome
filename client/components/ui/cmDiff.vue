@@ -55,10 +55,11 @@
     import DiffMatchPatch from 'diff-match-patch';
 
     // Components
-    import { codemirror } from 'vue-codemirror'
+    import { codemirror } from 'vue-codemirror';
 
     //------------------------------------------------------------------------------------------------------------------
 
+    // eslint-disable-next-line camelcase
     window.diff_match_patch = DiffMatchPatch;
     window.DIFF_DELETE = -1;
     window.DIFF_INSERT = 1;
@@ -81,16 +82,6 @@
                 required: true
             }
         },
-        methods: {
-            cmRefresh()
-            {
-                this.$refs.editor.refresh();
-            }
-        },
-        watch: {
-            left(){ return this.cmRefresh(); },
-            right(){ return this.cmRefresh(); }
-        },
         data()
         {
             return {
@@ -99,12 +90,12 @@
                     orig: this.right,
                     // connect: 'align',
                     mode: {
-						name: "gfm",
-						gitHubSpice: false,
-						tokenTypeOverrides: {
-							emoji: "emoji"
-						}
-					},
+                        name: 'gfm',
+                        gitHubSpice: false,
+                        tokenTypeOverrides: {
+                            emoji: 'emoji'
+                        }
+                    },
                     readOnly: true,
                     lineNumbers: true,
                     revertButtons: false,
@@ -112,8 +103,18 @@
                     highlightDifferences: true
                 }
             };
+        },
+        watch: {
+            left() { return this.cmRefresh(); },
+            right() { return this.cmRefresh(); }
+        },
+        methods: {
+            cmRefresh()
+            {
+                this.$refs.editor.refresh();
+            }
         }
-    }
+    };
 </script>
 
 <!--------------------------------------------------------------------------------------------------------------------->

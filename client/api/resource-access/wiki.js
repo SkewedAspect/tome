@@ -81,7 +81,7 @@ class WikiResourceAccess
 
     savePage(page)
     {
-        const verb = !!page.page_id ? 'patch' : 'post';
+        const verb = page.page_id ? 'patch' : 'post';
         return $http[verb](`/wiki${ page.path }`, page)
             .then(({ data }) =>
             {
@@ -106,7 +106,7 @@ class WikiResourceAccess
         return $http.delete(`/wiki${ path }`)
             .then(() =>
             {
-                let pageInst = this.$pages[path];
+                const pageInst = this.$pages[path];
                 if(pageInst)
                 {
                     delete this.$pages[path];

@@ -8,6 +8,8 @@ const { ValidationError } = require('../errors');
 
 //----------------------------------------------------------------------------------------------------------------------
 
+/* eslint-disable camelcase */
+
 class AccountRulesEngine
 {
     validateGetAccountBy(filterName, accountFilter)

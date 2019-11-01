@@ -4,41 +4,38 @@
 
 <template>
     <div v-if="show" class="breadcrumb-area">
-
         <!-- Wiki Toolbar Buttons -->
-		<b-button-toolbar id="breadcrumb-buttons" v-if="routeName === 'wiki'">
-			<b-button-group class="mx-1" v-if="canView">
-
+        <b-button-toolbar v-if="routeName === 'wiki'" id="breadcrumb-buttons">
+            <b-button-group v-if="canView" class="mx-1">
                 <!-- Edit / Cancel  -->
-				<b-btn v-if="canModify && !editing" variant="link" size="sm" :to="{ query: { edit: null } }">
-					<font-awesome-icon icon="edit"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Edit</span>
-				</b-btn>
-				<b-btn v-else-if="editing" variant="link" size="sm" :to="{ query: {} }">
-					<font-awesome-icon icon="times"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Cancel</span>
-				</b-btn>
+                <b-btn v-if="canModify && !editing" variant="link" size="sm" :to="{ query: { edit: null } }">
+                    <font-awesome-icon icon="edit"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Edit</span>
+                </b-btn>
+                <b-btn v-else-if="editing" variant="link" size="sm" :to="{ query: {} }">
+                    <font-awesome-icon icon="times"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Cancel</span>
+                </b-btn>
 
                 <!-- History / Undo -->
                 <b-btn v-if="canView && !editing" variant="link" size="sm" :to="historyLink">
-					<font-awesome-icon icon="history"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">History</span>
-				</b-btn>
-				<b-btn v-else-if="editing" variant="link" size="sm" @click="broadcast('page reset')">
-					<font-awesome-icon icon="undo"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Reset</span>
-				</b-btn>
+                    <font-awesome-icon icon="history"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">History</span>
+                </b-btn>
+                <b-btn v-else-if="editing" variant="link" size="sm" @click="broadcast('page reset')">
+                    <font-awesome-icon icon="undo"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Reset</span>
+                </b-btn>
 
                 <!-- Comments / Save -->
-				<b-btn v-if="canView && !editing" variant="link" size="sm" :to="commentLink">
-					<font-awesome-icon icon="comments"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Comments</span>
-				</b-btn>
-				<b-btn v-else-if="editing" variant="link" size="sm" @click="broadcast('page save')">
-					<font-awesome-icon icon="save"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Save</span>
-				</b-btn>
-			</b-button-group>
-		</b-button-toolbar>
+                <b-btn v-if="canView && !editing" variant="link" size="sm" :to="commentLink">
+                    <font-awesome-icon icon="comments"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Comments</span>
+                </b-btn>
+                <b-btn v-else-if="editing" variant="link" size="sm" @click="broadcast('page save')">
+                    <font-awesome-icon icon="save"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Save</span>
+                </b-btn>
+            </b-button-group>
+        </b-button-toolbar>
 
         <!-- Comments Toolbar Buttons -->
-        <b-button-toolbar id="breadcrumb-buttons" v-else-if="routeName === 'comments'">
-            <b-button-group class="mx-1" v-if="canView">
-
+        <b-button-toolbar v-else-if="routeName === 'comments'" id="breadcrumb-buttons">
+            <b-button-group v-if="canView" class="mx-1">
                 <!-- Wiki -->
                 <b-btn v-if="canView" variant="link" size="sm" :to="wikiLink">
                     <font-awesome-icon icon="file-alt"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Wiki</span>
@@ -52,9 +49,8 @@
         </b-button-toolbar>
 
         <!-- History Toolbar Buttons -->
-        <b-button-toolbar id="breadcrumb-buttons" v-else-if="routeName === 'history'">
-            <b-button-group class="mx-1" v-if="canView">
-
+        <b-button-toolbar v-else-if="routeName === 'history'" id="breadcrumb-buttons">
+            <b-button-group v-if="canView" class="mx-1">
                 <!-- Wiki -->
                 <b-btn v-if="canView" variant="link" size="sm" :to="wikiLink">
                     <font-awesome-icon icon="file-alt"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Wiki</span>
@@ -103,16 +99,16 @@
 <script>
     //------------------------------------------------------------------------------------------------------------------
 
-	import _ from 'lodash';
+    import _ from 'lodash';
 
     // Managers
-	import authMan from '../../api/managers/auth';
-	import wikiMan from '../../api/managers/wiki';
+    import authMan from '../../api/managers/auth';
+    import wikiMan from '../../api/managers/wiki';
 
-	// Utils
+    // Utils
     import pathUtils from '../../api/utils/path';
 
-	// Components
+    // Components
     import Breadcrumbs from '../ui/breadcrumbs.vue';
 
     //------------------------------------------------------------------------------------------------------------------
@@ -121,19 +117,19 @@
         components: {
             Breadcrumbs
         },
-		computed: {
+        computed: {
             path()
             {
-                let path = _.get(this.$route, 'params.path', '/');
+                const path = _.get(this.$route, 'params.path', '/');
                 return pathUtils.normalizePath(path);
             },
-			editing(){ return _.includes(_.keys(this.$route.query), 'edit'); },
-			historyLink()
+            editing() { return _.includes(_.keys(this.$route.query), 'edit'); },
+            historyLink()
             {
                 const path = this.$route.params.path;
                 return { path: _.isUndefined(path) ? '/history' : `/history/${ path }` };
             },
-			commentLink()
+            commentLink()
             {
                 const path = this.$route.params.path;
                 return { path: _.isUndefined(path) ? '/comment' : `/comment/${ path }` };
@@ -144,51 +140,51 @@
                 return { path: _.isUndefined(path) ? '/wiki' : `/wiki/${ path }` };
             },
 
-        	breadcrumbs()
-			{
+            breadcrumbs()
+            {
                 let crumbPath = '/wiki';
                 const pathCrumbs = _.compact(this.path.split('/'));
-                let breadcrumbs = [{ text: 'wiki', to: { path: '/wiki' }, active: pathCrumbs.length === 0 && this.$route.name === 'wiki' }];
+                const breadcrumbs = [ { text: 'wiki', to: { path: '/wiki' }, active: pathCrumbs.length === 0 && this.$route.name === 'wiki' } ];
                 _.each(pathCrumbs, (crumb) =>
                 {
                     crumbPath += `/${ crumb }`;
                     breadcrumbs.push({ text: crumb, to: { path: crumbPath } });
                 });
 
-				return breadcrumbs;
-			},
-			canView()
-			{
-				if(this.page)
-				{
-					return wikiMan.canView(this.page);
-				} // end if
+                return breadcrumbs;
+            },
+            canView()
+            {
+                if(this.page)
+                {
+                    return wikiMan.canView(this.page);
+                } // end if
 
-				return false;
-			},
-			canModify()
-			{
-				if(this.page)
-				{
+                return false;
+            },
+            canModify()
+            {
+                if(this.page)
+                {
                     return wikiMan.canModify(this.page);
-				} // end if
+                } // end if
 
-				return false;
-			},
-            routeName(){ return this.$route.name; },
-			show(){ return _.includes(['wiki', 'history', 'comments', 'search'], this.$route.name); }
-		},
-		methods: {
-			broadcast(event, ...args)
-			{
-				this.$root.$emit(event, ...args);
-			}
-		},
-		subscriptions: {
-        	account: authMan.account$,
-			page: wikiMan.currentPage$
-		}
-    }
+                return false;
+            },
+            routeName() { return this.$route.name; },
+            show() { return _.includes([ 'wiki', 'history', 'comments', 'search' ], this.$route.name); }
+        },
+        methods: {
+            broadcast(event, ...args)
+            {
+                this.$root.$emit(event, ...args);
+            }
+        },
+        subscriptions: {
+            account: authMan.account$,
+            page: wikiMan.currentPage$
+        }
+    };
 </script>
 
 <!--------------------------------------------------------------------------------------------------------------------->

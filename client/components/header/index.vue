@@ -1,31 +1,34 @@
-<!--------------------------------------------------------------------------------------------------------------------->
-<!-- Header
-<!--------------------------------------------------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------------------------------------------------
+  -- Header
+  --------------------------------------------------------------------------------------------------------------------->
 
 <template>
-	<header id="site-header">
+    <header id="site-header">
         <b-navbar toggleable="sm" type="dark" variant="dark">
             <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
-            <b-navbar-brand to="/">Tome</b-navbar-brand>
-            <b-collapse is-nav id="nav_collapse">
-
+            <b-navbar-brand to="/">
+                Tome
+            </b-navbar-brand>
+            <b-collapse id="nav_collapse" is-nav>
                 <b-navbar-nav>
-                    <b-nav-item to="/recent">Recent</b-nav-item>
+                    <b-nav-item to="/recent">
+                        Recent
+                    </b-nav-item>
                 </b-navbar-nav>
 
                 <!-- Right aligned nav items -->
                 <b-navbar-nav class="ml-auto">
                     <search-bar class="mr-2"></search-bar>
                     <b-nav-form>
-						<login></login>
+                        <login></login>
                     </b-nav-form>
                 </b-navbar-nav>
             </b-collapse>
         </b-navbar>
 
-		<!-- Breadcrumbs bar -->
-		<breadcrumb-bar></breadcrumb-bar>
-	</header>
+        <!-- Breadcrumbs bar -->
+        <breadcrumb-bar></breadcrumb-bar>
+    </header>
 </template>
 
 <!--------------------------------------------------------------------------------------------------------------------->
@@ -44,25 +47,25 @@
     //------------------------------------------------------------------------------------------------------------------
 
     // Components
-	import BreadcrumbBar from './breadcrumbBar.vue';
-	import Login from './login.vue';
-	import SearchBar from './search.vue';
+    import BreadcrumbBar from './breadcrumbBar.vue';
+    import Login from './login.vue';
+    import SearchBar from './search.vue';
 
     //------------------------------------------------------------------------------------------------------------------
 
     export default {
-    	components: {
-    		BreadcrumbBar,
-			Login,
-			SearchBar
-		},
+        components: {
+            BreadcrumbBar,
+            Login,
+            SearchBar
+        },
         data()
         {
             return {
                 // Data goes here
             };
         }
-    }
+    };
 </script>
 
 <!--------------------------------------------------------------------------------------------------------------------->
