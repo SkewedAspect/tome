@@ -22,11 +22,11 @@ function migrateDB(db, users, pages, revisions, comments)
     console.log('Beginning migration...');
 
     return Promise.all([
-            db('account').truncate(),
-            db('page').truncate(),
-            db('revision').truncate(),
-            db('comment').truncate()
-        ])
+        db('account').truncate(),
+        db('page').truncate(),
+        db('revision').truncate(),
+        db('comment').truncate()
+    ])
         .then(() =>
         {
             console.log(`Processing accounts(${ users.length })...`);
@@ -53,7 +53,7 @@ function migrateDB(db, users, pages, revisions, comments)
 
             return Promise.map(pages, (page) =>
             {
-                //TODO: Read this from the site's config.
+                // TODO: Read this from the site's config.
                 if(page.url === 'welcome')
                 {
                     page.url = '';
@@ -92,10 +92,10 @@ function migrateDB(db, users, pages, revisions, comments)
             return Promise.map(revisions, (revision) =>
             {
                 return db('revision').insert({
-                        page_id: pageMap[revision.pageID],
-                        body: revision.body,
-                        edited: db.raw("datetime(?, 'unixepoch')", [revision.edited])
-                    });
+                    page_id: pageMap[revision.pageID],
+                    body: revision.body,
+                    edited: db.raw("datetime(?, 'unixepoch')", [ revision.edited ])
+                });
             });
         })
         .then(() =>
@@ -113,8 +113,8 @@ function migrateDB(db, users, pages, revisions, comments)
                         page_id: pageMap[comment.pageID],
                         title: comment.title,
                         body: comment.body,
-                        created: db.raw("datetime(?, 'unixepoch')", [createdTS]),
-                        edited: db.raw("datetime(?, 'unixepoch')", [editedTS])
+                        created: db.raw("datetime(?, 'unixepoch')", [ createdTS / 1000 ]),
+                        edited: db.raw("datetime(?, 'unixepoch')", [ editedTS / 1000 ])
                     });
             });
         })
@@ -153,13 +153,14 @@ if(oldDBPath)
         pages = _.values(require(path.resolve(path.join(oldDBPath, 'pages.json'))));
         revisions = _.values(require(path.resolve(path.join(oldDBPath, 'revisions.json'))));
     }
-    catch(error)
+    catch (error)
     {
         console.error('Error: <dbPath> is not valid:', error.message);
     } // end catch
 
     // There might not be a comments db
-    try { comments = _.values(require(path.resolve(path.join(oldDBPath, 'comments.json')))); } catch(_){}
+    try { comments = _.values(require(path.resolve(path.join(oldDBPath, 'comments.json')))); }
+    catch (_) {}
 
     // Fake dates on the revisions
     _.each(pages, (page) =>
@@ -168,7 +169,7 @@ if(oldDBPath)
         const endDate = moment(new Date(page.updated));
         const startDate = moment(new Date(page.created || endDate.clone().subtract(allRevs.length, 'days')));
 
-        const dates = [startDate];
+        const dates = [ startDate ];
         if(allRevs.length > 1)
         {
             const divisions = allRevs.length - 1;
@@ -189,12 +190,24 @@ if(oldDBPath)
     const db = knex({
         client: 'sqlite3',
         connection: {
-            filename: './db/tome.db'
+            filename: './db/rfi.db'
         },
+        // pool: {
+        //     afterCreate(db, done)
+        //     {
+        //         // Turn on tracing
+        //         db.on('trace', (queryString) =>
+        //         {
+        //             console.debug('QUERY TRACE:', queryString);
+        //         });
+        //
+        //         done(null, db);
+        //     }
+        // },
         useNullAsDefault: true
     });
 
-    return migrateDB(db, users, pages, revisions, comments);
+    migrateDB(db, users, pages, revisions, comments);
 }
 else
 {

@@ -2,7 +2,7 @@
 // Initial Setup Migration
 //----------------------------------------------------------------------------------------------------------------------
 
-exports.up = function(knex, Promise)
+exports.up = function(knex)
 {
     return Promise.all([
 

@@ -89,12 +89,12 @@ Start numbering with offset:
 
 //----------------------------------------------------------------------------------------------------------------------
 
-exports.seed = function(knex, Promise)
+exports.seed = function(knex)
 {
-    return Promise.join(
+    return Promise.all([
         knex('page').del(),
         knex('revision').del()
-    )
+    ])
         .then(() =>
         {
             return knex('page')

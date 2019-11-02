@@ -60,7 +60,7 @@ class DatabaseManager
     {
         if(!this.loading)
         {
-            this.dbConfig = _.defaults({
+            this.dbConfig = _.merge({
                 client: 'sqlite3',
                 connection: {
                     filename: './db/tome.db'

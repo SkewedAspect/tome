@@ -124,6 +124,9 @@ class AccountResourceAccess
 
     addAccount(account)
     {
+        account.permissions = JSON.stringify(_.get(account, 'permissions', []));
+        account.settings = JSON.stringify(_.get(account, 'settings', {}));
+
         return this.loading
             .then((db) => db('account')
                 .insert(account)
@@ -134,8 +137,8 @@ class AccountResourceAccess
     {
         const account_id = account.account_id;
         account = _.omit(account, 'account_id', 'googleID');
-        account.permissions = JSON.stringify(_.get(account, 'permissions'));
-        account.settings = JSON.stringify(_.get(account, 'settings'));
+        account.permissions = JSON.stringify(_.get(account, 'permissions', []));
+        account.settings = JSON.stringify(_.get(account, 'settings', {}));
 
         return this.loading
             .then((db) => db('account')
