@@ -7,7 +7,9 @@
         <b-navbar toggleable="sm" type="dark" variant="dark">
             <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
             <b-navbar-brand to="/">
-                Tome
+                <font-awesome-icon v-if="$siteConfig.faIcon" :icon="$siteConfig.faIcon"></font-awesome-icon>
+                <b-img v-else-if="$siteConfig.localIcon" class="logo" :src="$siteConfig.localIcon" alt="Site Logo"></b-img>
+                {{ $siteConfig.siteName }}
             </b-navbar-brand>
             <b-collapse id="nav_collapse" is-nav>
                 <b-navbar-nav>
@@ -38,6 +40,11 @@
 	{
 		position: fixed;
 		top: 0; left: 0; right: 0;
+
+        .logo {
+            max-height: 40px;
+            margin-right: 0.25em;
+        }
     }
 </style>
 
@@ -58,12 +65,6 @@
             BreadcrumbBar,
             Login,
             SearchBar
-        },
-        data()
-        {
-            return {
-                // Data goes here
-            };
         }
     };
 </script>

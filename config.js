@@ -9,7 +9,6 @@ const UNIT_TESTS = ((process.env.UNIT_TESTS || '').toLowerCase() === 'true') || 
 
 module.exports = {
     debug: DEBUG,
-    debugStream: DEBUG,
     overrideAuth: DEBUG,
     unitTests: UNIT_TESTS,
     secret: process.env.SESSION_SECRET || 'copula ## main beat pen 21 jjg226dh',
@@ -23,8 +22,7 @@ module.exports = {
         port: process.env.SERVER_PORT || 4321
     },
 
-    // TOME Options
-    allowRegistration: true,
+    //------------------------------------------------------------------------------------------------------------------
 
     database:
     {

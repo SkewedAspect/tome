@@ -46,6 +46,10 @@
 				padding: 0;
 			}
 		}
+
+        #google-signin-btn {
+            min-width: 96px;
+        }
     }
 </style>
 

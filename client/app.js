@@ -53,6 +53,9 @@ import HistoryPage from './pages/history.vue';
 import SearchPage from './pages/search.vue';
 import WikiPage from './pages/wiki.vue';
 
+// Config
+import siteConfig from '../config.site.js';
+
 // ---------------------------------------------------------------------------------------------------------------------
 // VueRX
 // ---------------------------------------------------------------------------------------------------------------------
@@ -116,6 +119,22 @@ const router = new VueRouter({
 //----------------------------------------------------------------------------------------------------------------------
 
 Vue.component('wiki-link', WikiLink);
+
+Vue.mixin({
+    computed: {
+        $siteConfig()
+        {
+            return {
+                siteName: 'Tome',
+                localIcon: '/assets/images/logo.png',
+                allowRegistration: true,
+
+                // Apply overrides
+                ...siteConfig
+            };
+        }
+    }
+});
 
 //----------------------------------------------------------------------------------------------------------------------
 // App Setup

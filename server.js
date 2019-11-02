@@ -96,6 +96,7 @@ const loading = dbMan.getDB()
 
         // Setup static serving
         app.use(express.static(path.resolve('./dist')));
+        app.use('/assets', express.static(path.resolve('./assets')));
 
         // Set up our application routes
         app.use('/account', accountsRoute);
