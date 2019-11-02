@@ -33,6 +33,29 @@
     export default {
         components: {
             SiteHeader
+        },
+        computed: {
+            bootswatchCSS()
+            {
+                const theme = this.$siteConfig.bootswatch;
+                if(theme)
+                {
+                    return `https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/${ theme }/bootstrap.min.css`;
+                } // end if
+
+                return undefined;
+            }
+        },
+        metaInfo()
+        {
+            if(this.bootswatchCSS)
+            {
+                return {
+                    link: [
+                        { rel: 'stylesheet', href: this.bootswatchCSS }
+                    ]
+                };
+            } // end if
         }
     };
 </script>

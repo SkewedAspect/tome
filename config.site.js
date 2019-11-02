@@ -16,6 +16,9 @@ module.exports = {
     // What is the name of the site? (Default: 'Tome')
     // siteName: 'Example Wiki',
 
+    // What Bootswatch theme would you like to use, if any?
+    // bootswatch: 'flatly',
+
     // If you want to use a Font Awesome icon for your logo, enable this option. (Default: [ 'far', 'fa-book-open' ])
     // faIcon: 'dumpster-fire',
 
