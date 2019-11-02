@@ -17,7 +17,7 @@
     import _ from 'lodash';
     import $http from 'axios';
 
-    const relUrlRegEx = new RegExp('^(?!www\\.|(?:http|ftp)s?://|[A-Za-z]:\\\\|//)[^/]*/[^/].*$');
+    const relUrlRegEx = new RegExp('^(?!www\\.|(?:http|ftp)s?://|[A-Za-z]:\\\\|//)[^/]*.*$');
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -55,7 +55,10 @@
 
                 return url;
             },
-            isExternal() { return !relUrlRegEx.test(this.href); }
+            isExternal()
+            {
+                return !relUrlRegEx.test(this.href);
+            }
         },
         watch: {
             href()
