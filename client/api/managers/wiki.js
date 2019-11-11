@@ -89,9 +89,14 @@ class WikiManager
 
     canModify(page)
     {
-        const user = authMan.account || { permissions: [], groups: [] };
-        const viewPerm = `wikiModify/${ page.actions.wikiModify }`;
-        return viewPerm === 'wikiModify/*' || permsMan.hasPerm(user, viewPerm);
+        const user = authMan.account;
+        if(user)
+        {
+            const viewPerm = `wikiModify/${ page.actions.wikiModify }`;
+            return viewPerm === 'wikiModify/*' || permsMan.hasPerm(user, viewPerm);
+        } // end if
+
+        return false;
     } // end canModify
 } // end WikiManager
 

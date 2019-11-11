@@ -164,7 +164,7 @@
             },
             canModify()
             {
-                if(this.page)
+                if(this.page && this.account)
                 {
                     return wikiMan.canModify(this.page);
                 } // end if
