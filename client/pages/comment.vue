@@ -100,17 +100,17 @@
 
             <!-- New Comment -->
             <hr/>
-            <b-button-toolbar v-show="!showAddCommentComponent" class="float-right mb-4">
-                <b-btn variant="success" @click="showAddCommentComponent = true">
+            <b-button-toolbar v-show="!showCommentComponent" class="float-right mb-4">
+                <b-btn variant="success" @click="add">
                     Add Comment
                 </b-btn>
             </b-button-toolbar>
             <add-edit-comment
-                v-show="showAddCommentComponent"
+                v-show="showCommentComponent"
                 v-if="canPost()"
                 :comment="comment"
                 @saved="createNewComment"
-                @canceled="showAddCommentComponent = false"
+                @canceled="showCommentComponent = false"
             ></add-edit-comment>
 
             <!-- Modal Component -->
@@ -215,7 +215,7 @@
                     lineNumbers: true,
                     theme: 'default'
                 },
-                showAddCommentComponent: false
+                showCommentComponent: false
             };
         },
         computed: {
@@ -289,8 +289,17 @@
                 this.errorMessage = undefined;
             },
 
+            add()
+            {
+                if(this.comment.comment_id)
+                {
+                    this.createNewComment();
+                }
+                this.showCommentComponent = true;
+            },
             edit(comment)
             {
+                this.showCommentComponent = true;
                 this.comment = comment;
             },
             del(comment)
