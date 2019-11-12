@@ -121,7 +121,7 @@ class DatabaseManager
                 pool: {
                     min: 1,
                     max: 1,
-                    disposeTimeout: 1000 * 60 * 60 * 100, // 100 hours
+                    // disposeTimeout: 1000 * 60 * 60 * 100, // 100 hours
                     idleTimeoutMillis: 1000 * 60 * 60 * 100 // 100 hours
                 }
             });

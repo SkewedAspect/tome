@@ -2,15 +2,15 @@
 // Wiki Page Seeds
 //----------------------------------------------------------------------------------------------------------------------
 
-exports.seed = function(knex, Promise)
+exports.seed = function(knex)
 {
-    return Promise.join(
+    return Promise.all([
         knex('page').del(),
         knex('revision').del()
-    )
+    ])
         .then(() =>
         {
-            return Promise.join(
+            return Promise.all([
                 knex('page').insert({ page_id: 1, path: '/', title: 'Home', action_view: '*', action_modify: '*' })
                     .then(([ page_id ]) => knex('revision').insert({ page_id, body: 'Home page.', revision_id: 1 })),
                 knex('page').insert({ page_id: 2, path: '/perm', title: 'Perm Wiki Page', action_view: 'special', action_modify: 'special' })
@@ -41,7 +41,7 @@ exports.seed = function(knex, Promise)
                     }),
                 knex('page').insert({ page_id: 8, path: '/not-deleted', title: 'Not Deleted Wiki Page' })
                     .then(([ page_id ]) => knex('revision').insert({ page_id, body: 'This is a _normal_ wiki sub page.', revision_id: 12 }))
-            );
+            ]);
         });
 };
 
