@@ -99,6 +99,7 @@
             </ul>
 
             <!-- New Comment -->
+            <hr class="mt-0 mb-3" />
             <b-button-toolbar v-show="!showAddCommentComponent" class="float-right">
                 <b-btn variant="success" @click="showAddCommentComponent = true">
                     Add Comment
