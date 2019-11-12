@@ -100,7 +100,7 @@
 
             <!-- New Comment -->
             <hr/>
-            <b-button-toolbar v-show="!showAddCommentComponent" class="float-right">
+            <b-button-toolbar v-show="!showAddCommentComponent" class="float-right mb-4">
                 <b-btn variant="success" @click="showAddCommentComponent = true">
                     Add Comment
                 </b-btn>
