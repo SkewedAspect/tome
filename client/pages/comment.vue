@@ -65,8 +65,8 @@
             <h3 v-if="comments.length === 0" class="text-center mt-4">
                 No Comments.
             </h3>
-            <ul v-else class="list-unstyled">
-                <b-media v-for="commentItem in sortedComments" :key="commentItem.id" tag="li" class="commentItem-block mt-3">
+            <transition-group name="comment-transition" v-else class="list-unstyled" tag="ul">
+                <b-media v-for="commentItem in sortedComments" :key="commentItem.comment_id" tag="li" class="commentItem-block mt-3">
                     <template slot="aside">
                         <div class="text-center">
                             <b-img class="img-thumbnail" :src="commentItem.account.avatar" blank-color="#aaa" width="96" alt="placeholder"></b-img>
@@ -96,7 +96,7 @@
                         <markdown :text="commentItem.body"></markdown>
                     </div>
                 </b-media>
-            </ul>
+            </transition-group>
 
             <!-- New Comment -->
             <hr/>
@@ -160,6 +160,9 @@
             .edited {
                 font-style: italic;
             }
+        }
+        .comment-transition-move {
+            transition: transform 1s;
         }
 	}
 </style>
