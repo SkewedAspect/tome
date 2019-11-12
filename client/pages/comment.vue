@@ -301,6 +301,7 @@
             },
             canEdit(comment)
             {
+                this.account;
                 return commentMan.canEdit(comment);
             },
 
