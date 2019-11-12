@@ -99,7 +99,18 @@
             </ul>
 
             <!-- New Comment -->
-            <add-edit-comment v-if="canPost()" :comment="comment" @saved="createNewComment"></add-edit-comment>
+            <b-button-toolbar v-show="!showAddCommentComponent" class="float-right">
+                <b-btn variant="success" @click="showAddCommentComponent = true">
+                    Add Comment
+                </b-btn>
+            </b-button-toolbar>
+            <add-edit-comment
+                v-show="showAddCommentComponent"
+                v-if="canPost()"
+                :comment="comment"
+                @saved="createNewComment"
+                @canceled="showAddCommentComponent = false"
+            ></add-edit-comment>
 
             <!-- Modal Component -->
             <b-modal id="delModal" ref="delModal" ok-variant="danger" @cancel="onCancel" @ok="onOk">
@@ -199,7 +210,8 @@
                     },
                     lineNumbers: true,
                     theme: 'default'
-                }
+                },
+                showAddCommentComponent: false
             };
         },
         computed: {
