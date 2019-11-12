@@ -41,10 +41,10 @@
             </b-alert>
         </div>
         <div v-else>
-            <header>
+            <header class="clearfix m-md-1">
                 <b-dropdown
                     id="comment-sort-order"
-                    class="float-right m-md-2"
+                    class="float-right"
                     :text="`Date ${ sort === 'asc' ? 'Ascending' : 'Descending' }`"
                     size="sm"
                     right
@@ -58,8 +58,8 @@
                 </b-dropdown>
 
                 <h4>Comments</h4>
-                <hr class="mt-0 mb-3" />
             </header>
+            <hr class="mt-0" />
 
             <!-- Comments List -->
             <h3 v-if="comments.length === 0" class="text-center mt-4">
@@ -99,7 +99,7 @@
             </ul>
 
             <!-- New Comment -->
-            <hr class="mt-0 mb-3" />
+            <hr/>
             <b-button-toolbar v-show="!showAddCommentComponent" class="float-right">
                 <b-btn variant="success" @click="showAddCommentComponent = true">
                     Add Comment
