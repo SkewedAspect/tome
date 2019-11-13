@@ -41,10 +41,10 @@
             </b-alert>
         </div>
         <div v-else>
-            <header>
+            <header class="clearfix m-md-1">
                 <b-dropdown
                     id="comment-sort-order"
-                    class="float-right m-md-2"
+                    class="float-right"
                     :text="`Date ${ sort === 'asc' ? 'Ascending' : 'Descending' }`"
                     size="sm"
                     right
@@ -58,15 +58,15 @@
                 </b-dropdown>
 
                 <h4>Comments</h4>
-                <hr class="mt-0 mb-3" />
             </header>
+            <hr class="mt-0" />
 
             <!-- Comments List -->
             <h3 v-if="comments.length === 0" class="text-center mt-4">
                 No Comments.
             </h3>
-            <ul v-else class="list-unstyled">
-                <b-media v-for="commentItem in sortedComments" :key="commentItem.id" tag="li" class="commentItem-block mt-3">
+            <transition-group name="comment-transition" v-else class="list-unstyled" tag="ul">
+                <b-media v-for="commentItem in sortedComments" :key="commentItem.comment_id" tag="li" class="commentItem-block mt-3">
                     <template slot="aside">
                         <div class="text-center">
                             <b-img class="img-thumbnail" :src="commentItem.account.avatar" blank-color="#aaa" width="96" alt="placeholder"></b-img>
@@ -96,10 +96,22 @@
                         <markdown :text="commentItem.body"></markdown>
                     </div>
                 </b-media>
-            </ul>
+            </transition-group>
 
             <!-- New Comment -->
-            <add-edit-comment v-if="canPost()" :comment="comment" @saved="createNewComment"></add-edit-comment>
+            <hr/>
+            <b-button-toolbar v-show="!showCommentComponent" class="float-right mb-4">
+                <b-btn variant="success" @click="add">
+                    Add Comment
+                </b-btn>
+            </b-button-toolbar>
+            <add-edit-comment
+                v-show="showCommentComponent"
+                v-if="canPost()"
+                :comment="comment"
+                @saved="createNewComment"
+                @canceled="showCommentComponent = false"
+            ></add-edit-comment>
 
             <!-- Modal Component -->
             <b-modal id="delModal" ref="delModal" ok-variant="danger" @cancel="onCancel" @ok="onOk">
@@ -148,6 +160,9 @@
             .edited {
                 font-style: italic;
             }
+        }
+        .comment-transition-move {
+            transition: transform 1s;
         }
 	}
 </style>
@@ -199,7 +214,8 @@
                     },
                     lineNumbers: true,
                     theme: 'default'
-                }
+                },
+                showCommentComponent: false
             };
         },
         computed: {
@@ -273,8 +289,17 @@
                 this.errorMessage = undefined;
             },
 
+            add()
+            {
+                if(this.comment.comment_id)
+                {
+                    this.createNewComment();
+                }
+                this.showCommentComponent = true;
+            },
             edit(comment)
             {
+                this.showCommentComponent = true;
                 this.comment = comment;
             },
             del(comment)
@@ -289,7 +314,7 @@
             },
             canEdit(comment)
             {
-                return commentMan.canEdit(comment);
+                return !!this.account && commentMan.canEdit(comment);
             },
 
             cmRefresh()

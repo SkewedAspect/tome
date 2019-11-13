@@ -54,6 +54,10 @@
                 <font-awesome-icon icon="undo"></font-awesome-icon>
                 Clear
             </b-btn>
+            <b-btn class="ml-2" @click="cancel">
+                <font-awesome-icon icon="times"></font-awesome-icon>
+                Cancel
+            </b-btn>
             <b-btn variant="success" class="ml-2" :disabled="!isValid" @click="save">
                 <font-awesome-icon icon="save"></font-awesome-icon>
                 <span v-if="isNew">Post</span>
@@ -144,6 +148,11 @@
                     {
                         this.$emit('saved');
                     });
+            },
+            cancel()
+            {
+                this.comment.reset();
+                this.$emit('canceled');
             }
         },
         subscriptions: {
