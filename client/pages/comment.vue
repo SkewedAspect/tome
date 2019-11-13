@@ -314,8 +314,7 @@
             },
             canEdit(comment)
             {
-                this.account;
-                return commentMan.canEdit(comment);
+                return !!this.account && commentMan.canEdit(comment);
             },
 
             cmRefresh()

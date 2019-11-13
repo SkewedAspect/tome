@@ -55,7 +55,7 @@
                 Clear
             </b-btn>
             <b-btn class="ml-2" @click="cancel">
-                <font-awesome-icon icon="ban"></font-awesome-icon>
+                <font-awesome-icon icon="times"></font-awesome-icon>
                 Cancel
             </b-btn>
             <b-btn variant="success" class="ml-2" :disabled="!isValid" @click="save">
