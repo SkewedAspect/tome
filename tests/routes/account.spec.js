@@ -344,7 +344,7 @@ describe("Account API ('/account')", () =>
 
                             const account = response.body;
                             expect(account).to.be.an('object');
-                            expect(account.permissions).to.deep.equal(accountUpdate.permissions);
+                            expect(account.permissions).to.be.empty;
                         });
                 });
         });

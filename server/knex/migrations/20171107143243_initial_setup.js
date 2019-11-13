@@ -116,7 +116,7 @@ exports.up = function(knex)
         {
         // Setup Trigger for tables
             return Promise.all([
-            // `page` FTS triggers
+                // `page` FTS triggers
                 knex.raw(`CREATE TRIGGER page_ai AFTER INSERT ON page BEGIN
                     INSERT INTO page_search(rowid, title) VALUES (new.page_id, new.title);
                 END;`),
