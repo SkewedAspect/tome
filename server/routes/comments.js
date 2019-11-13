@@ -57,12 +57,6 @@ function getPage(path, user, perm = 'wikiView')
 
 //----------------------------------------------------------------------------------------------------------------------
 
-router.get('/recent', promisify((req) =>
-{
-    const max = req.query.max;
-    return wikiMan.getRecentComments(max);
-}));
-
 router.get('*', (request, response) =>
 {
     interceptHTML(response, promisify((req, resp) =>
