@@ -76,6 +76,36 @@ class CommentResourceAccess
                 .map(this._mungeComment));
     } // end getComments
 
+    getRecentComments(max = 25)
+    {
+        return this.loading
+            .then((db) =>
+            {
+                let query = db('comment')
+                    .select(
+                        'comment.comment_id',
+                        'comment.title',
+                        'comment.body',
+                        'comment.created',
+                        'comment.edited',
+                        'comment.account_id',
+                        'comment.page_id',
+                        'page.path as page_path',
+                        'page.title as page_title'
+                    )
+                    .innerJoin('page', 'comment.page_id', 'page.page_id')
+                    .orderBy('comment.created', 'desc');
+
+                if(max && Number.isFinite(max))
+                {
+                    query = query.limit(max);
+                } // end if
+
+                return query;
+            })
+            .map(this._mungeComment);
+    } // end getRecentComments
+
     addComment(comment)
     {
         return this.loading

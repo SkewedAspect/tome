@@ -93,6 +93,11 @@ class WikiManager
             .then(() => commentRA.getComments(path));
     } // end getComments
 
+    getRecentComments(max = 25)
+    {
+        return commentRA.getRecentComments(max);
+    } // end getRecentComments
+
     addComment(comment)
     {
         return commentRE.validateComment(comment)
