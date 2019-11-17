@@ -96,7 +96,7 @@ class CommentResourceAccess
                     .innerJoin('page', 'comment.page_id', 'page.page_id')
                     .orderBy('comment.created', 'desc');
 
-                if(max && Number.isFinite(max))
+                if(max)
                 {
                     query = query.limit(max);
                 } // end if
