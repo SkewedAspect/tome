@@ -1,133 +1,204 @@
 //----------------------------------------------------------------------------------------------------------------------
-// tomev1ToSQLite - Brief description for tomev1ToSQLite module.
+// Convert from Tome v1 to Tome v2
 //----------------------------------------------------------------------------------------------------------------------
+
+/* eslint-disable camelcase */
 
 const _ = require('lodash');
-const Promise = require('bluebird');
 const path = require('path');
-const knex = require('knex');
 const moment = require('moment');
-
 const program = require('commander');
+
+// Managers
+const dbMan = require('../server/database');
 
 //----------------------------------------------------------------------------------------------------------------------
 
+let oldDBPath;
 const pageMap = {};
 const accountMap = {};
 
 //----------------------------------------------------------------------------------------------------------------------
 
-function migrateDB(db, users, pages, revisions, comments)
+async function migrateDB(db, users, pages, revisions, comments, config)
 {
-    console.log('Beginning migration...');
+    console.log('Clearing out database...');
 
-    return Promise.all([
-        db('account').truncate(),
-        db('page').truncate(),
-        db('revision').truncate(),
-        db('comment').truncate()
-    ])
-        .then(() =>
-        {
-            console.log(`Processing accounts(${ users.length })...`);
+    //------------------------------------------------------------------------------------------------------------------
 
-            return Promise.map(users, (user) =>
+    await db('account').truncate();
+    await db('page').truncate();
+    await db('revision').truncate();
+    await db('comment').truncate();
+
+    //------------------------------------------------------------------------------------------------------------------
+
+    console.log(`Processing accounts(${ users.length })...`);
+
+    //------------------------------------------------------------------------------------------------------------------
+
+    await Promise.all(users.map((user) =>
+    {
+        return db('account')
+            .insert({
+                username: (user.nickname || user.email.split('@')[0]).toLowerCase(),
+                email: user.email,
+                full_name: user.displayName,
+                google_id: user.gPlusID,
+                avatar: user.avatar
+            })
+            .then(([ accountID ]) =>
             {
-                return db('account')
-                    .insert({
-                        username: (user.nickname || user.email.split('@')[0]).toLowerCase(),
-                        email: user.email,
-                        full_name: user.displayName,
-                        google_id: user.gPlusID,
-                        avatar: user.avatar
-                    })
-                    .then(([ accountID ]) =>
-                    {
-                        accountMap[user.email] = accountID;
-                    });
+                accountMap[user.email] = accountID;
             });
-        })
-        .then(() =>
-        {
-            console.log(`Processing pages(${ pages.length })...`);
+    }));
 
-            return Promise.map(pages, (page) =>
+    //------------------------------------------------------------------------------------------------------------------
+
+    console.log(`Processing pages(${ pages.length })...`);
+
+    //------------------------------------------------------------------------------------------------------------------
+
+    await Promise.all(pages.map((page) =>
+    {
+        const welcomeURL = config.frontPage.substr(1);
+        if(page.url === welcomeURL)
+        {
+            page.url = '';
+        } // end if
+
+        const revision = _.find(revisions, { id: page.revisionID });
+
+        const pageObj = {
+            path: `/${ page.url }`,
+            title: revision.title
+        };
+
+        if(pageObj.path === '/')
+        {
+            pageObj.action_view = '*';
+            pageObj.action_modify = '*';
+        }
+        else if(page.private)
+        {
+            pageObj.action_view = 'private';
+            pageObj.action_modify = 'private';
+        } // end if
+
+        return db('page')
+            .insert(pageObj)
+            .then(([ pageID ]) =>
             {
-                // TODO: Read this from the site's config.
-                if(page.url === 'welcome')
-                {
-                    page.url = '';
-                } // end if
-
-                const revision = _.find(revisions, { id: page.revisionID });
-
-                const pageObj = {
-                    path: `/${ page.url }`,
-                    title: revision.title
-                };
-
-                if(pageObj.path === '/')
-                {
-                    pageObj.action_view = '*';
-                    pageObj.action_modify = '*';
-                }
-                else if(page.private)
-                {
-                    pageObj.action_view = 'private';
-                    pageObj.action_modify = 'private';
-                } // end if
-
-                return db('page')
-                    .insert(pageObj)
-                    .then(([ pageID ]) =>
-                    {
-                        pageMap[page.id] = pageID;
-                    });
+                pageMap[page.id] = pageID;
             });
-        })
-        .then(() =>
-        {
-            console.log(`Processing revisions(${ revisions.length })...`);
+    }));
 
-            return Promise.map(revisions, (revision) =>
-            {
-                return db('revision').insert({
-                    page_id: pageMap[revision.pageID],
-                    body: revision.body,
-                    edited: db.raw("datetime(?, 'unixepoch')", [ revision.edited ])
-                });
-            });
-        })
-        .then(() =>
-        {
-            console.log(`Processing comments(${ comments.length })...`);
+    //------------------------------------------------------------------------------------------------------------------
 
-            return Promise.map(comments, (comment) =>
-            {
-                const createdTS = (new Date(comment.created)).getTime();
-                const editedTS = (new Date(comment.updated)).getTime();
+    console.log(`Processing revisions(${ revisions.length })...`);
 
-                return db('comment')
-                    .insert({
-                        account_id: accountMap[comment.userID],
-                        page_id: pageMap[comment.pageID],
-                        title: comment.title,
-                        body: comment.body,
-                        created: db.raw("datetime(?, 'unixepoch')", [ createdTS / 1000 ]),
-                        edited: db.raw("datetime(?, 'unixepoch')", [ editedTS / 1000 ])
-                    });
-            });
-        })
-        .then(() =>
-        {
-            console.log('Done.');
-            process.exit(0);
+    //------------------------------------------------------------------------------------------------------------------
+
+    await Promise.all(revisions.map((revision) =>
+    {
+        return db('revision').insert({
+            page_id: pageMap[revision.pageID],
+            body: revision.body,
+            edited: db.raw("datetime(?, 'unixepoch')", [ revision.edited ])
         });
+    }));
+
+    //------------------------------------------------------------------------------------------------------------------
+
+    console.log(`Processing comments(${ comments.length })...`);
+
+    //------------------------------------------------------------------------------------------------------------------
+
+    await Promise.all(comments.map((comment) =>
+    {
+        const createdTS = (new Date(comment.created)).getTime();
+        const editedTS = (new Date(comment.updated)).getTime();
+
+        return db('comment')
+            .insert({
+                account_id: accountMap[comment.userID],
+                page_id: pageMap[comment.pageID],
+                title: comment.title,
+                body: comment.body,
+                created: db.raw("datetime(?, 'unixepoch')", [ createdTS / 1000 ]),
+                edited: db.raw("datetime(?, 'unixepoch')", [ editedTS / 1000 ])
+            });
+    }));
 } // end migrateDB
+
+function loadOldDBFile(dbPath)
+{
+    try
+    {
+        return require(path.resolve(path.join(oldDBPath, dbPath)));
+    }
+    catch (_)
+    {
+        console.warn(`Failed to load '${ dbPath }'. Returning empty object.`);
+        return {};
+    } // end try/catch
+} // end loadOldDBFile
 
 //----------------------------------------------------------------------------------------------------------------------
 
-let oldDBPath;
+async function main()
+{
+    if(oldDBPath)
+    {
+        console.log('Preparing...');
+
+        const users = Object.values(loadOldDBFile('users.json'));
+        const pages = Object.values(loadOldDBFile('pages.json'));
+        const revisions = Object.values(loadOldDBFile('revisions.json'));
+        const comments = Object.values(loadOldDBFile('comments.json'));
+        const oldConfig = loadOldDBFile('../config.js');
+
+        // Fake dates on the revisions
+        pages.forEach((page) =>
+        {
+            const allRevs = _.filter(revisions, { pageID: page.id });
+            const endDate = moment(new Date(page.updated));
+            const startDate = moment(new Date(page.created || endDate.clone().subtract(allRevs.length, 'days')));
+
+            const dates = [ startDate ];
+            if(allRevs.length > 1)
+            {
+                const divisions = allRevs.length - 1;
+                const inc = (endDate - startDate) / divisions;
+
+                _.each(_.range(divisions), (idx) =>
+                {
+                    dates.push(startDate.clone().add(inc * (idx + 1)));
+                });
+            } // end if
+
+            // We have to modify the rev object directly.
+            allRevs.forEach((rev, idx) =>
+            {
+                rev.edited = rev.created ? (new Date(rev.created).getTime() / 1000) : dates[idx].unix();
+            });
+        });
+
+        console.log('Beginning migration...');
+
+        // Get a reference to the DB, and migrate the old to the new.
+        const db = await dbMan.getDB();
+        return migrateDB(db, users, pages, revisions, comments, oldConfig);
+    }
+    else
+    {
+        console.error('<dbPath> is required.');
+        program.outputHelp();
+        process.exit(1);
+    } // end if
+} // end main
+
+//----------------------------------------------------------------------------------------------------------------------
 
 program
     .version('0.1.0')
@@ -140,80 +211,17 @@ program
 
 //----------------------------------------------------------------------------------------------------------------------
 
-if(oldDBPath)
-{
-    let users = [];
-    let pages = [];
-    let revisions = [];
-    let comments = [];
-
-    try
+// Run the main script
+main()
+    .then(() =>
     {
-        users = _.values(require(path.resolve(path.join(oldDBPath, 'users.json'))));
-        pages = _.values(require(path.resolve(path.join(oldDBPath, 'pages.json'))));
-        revisions = _.values(require(path.resolve(path.join(oldDBPath, 'revisions.json'))));
-    }
-    catch (error)
+        console.log('Done.');
+        process.exit(0);
+    })
+    .catch((ex) =>
     {
-        console.error('Error: <dbPath> is not valid:', error.message);
-    } // end catch
-
-    // There might not be a comments db
-    try { comments = _.values(require(path.resolve(path.join(oldDBPath, 'comments.json')))); }
-    catch (_) {}
-
-    // Fake dates on the revisions
-    _.each(pages, (page) =>
-    {
-        const allRevs = _.filter(revisions, { pageID: page.id });
-        const endDate = moment(new Date(page.updated));
-        const startDate = moment(new Date(page.created || endDate.clone().subtract(allRevs.length, 'days')));
-
-        const dates = [ startDate ];
-        if(allRevs.length > 1)
-        {
-            const divisions = allRevs.length - 1;
-            const inc = (endDate - startDate) / divisions;
-
-            _.each(_.range(divisions), (idx) =>
-            {
-                dates.push(startDate.clone().add(inc * (idx + 1)));
-            });
-        } // end if
-
-        _.each(allRevs, (rev, idx) =>
-        {
-            rev.edited = rev.created ? (new Date(rev.created).getTime() / 1000) : dates[idx].unix();
-        });
+        console.error(`Error encountered: '${ ex.stack }'.`);
+        process.exit(1);
     });
-
-    const db = knex({
-        client: 'sqlite3',
-        connection: {
-            filename: './db/rfi.db'
-        },
-        // pool: {
-        //     afterCreate(db, done)
-        //     {
-        //         // Turn on tracing
-        //         db.on('trace', (queryString) =>
-        //         {
-        //             console.debug('QUERY TRACE:', queryString);
-        //         });
-        //
-        //         done(null, db);
-        //     }
-        // },
-        useNullAsDefault: true
-    });
-
-    migrateDB(db, users, pages, revisions, comments);
-}
-else
-{
-    console.error('<dbPath> is required.');
-    program.outputHelp();
-    process.exit(1);
-} // end if
 
 //----------------------------------------------------------------------------------------------------------------------
