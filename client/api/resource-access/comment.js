@@ -109,6 +109,12 @@ class CommentResourceAccess
                 } // end if
             });
     } // end deleteComment
+
+    getRecent(max)
+    {
+        return $http.get('/recent/comments', { params: { max } })
+            .then(({ data }) => data);
+    } // end getRecent
 } // end CommentResourceAccess
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -80,6 +80,11 @@ class WikiManager
         return wikiRA.deletePage(path);
     } // end deletePage
 
+    getRecent(max)
+    {
+        return wikiRA.getRecent(max);
+    } // end getRecent
+
     canView(page)
     {
         const user = authMan.account || { permissions: [], groups: [] };

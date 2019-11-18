@@ -182,9 +182,15 @@ class WikiResourceAccess
             .then((db) =>
             {
                 let query = db('page')
+                    .select(
+                        'page.title as title',
+                        'page.path as path',
+                        'revision.revision_id as revision_id',
+                        'revision.page_id as page_id',
+                        'revision.edited as edited'
+                    )
                     .innerJoin('revision', 'page.page_id', '=', 'revision.page_id')
                     .orderBy('edited', 'desc');
-
                 if(max)
                 {
                     query = query.limit(max);

@@ -85,7 +85,6 @@ class CommentResourceAccess
                     .select(
                         'comment.comment_id',
                         'comment.title',
-                        'comment.body',
                         'comment.created',
                         'comment.edited',
                         'comment.account_id',

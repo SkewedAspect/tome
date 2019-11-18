@@ -40,23 +40,39 @@
 
         <b-row class="mt-3">
             <b-col cols="6">
-                <b-card class="h-100">
+                <b-card class="h-100" no-body>
                     <template slot="header">
                         <h5 class="m-0">
                             Pages
                         </h5>
                     </template>
-                    Foo
+                    <div v-if="loadingRevisions" class="card-body text-center">
+                        <h4>Loading...</h4>
+                        <b-progress :value="100" animated></b-progress>
+                    </div>
+                    <b-list-group flush>
+                        <b-list-group-item v-for="revision in revisions" :key="revision.revision_id">
+                            {{ revision }}
+                        </b-list-group-item>
+                    </b-list-group>
                 </b-card>
             </b-col>
             <b-col cols="6">
-                <b-card class="h-100">
+                <b-card class="h-100" no-body>
                     <template slot="header">
                         <h5 class="m-0">
                             Comments
                         </h5>
                     </template>
-                    Bar
+                    <div v-if="loadingComments" class="card-body text-center">
+                        <h4>Loading...</h4>
+                        <b-progress :value="100" animated></b-progress>
+                    </div>
+                    <b-list-group flush>
+                        <b-list-group-item v-for="comment in comments" :key="comment.comment_id">
+                            {{ comment }}
+                        </b-list-group-item>
+                    </b-list-group>
                 </b-card>
             </b-col>
         </b-row>
@@ -75,7 +91,9 @@
 <script>
     //------------------------------------------------------------------------------------------------------------------
 
-    // import _ from 'lodash';
+    // Managers
+    import wikiMan from '../api/managers/wiki';
+    import commentMan from '../api/managers/comment';
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -83,8 +101,45 @@
         data()
         {
             return {
-                maxItems: 25
+                loadingRevisions: false,
+                loadingComments: false,
+                maxItems: 25,
+                revisions: [],
+                comments: []
             };
+        },
+        watch: {
+            maxItems()
+            {
+                this.reload();
+            }
+        },
+        mounted()
+        {
+            this.maxItems = 25;
+            this.reload();
+        },
+        methods: {
+            async reload()
+            {
+                // Load Revisions
+                this.loadingRevisions = true;
+                this.revisions = await wikiMan.getRecent(this.maxItems)
+                    .catch((ex) =>
+                    {
+                        console.error('Error loading revisions:', ex);
+                    });
+                this.loadingRevisions = false;
+
+                // Load Comments
+                this.loadingComments = true;
+                this.comments = await commentMan.getRecent(this.maxItems)
+                    .catch((ex) =>
+                    {
+                        console.error('Error loading comments:', ex);
+                    });
+                this.loadingComments = false;
+            }
         }
     };
 </script>
