@@ -69,8 +69,23 @@
                         <b-progress :value="100" animated></b-progress>
                     </div>
                     <b-list-group flush>
-                        <b-list-group-item v-for="comment in comments" :key="comment.comment_id">
-                            {{ comment }}
+                        <b-list-group-item
+                            v-for="comment in comments"
+                            :key="comment.comment_id"
+                            :to="`/comment${ comment.page_path }#comment-${ comment.comment_id }`"
+                        >
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">
+                                    {{ comment.title }}
+                                </h5>
+                                <small>{{ fromNow(comment.edited) }}</small>
+                            </div>
+
+                            <div class="comment-content">
+                                <markdown class="mb-1" :text="comment.body"></markdown>
+                            </div>
+
+                            <small class="text-muted">{{ comment.username }}</small>
                         </b-list-group-item>
                     </b-list-group>
                 </b-card>
@@ -83,6 +98,12 @@
 
 <style lang="scss">
     #recent-page {
+        .comment-content {
+            font-size: 0.90rem;
+            p:last-child {
+                margin-bottom: 0;
+            }
+        }
     }
 </style>
 
@@ -91,13 +112,22 @@
 <script>
     //------------------------------------------------------------------------------------------------------------------
 
+    import moment from 'moment';
+
     // Managers
     import wikiMan from '../api/managers/wiki';
     import commentMan from '../api/managers/comment';
 
+    // Components
+    import Markdown from '../components/ui/markdown.vue';
+
     //------------------------------------------------------------------------------------------------------------------
 
     export default {
+        name: 'RecentPage',
+        components: {
+            Markdown
+        },
         data()
         {
             return {
@@ -139,6 +169,10 @@
                         console.error('Error loading comments:', ex);
                     });
                 this.loadingComments = false;
+            },
+            fromNow(datetime)
+            {
+                return moment(datetime).fromNow();
             }
         }
     };

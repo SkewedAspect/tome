@@ -57,6 +57,8 @@ describe("Recent API ('/recent')", () =>
                     expect(comment).to.have.property('page_id');
                     expect(comment).to.have.property('page_path');
                     expect(comment).to.have.property('page_title');
+                    expect(comment).to.have.property('body');
+                    expect(comment).to.have.property('username');
                     expect(comment).to.have.property('created');
                     expect(comment).to.have.property('edited');
                     expect(comment).to.have.property('account_id');
