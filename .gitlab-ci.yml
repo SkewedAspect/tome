@@ -7,7 +7,7 @@ Unit Tests:
     - yarn install
     - yarn run test
   stage: test
-  image: node:carbon-alpine
+  image: node:lts-alpine
   coverage: '/Statements.*?(\d+(?:\.\d+)?)%/'
 
 Build Docker:
