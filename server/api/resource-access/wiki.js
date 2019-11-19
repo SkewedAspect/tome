@@ -187,7 +187,9 @@ class WikiResourceAccess
                         'page.path as path',
                         'revision.revision_id as revision_id',
                         'revision.page_id as page_id',
-                        'revision.edited as edited'
+                        'revision.edited as edited',
+                        db.raw('RANK () OVER '
+                            + '( PARTITION BY revision.page_id ORDER BY revision.edited ASC ) revision_num ')
                     )
                     .innerJoin('revision', 'page.page_id', '=', 'revision.page_id')
                     .orderBy('edited', 'desc');

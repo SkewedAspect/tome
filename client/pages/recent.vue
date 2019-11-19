@@ -62,7 +62,7 @@
                                 </h5>
                                 <small>{{ fromNow(revision.edited) }}</small>
                             </div>
-                            <small class="text-muted">Revision {{ revision.revision_id }}</small>
+                            <small class="text-muted">Revision {{ revision.revision_num }}</small>
                         </b-list-group-item>
                     </b-list-group>
                 </b-card>
@@ -87,11 +87,12 @@
                             <div class="d-flex w-100 justify-content-between">
                                 <h5 class="mb-1">
                                     {{ comment.title }}
+                                    <small class="text-muted">by {{ comment.username }}</small>
                                 </h5>
                                 <small>{{ fromNow(comment.edited) }}</small>
                             </div>
 
-                            <small class="text-muted">by {{ comment.username }}</small>
+                            <small class="text-muted">on "{{ comment.page_title }}"</small>
                         </b-list-group-item>
                     </b-list-group>
                 </b-card>
@@ -124,22 +125,16 @@
     import wikiMan from '../api/managers/wiki';
     import commentMan from '../api/managers/comment';
 
-    // Components
-    import Markdown from '../components/ui/markdown.vue';
-
     //------------------------------------------------------------------------------------------------------------------
 
     export default {
         name: 'RecentPage',
-        components: {
-            Markdown
-        },
         data()
         {
             return {
                 loadingRevisions: false,
                 loadingComments: false,
-                maxItems: 25,
+                maxItems: 10,
                 revisions: [],
                 comments: []
             };
@@ -152,7 +147,7 @@
         },
         mounted()
         {
-            this.maxItems = 25;
+            this.maxItems = 10;
             this.reload();
         },
         methods: {
