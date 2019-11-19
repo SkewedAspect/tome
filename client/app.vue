@@ -3,9 +3,10 @@
 <!--------------------------------------------------------------------------------------------------------------------->
 
 <template>
-    <div id="app">
+    <div id="app" :class="breadcrumbs ? 'breadcrumbs-shown' : ''">
         <site-header></site-header>
         <router-view></router-view>
+        <site-footer></site-footer>
     </div>
 </template>
 
@@ -13,10 +14,15 @@
 
 <style lang="scss">
 	#app {
-		height: calc(100% - 100px);
+		height: calc(100% - 66px);
 		overflow: auto;
-		margin-top: 100px;
+		margin-top: 66px;
 		padding-top: 10px;
+
+        &.breadcrumbs-shown {
+            height: calc(100% - 110px);
+            margin-top: 110px;
+        }
 	}
 </style>
 
@@ -27,12 +33,14 @@
 
 	// Components
     import SiteHeader from './components/header/index.vue';
+    import SiteFooter from './components/ui/footer.vue';
 
     //------------------------------------------------------------------------------------------------------------------
 
     export default {
         components: {
-            SiteHeader
+            SiteHeader,
+            SiteFooter
         },
         computed: {
             bootswatchCSS()
@@ -44,6 +52,10 @@
                 } // end if
 
                 return undefined;
+            },
+            breadcrumbs()
+            {
+                return [ 'wiki', 'history', 'comments', 'search' ].includes(this.$route.name);
             }
         },
         metaInfo()

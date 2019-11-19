@@ -65,8 +65,9 @@
             <h3 v-if="comments.length === 0" class="text-center mt-4">
                 No Comments.
             </h3>
-            <transition-group name="comment-transition" v-else class="list-unstyled" tag="ul">
+            <transition-group v-else name="comment-transition" class="list-unstyled" tag="ul">
                 <b-media v-for="commentItem in sortedComments" :key="commentItem.comment_id" tag="li" class="commentItem-block mt-3">
+                    <a :id="`comment-${ commentItem.comment_id }`"></a>
                     <template slot="aside">
                         <div class="text-center">
                             <b-img class="img-thumbnail" :src="commentItem.account.avatar" blank-color="#aaa" width="96" alt="placeholder"></b-img>

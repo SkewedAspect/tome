@@ -9,7 +9,7 @@
     "build": "npm run clean && parcel build client/index.html",
     "watch": "npm run clean && parcel watch client/index.html",
     "lint": "eslint --fix --ext .js,.vue server.js config.js server/ client/ tests/",
-    "test": "LOG_LEVEL=ERROR UNIT_TESTS=TRUE nyc --reporter=text-summary mocha tests/ --recursive --exit --delay",
+    "test": "LOG_LEVEL=ERROR UNIT_TESTS=TRUE nyc --reporter=text-summary mocha -r tests/setup.js tests/**/*.spec.js --recursive --exit --delay",
     "start": "DEBUG=true node server.js"
   },
   "author": "Christopher S. Case <chris.case@g33xnexus.com>",

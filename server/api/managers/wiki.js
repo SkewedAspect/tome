@@ -39,6 +39,11 @@ class WikiManager
             .then(() => wikiRA.getPageHistory(path));
     } // end getHistory
 
+    getRecentPageRevisions(max = 25)
+    {
+        return wikiRA.getRecentPageRevisions(max);
+    } // end getRecentPageRevisions
+
     getPermission(path, action)
     {
         return wikiRE.validatePath(path)
@@ -92,6 +97,11 @@ class WikiManager
         return wikiRE.validatePath(path)
             .then(() => commentRA.getComments(path));
     } // end getComments
+
+    getRecentComments(max = 25)
+    {
+        return commentRA.getRecentComments(max);
+    } // end getRecentComments
 
     addComment(comment)
     {

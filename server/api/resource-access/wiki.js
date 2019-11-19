@@ -176,6 +176,41 @@ class WikiResourceAccess
                 }));
     } // end getPageHistory
 
+    getRecentPageRevisions(max = 25)
+    {
+        return this.loading
+            .then((db) =>
+            {
+                let query = db('page')
+                    .select(
+                        'page.title as title',
+                        'page.path as path',
+                        'revision.revision_id as revision_id',
+                        'revision.page_id as page_id',
+                        'revision.edited as edited',
+                        db.raw('RANK () OVER '
+                            + '( PARTITION BY revision.page_id ORDER BY revision.edited ASC ) revision_num ')
+                    )
+                    .innerJoin('revision', 'page.page_id', '=', 'revision.page_id')
+                    .orderBy('edited', 'desc');
+                if(max)
+                {
+                    query = query.limit(max);
+                } // end if
+
+                return query.then((pages) =>
+                {
+                    return pages.map((page) =>
+                    {
+                        return {
+                            ...page,
+                            edited: Date.parse(`${ page.edited } GMT`)
+                        };
+                    });
+                });
+            });
+    } // end getRecentPageRevisions
+
     getPermission(path, action)
     {
         return this._getPermission(path, action);

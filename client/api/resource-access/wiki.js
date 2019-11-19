@@ -113,6 +113,12 @@ class WikiResourceAccess
                 } // end if
             });
     } // end deletePage
+
+    getRecent(max)
+    {
+        return $http.get('/recent/wiki', { params: { max } })
+            .then(({ data }) => data);
+    } // end getRecent
 } // end WikiResourceAccess
 
 //----------------------------------------------------------------------------------------------------------------------

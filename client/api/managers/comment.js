@@ -85,6 +85,11 @@ class CommentManager
                 return this.selectPage(this.currentPath);
             });
     } // end deleteComment
+
+    getRecent(max)
+    {
+        return commentRA.getRecent(max);
+    } // end getRecent
 } // end CommentManager
 
 //----------------------------------------------------------------------------------------------------------------------
