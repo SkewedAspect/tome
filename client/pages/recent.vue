@@ -51,8 +51,18 @@
                         <b-progress :value="100" animated></b-progress>
                     </div>
                     <b-list-group flush>
-                        <b-list-group-item v-for="revision in revisions" :key="revision.revision_id">
-                            {{ revision }}
+                        <b-list-group-item
+                            v-for="revision in revisions"
+                            :key="revision.revision_id"
+                            :to="`/history${ revision.path }`"
+                        >
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">
+                                    {{ revision.title }}
+                                </h5>
+                                <small>{{ fromNow(revision.edited) }}</small>
+                            </div>
+                            <small class="text-muted">Revision {{ revision.revision_id }}</small>
                         </b-list-group-item>
                     </b-list-group>
                 </b-card>
@@ -81,11 +91,7 @@
                                 <small>{{ fromNow(comment.edited) }}</small>
                             </div>
 
-                            <div class="comment-content">
-                                <markdown class="mb-1" :text="comment.body"></markdown>
-                            </div>
-
-                            <small class="text-muted">{{ comment.username }}</small>
+                            <small class="text-muted">by {{ comment.username }}</small>
                         </b-list-group-item>
                     </b-list-group>
                 </b-card>
