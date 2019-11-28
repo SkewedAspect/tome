@@ -78,12 +78,16 @@
                         </div>
                     </template>
                     <div class="body-container pl-3">
-                        <b-button-toolbar v-if="canEdit(commentItem)" class="float-right">
-                            <b-btn size="sm" @click="edit(commentItem)">
+                        <b-button-toolbar class="float-right">
+                            <b-btn size="sm" @click="quote(commentItem)">
+                                <font-awesome-icon icon="quote-right"></font-awesome-icon>
+                                Quote
+                            </b-btn>
+                            <b-btn v-if="canEdit(commentItem)" class="ml-2" size="sm" @click="edit(commentItem)">
                                 <font-awesome-icon icon="edit"></font-awesome-icon>
                                 Edit
                             </b-btn>
-                            <b-btn class="ml-2" size="sm" @click="del(commentItem)">
+                            <b-btn v-if="canEdit(commentItem)" class="ml-2" size="sm" @click="del(commentItem)">
                                 <font-awesome-icon icon="trash-alt"></font-awesome-icon>
                                 Delete
                             </b-btn>
@@ -309,6 +313,13 @@
             {
                 this.delComment = comment;
                 this.$refs.delModal.show();
+            },
+            quote(commentItem)
+            {
+                const quotedComment = "> " + commentItem.body.replace(/\n/g, '\n> ') + '\n> \n> ' + `-- <cite>${commentItem.account.username}</cite>`;
+                this.createNewComment();
+                this.comment.body = quotedComment;
+                this.showCommentComponent = true;
             },
 
             canPost()
