@@ -337,7 +337,10 @@
             },
             cancelComment()
             {
-                this.comment = this.originalComment;
+                if(this.originalComment)
+                {
+                    this.comment = this.originalComment;
+                }
                 this.showCommentComponent = false;
             },
             createNewComment()
