@@ -45,6 +45,19 @@ class CommentResourceAccess
 
     //------------------------------------------------------------------------------------------------------------------
 
+    copyComment(comment)
+    {
+        return new CommentModel({
+            title: comment.title,
+            body: comment.body,
+            created: comment.created,
+            edited: comment.edited,
+            page_id: comment.page_id,
+            account_id: comment.account_id,
+            path: comment.path
+        });
+    } // end copyComment
+
     createComment(path, account_id)
     {
         return new CommentModel({

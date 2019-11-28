@@ -111,7 +111,7 @@
                 v-if="canPost()"
                 :comment="comment"
                 @saved="createNewComment"
-                @canceled="showCommentComponent = false"
+                @canceled="cancelComment"
             ></add-edit-comment>
 
             <!-- Modal Component -->
@@ -204,6 +204,7 @@
                 errorMessage: undefined,
                 sort: 'asc',
                 comment: undefined,
+                originalComment: undefined,
                 delComment: undefined,
                 cmOptions: {
                     mode: {
@@ -301,7 +302,8 @@
             edit(comment)
             {
                 this.showCommentComponent = true;
-                this.comment = comment;
+                this.originalComment = comment;
+                this.comment = commentMan.copyComment(comment);
             },
             del(comment)
             {
@@ -333,14 +335,24 @@
             {
                 return moment(date).format('MMMM Do YYYY,<br> h:mm a');
             },
+            cancelComment()
+            {
+                if(this.originalComment)
+                {
+                    this.comment = this.originalComment;
+                }
+                this.showCommentComponent = false;
+            },
             createNewComment()
             {
                 if(this.account)
                 {
+                    this.originalComment = undefined;
                     this.comment = commentMan.createComment(this.path);
                 }
                 else
                 {
+                    this.originalComment = undefined;
                     this.comment = undefined;
                 } // end if
             }
