@@ -53,6 +53,11 @@ class CommentManager
         } // end if
     } // end canEdit
 
+    copyComment(comment)
+    {
+        return commentRA.copyComment(comment);
+    } // end copyComment
+
     createComment(path)
     {
         return commentRA.createComment(path, authMan.account.account_id);
