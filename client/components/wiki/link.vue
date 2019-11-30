@@ -4,8 +4,8 @@
 <template>
     <a :href="url" class="wiki-link" :class="{ 'text-danger': !exists }" @click="handleClick">
         <slot></slot>
-        <font-awesome-icon v-if="isExternal" icon="external-link" size="xs" class="text-muted"></font-awesome-icon>
-        <font-awesome-icon v-else-if="isPrivate" icon="lock-alt" size="xs" class="text-warning"></font-awesome-icon>
+        <fa v-if="isExternal" icon="external-link" size="xs" class="text-muted"></fa>
+        <fa v-else-if="isPrivate" icon="lock-alt" size="xs" class="text-warning"></fa>
     </a>
 </template>
 

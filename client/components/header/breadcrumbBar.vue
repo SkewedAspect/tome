@@ -9,26 +9,26 @@
             <b-button-group v-if="canView" class="mx-1">
                 <!-- Edit / Cancel  -->
                 <b-btn v-if="canModify && !editing" variant="link" size="sm" :to="{ query: { edit: null } }">
-                    <font-awesome-icon icon="edit"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Edit</span>
+                    <fa icon="edit"></fa><span class="ml-1 d-none d-sm-inline-block">Edit</span>
                 </b-btn>
                 <b-btn v-else-if="editing" variant="link" size="sm" :to="{ query: {} }">
-                    <font-awesome-icon icon="times"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Cancel</span>
+                    <fa icon="times"></fa><span class="ml-1 d-none d-sm-inline-block">Cancel</span>
                 </b-btn>
 
                 <!-- History / Undo -->
                 <b-btn v-if="canView && !editing" variant="link" size="sm" :to="historyLink">
-                    <font-awesome-icon icon="history"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">History</span>
+                    <fa icon="history"></fa><span class="ml-1 d-none d-sm-inline-block">History</span>
                 </b-btn>
                 <b-btn v-else-if="editing" variant="link" size="sm" @click="broadcast('page reset')">
-                    <font-awesome-icon icon="undo"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Reset</span>
+                    <fa icon="undo"></fa><span class="ml-1 d-none d-sm-inline-block">Reset</span>
                 </b-btn>
 
                 <!-- Comments / Save -->
                 <b-btn v-if="canView && !editing" variant="link" size="sm" :to="commentLink">
-                    <font-awesome-icon icon="comments"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Comments</span>
+                    <fa icon="comments"></fa><span class="ml-1 d-none d-sm-inline-block">Comments</span>
                 </b-btn>
                 <b-btn v-else-if="editing" variant="link" size="sm" @click="broadcast('page save')">
-                    <font-awesome-icon icon="save"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Save</span>
+                    <fa icon="save"></fa><span class="ml-1 d-none d-sm-inline-block">Save</span>
                 </b-btn>
             </b-button-group>
         </b-button-toolbar>
@@ -38,12 +38,12 @@
             <b-button-group v-if="canView" class="mx-1">
                 <!-- Wiki -->
                 <b-btn v-if="canView" variant="link" size="sm" :to="wikiLink">
-                    <font-awesome-icon icon="file-alt"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Wiki</span>
+                    <fa icon="file-alt"></fa><span class="ml-1 d-none d-sm-inline-block">Wiki</span>
                 </b-btn>
 
                 <!-- History -->
                 <b-btn v-if="canView" variant="link" size="sm" :to="historyLink">
-                    <font-awesome-icon icon="history"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">History</span>
+                    <fa icon="history"></fa><span class="ml-1 d-none d-sm-inline-block">History</span>
                 </b-btn>
             </b-button-group>
         </b-button-toolbar>
@@ -53,12 +53,12 @@
             <b-button-group v-if="canView" class="mx-1">
                 <!-- Wiki -->
                 <b-btn v-if="canView" variant="link" size="sm" :to="wikiLink">
-                    <font-awesome-icon icon="file-alt"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Wiki</span>
+                    <fa icon="file-alt"></fa><span class="ml-1 d-none d-sm-inline-block">Wiki</span>
                 </b-btn>
 
                 <!-- Comments -->
                 <b-btn v-if="canView" variant="link" size="sm" :to="commentLink">
-                    <font-awesome-icon icon="comments"></font-awesome-icon><span class="ml-1 d-none d-sm-inline-block">Comments</span>
+                    <fa icon="comments"></fa><span class="ml-1 d-none d-sm-inline-block">Comments</span>
                 </b-btn>
             </b-button-group>
         </b-button-toolbar>

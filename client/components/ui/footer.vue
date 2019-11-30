@@ -6,13 +6,13 @@
     <ul id="site-footer" class="container list-inline mt-3">
         <li class="list-inline-item">
             <a :href="projectURL">
-                <font-awesome-icon :icon="[ 'fab', 'gitlab' ]"></font-awesome-icon>
+                <fa :icon="[ 'fab', 'gitlab' ]"></fa>
                 GitLab Project
             </a>
         </li>
         <li class="list-inline-item">
             <a :href="issuesURL">
-                <font-awesome-icon icon="bug"></font-awesome-icon>
+                <fa icon="bug"></fa>
                 Report Issue
             </a>
         </li>

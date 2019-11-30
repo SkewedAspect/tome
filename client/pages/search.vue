@@ -27,7 +27,7 @@
             </p>
             <ul class="fa-ul">
                 <li v-for="results in searchResults" :key="results.page.id" class="mt-4">
-                    <font-awesome-icon icon="file-alt" transform="down-3" list-item></font-awesome-icon>
+                    <fa icon="file-alt" transform="down-3" list-item></fa>
                     <router-link :to="'/wiki' + results.page.path">
                         <!-- eslint-disable-next-line vue/no-v-html-->
                         <h5 class="mb-0" v-html="results.match.title"></h5>

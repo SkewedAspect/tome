@@ -7,7 +7,7 @@
         <b-navbar toggleable="sm" type="dark" variant="dark">
             <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
             <b-navbar-brand to="/">
-                <font-awesome-icon v-if="$siteConfig.faIcon" :icon="$siteConfig.faIcon"></font-awesome-icon>
+                <fa v-if="$siteConfig.faIcon" :icon="$siteConfig.faIcon"></fa>
                 <b-img v-else-if="$siteConfig.localIcon" class="logo" :src="$siteConfig.localIcon" alt="Site Logo"></b-img>
                 {{ $siteConfig.siteName }}
             </b-navbar-brand>

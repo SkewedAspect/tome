@@ -6,7 +6,7 @@
     <div v-if="page" id="page-edit">
         <!-- TODO: Finish implementing error handling. -->
         <b-alert variant="danger">
-            <font-awesome-icon icon="exclamation-triangle"></font-awesome-icon>
+            <fa icon="exclamation-triangle"></fa>
             Unable to save. (For some reason or another. Who knows. Gremlins, maybe?)
         </b-alert>
 
@@ -51,11 +51,11 @@
             <div class="float-right">
                 <b-btn v-b-toggle.adv-collapse variant="outline-secondary" class="mt-1" style="width: 107px">
                     <span class="when-opened">
-                        <font-awesome-icon icon="compress-alt"></font-awesome-icon>
+                        <fa icon="compress-alt"></fa>
                         Collapse
                     </span>
                     <span class="when-closed">
-                        <font-awesome-icon icon="expand-alt"></font-awesome-icon>
+                        <fa icon="expand-alt"></fa>
                         Expand
                     </span>
                 </b-btn>
@@ -158,15 +158,15 @@
             <b-form-row>
                 <b-col sm="12" md="6" offset-md="6" class="mb-3 d-flex">
                     <b-button class="w-100 mr-2" type="reset" variant="secondary" :to="{ query: {} }">
-                        <font-awesome-icon icon="times"></font-awesome-icon>
+                        <fa icon="times"></fa>
                         Cancel
                     </b-button>
                     <b-button class="w-100 mr-2" type="reset" variant="danger">
-                        <font-awesome-icon icon="undo"></font-awesome-icon>
+                        <fa icon="undo"></fa>
                         Reset
                     </b-button>
                     <b-button class="w-100" type="submit" variant="success" :disabled="!page.dirty">
-                        <font-awesome-icon icon="save"></font-awesome-icon>
+                        <fa icon="save"></fa>
                         Save
                     </b-button>
                 </b-col>
@@ -176,7 +176,7 @@
         <!-- Modals -->
         <b-modal id="delModal" size="lg" ok-variant="danger" ok-title="Delete" @ok="deletePage">
             <template slot="modal-title">
-                <font-awesome-icon class="text-danger" icon="exclamation-triangle"></font-awesome-icon>
+                <fa class="text-danger" icon="exclamation-triangle"></fa>
                 Delete page "{{ page.title }}"
             </template>
 

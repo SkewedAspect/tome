@@ -10,25 +10,25 @@
             </h5>
             <b-button-toolbar>
                 <b-btn v-if="page.revision_id === revision.revision_id" variant="outline-primary" size="sm" style="width: 85px" disabled>
-                    <font-awesome-icon icon="check"></font-awesome-icon>
+                    <fa icon="check"></fa>
                     Current
                 </b-btn>
                 <b-btn v-else-if="page.body === revision.body" variant="outline-secondary" size="sm" style="width: 85px" disabled>
-                    <font-awesome-icon icon="ban"></font-awesome-icon>
+                    <fa icon="ban"></fa>
                     No Diff
                 </b-btn>
                 <b-btn v-else size="sm" style="width: 85px" :disabled="!!savingRevision" @click="revert(revision)">
-                    <font-awesome-icon v-if="savingRevision !== revision.revision_id" icon="undo"></font-awesome-icon>
-                    <font-awesome-icon v-else icon="spinner" spin></font-awesome-icon>
+                    <fa v-if="savingRevision !== revision.revision_id" icon="undo"></fa>
+                    <fa v-else icon="spinner" spin></fa>
                     Revert
                 </b-btn>
                 <b-btn v-b-toggle="`diff-collapse-${ revision.revision_id }`" class="ml-2" variant="outline-secondary" size="sm" style="width: 100px">
                     <span class="when-opened">
-                        <font-awesome-icon icon="compress-alt"></font-awesome-icon>
+                        <fa icon="compress-alt"></fa>
                         Hide Diff
                     </span>
                     <span class="when-closed">
-                        <font-awesome-icon icon="expand-alt"></font-awesome-icon>
+                        <fa icon="expand-alt"></fa>
                         Show Diff
                     </span>
                 </b-btn>

@@ -41,7 +41,7 @@
                 </b-tab>
                 <b-tab title="Preview" class="p-3">
                     <b-alert variant="warning" :show="!comment.body" class="text-center">
-                        <font-awesome-icon icon="exclamation-triangle"></font-awesome-icon>
+                        <fa icon="exclamation-triangle"></fa>
                         Nothing to preview.
                     </b-alert>
                     <markdown class="comment-preview" style="margin-bottom: 2px;" :text="comment.body"></markdown>
@@ -51,15 +51,15 @@
 
         <b-button-toolbar class="float-right">
             <b-btn variant="danger" @click="reset">
-                <font-awesome-icon icon="undo"></font-awesome-icon>
+                <fa icon="undo"></fa>
                 Clear
             </b-btn>
             <b-btn class="ml-2" @click="cancel">
-                <font-awesome-icon icon="times"></font-awesome-icon>
+                <fa icon="times"></fa>
                 Cancel
             </b-btn>
             <b-btn variant="success" class="ml-2" :disabled="!isValid" @click="save">
-                <font-awesome-icon icon="save"></font-awesome-icon>
+                <fa icon="save"></fa>
                 <span v-if="isNew">Post</span>
                 <span v-else>Save</span>
                 Comment

@@ -80,15 +80,15 @@
                     <div class="body-container pl-3">
                         <b-button-toolbar class="float-right">
                             <b-btn size="sm" @click="quote(commentItem)">
-                                <font-awesome-icon icon="quote-right"></font-awesome-icon>
+                                <fa icon="quote-right"></fa>
                                 Quote
                             </b-btn>
                             <b-btn v-if="canEdit(commentItem)" class="ml-2" size="sm" @click="edit(commentItem)">
-                                <font-awesome-icon icon="edit"></font-awesome-icon>
+                                <fa icon="edit"></fa>
                                 Edit
                             </b-btn>
                             <b-btn v-if="canEdit(commentItem)" class="ml-2" size="sm" @click="del(commentItem)">
-                                <font-awesome-icon icon="trash-alt"></font-awesome-icon>
+                                <fa icon="trash-alt"></fa>
                                 Delete
                             </b-btn>
                         </b-button-toolbar>
@@ -121,7 +121,7 @@
             <!-- Modal Component -->
             <b-modal id="delModal" ref="delModal" ok-variant="danger" @cancel="onCancel" @ok="onOk">
                 <template slot="modal-title">
-                    <font-awesome-icon icon="trash-alt"></font-awesome-icon>
+                    <fa icon="trash-alt"></fa>
                     Delete Comment.
                 </template>
 
@@ -133,11 +133,11 @@
                 </div>
 
                 <template slot="modal-ok">
-                    <font-awesome-icon icon="trash-alt"></font-awesome-icon>
+                    <fa icon="trash-alt"></fa>
                     Delete
                 </template>
                 <template slot="modal-cancel">
-                    <font-awesome-icon icon="times"></font-awesome-icon>
+                    <fa icon="times"></fa>
                     Cancel
                 </template>
             </b-modal>
