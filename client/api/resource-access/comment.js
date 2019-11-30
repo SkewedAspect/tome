@@ -54,7 +54,8 @@ class CommentResourceAccess
             edited: comment.edited,
             page_id: comment.page_id,
             account_id: comment.account_id,
-            path: comment.path
+            path: comment.path,
+            comment_id: comment.comment_id
         });
     } // end copyComment
 
