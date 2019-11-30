@@ -34,6 +34,48 @@ function getPath(req)
     return path;
 } // end getPath
 
+function editPage(req, resp, page)
+{
+    const path = getPath(req);
+    const user = getUser(req);
+
+    // Build different permissions
+    const modifyPerm = `wikiModify/${ page.actions.wikiModify }`;
+    const updatedViewPerm = `wikiView/${ _.get(req.body, 'action_view', page.actions.wikiView) }`;
+    const updatedModifyPerm = `wikiModify/${ _.get(req.body, 'action_modify', page.actions.wikiModify) }`;
+
+    // Build Perms Checks
+    const userNotHasPerm = modifyPerm !== 'wikiModify/*' && !permsMan.hasPerm(user, modifyPerm);
+    const userNotHasUpViewPerm = updatedViewPerm !== 'wikiView/*' && !permsMan.hasPerm(user, updatedViewPerm);
+    const userNotHasUpModPerm = updatedModifyPerm !== 'wikiModify/*' && !permsMan.hasPerm(user, updatedModifyPerm);
+    if(userNotHasPerm || userNotHasUpViewPerm || userNotHasUpModPerm)
+    {
+        resp.status(403).json({
+            name: 'Permission Denied',
+            code: 'ERR_PERMISSION',
+            message: `User '${ user.username }' does not have required permission.`
+        });
+    }
+    else
+    {
+        // eslint-disable-next-line camelcase
+        const newPage = _.merge({}, req.body, { path, page_id: page.page_id });
+        if(newPage.revision_id !== page.revision_id)
+        {
+            resp.status(409).json({
+                name: 'Version Conflict',
+                code: 'ERR_VERSION_CONFLICT',
+                message: `Edit made against older revision than most recent revision for '${ path }'.`,
+                page
+            });
+        }
+        else
+        {
+            return wikiMan.editPage(newPage);
+        } // end if
+    } // end if
+} // end editPage
+
 //----------------------------------------------------------------------------------------------------------------------
 
 router.head('*', promisify((req, resp) =>
@@ -120,24 +162,33 @@ router.options('*', promisify((req) =>
 router.post('*', ensureAuthenticated, promisify((req, resp) =>
 {
     const path = getPath(req);
+    const user = getUser(req);
 
     // First, we need to get the page, so we can check the permissions.
     return wikiMan.getPage(path)
         .then((page) =>
         {
-            resp.status(409).json({
-                name: 'Page Already Exists',
-                code: 'ERR_PAGE_EXISTS',
-                message: `A page already exists at path '${ path }'.`,
-                page
-            });
+            if(page && page.body === null)
+            {
+                // The page was deleted previously
+                req.body.revision_id = page.revision_id;
+                return editPage(req, resp, page);
+            }
+            else
+            {
+                resp.status(409).json({
+                    name: 'Page Already Exists',
+                    code: 'ERR_PAGE_EXISTS',
+                    message: `A page already exists at path '${path}'.`,
+                    page
+                });
+            } // end if
         })
         .catch({ code: 'ERR_NOT_FOUND' }, () =>
         {
             return wikiMan.getPermission(path, 'modify')
                 .then((perm) =>
                 {
-                    const user = getUser(req);
                     const viewPerm = `wikiModify/${ perm }`;
                     if(viewPerm !== 'wikiModify/*' && !permsMan.hasPerm(user, viewPerm))
                     {
@@ -210,43 +261,7 @@ router.patch('*', ensureAuthenticated, promisify((req, resp) =>
     return wikiMan.getPage(path)
         .then((page) =>
         {
-            const user = getUser(req);
-
-            // Build different permissions
-            const modifyPerm = `wikiModify/${ page.actions.wikiModify }`;
-            const updatedViewPerm = `wikiView/${ _.get(req.body, 'action_view', page.actions.wikiView) }`;
-            const updatedModifyPerm = `wikiModify/${ _.get(req.body, 'action_modify', page.actions.wikiModify) }`;
-
-            // Build Perms Checks
-            const userNotHasPerm = modifyPerm !== 'wikiModify/*' && !permsMan.hasPerm(user, modifyPerm);
-            const userNotHasUpViewPerm = updatedViewPerm !== 'wikiView/*' && !permsMan.hasPerm(user, updatedViewPerm);
-            const userNotHasUpModPerm = updatedModifyPerm !== 'wikiModify/*' && !permsMan.hasPerm(user, updatedModifyPerm);
-            if(userNotHasPerm || userNotHasUpViewPerm || userNotHasUpModPerm)
-            {
-                resp.status(403).json({
-                    name: 'Permission Denied',
-                    code: 'ERR_PERMISSION',
-                    message: `User '${ user.username }' does not have required permission.`
-                });
-            }
-            else
-            {
-                // eslint-disable-next-line camelcase
-                const newPage = _.merge({}, req.body, { path, page_id: page.page_id });
-                if(newPage.revision_id !== page.revision_id)
-                {
-                    resp.status(409).json({
-                        name: 'Version Conflict',
-                        code: 'ERR_VERSION_CONFLICT',
-                        message: `Edit made against older revision than most recent revision for '${ path }'.`,
-                        page
-                    });
-                }
-                else
-                {
-                    return wikiMan.editPage(newPage);
-                } // end if
-            } // end if
+            return editPage(req, resp, page);
         })
         .catch({ code: 'ERR_NOT_FOUND' }, () =>
         {
