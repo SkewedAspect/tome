@@ -3,7 +3,7 @@
   --------------------------------------------------------------------------------------------------------------------->
 
 <template>
-    <b-container id="comment-page">
+    <b-container id="comment-page" class="clearfix">
         <div v-if="loading">
             <h4 class="text-center">
                 Loading...
@@ -104,8 +104,8 @@
             </transition-group>
 
             <!-- New Comment -->
-            <hr/>
-            <b-button-toolbar v-show="!showCommentComponent" class="float-right mb-4">
+            <hr />
+            <b-button-toolbar v-show="!showCommentComponent" class="float-right">
                 <b-btn variant="success" @click="add">
                     Add Comment
                 </b-btn>
@@ -316,7 +316,7 @@
             },
             quote(commentItem)
             {
-                const quotedComment = "> " + commentItem.body.replace(/\n/g, '\n> ') + '\n> \n> ' + `-- <cite>${commentItem.account.username}</cite>`;
+                const quotedComment = `> ${ commentItem.body.replace(/\n/g, '\n> ') }\n> \n> ` + `-- <cite>${ commentItem.account.username }</cite>`;
                 this.createNewComment();
                 this.comment.body = quotedComment;
                 this.showCommentComponent = true;
