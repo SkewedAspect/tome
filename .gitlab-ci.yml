@@ -48,8 +48,12 @@ build docker:
   image: docker:latest
   services:
     - docker:dind
+  variables:
+    GIT_DEPTH: 1
   only:
-    - tags
+    - /^v\d+\.\d+\.\d+.*/
+  except:
+    - branches
   script:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/skewed-aspect/tome:latest -t registry.gitlab.com/skewed-aspect/tome:$CI_BUILD_REF_NAME .
