@@ -2,21 +2,54 @@ stages:
   - build
   - test
 
-Unit Tests:
-  script:
-    - yarn install
-    - yarn run test
+lint:
   stage: test
+  only:
+    - merge_requests
+    - triggers
+    - web
+  except:
+    - /^v\d+\.\d+\.\d+.*/
+  cache:
+    key: 'yarn-cache'
+    paths:
+      - .yarn-cache
+  variables:
+    GIT_DEPTH: 1
+  script:
+    - yarn install --pure-lockfile --cache-folder .yarn-cache
+    - yarn run lint
+  image: node:lts-alpine
+  tags:
+    - docker
+
+tests:
+  stage: test
+  only:
+    - merge_requests
+    - triggers
+    - web
+  except:
+    - /^v\d+\.\d+\.\d+.*/
+  cache:
+    key: 'yarn-cache'
+    paths:
+      - .yarn-cache
+  variables:
+    GIT_DEPTH: 1
+  script:
+    - yarn install --pure-lockfile --cache-folder .yarn-cache
+    - yarn test
   image: node:lts-alpine
   coverage: '/Statements.*?(\d+(?:\.\d+)?)%/'
 
-Build Docker:
+build docker:
+  stage: build
   image: docker:latest
   services:
     - docker:dind
   only:
     - tags
-  stage: build
   script:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/skewed-aspect/tome:latest -t registry.gitlab.com/skewed-aspect/tome:$CI_BUILD_REF_NAME .
