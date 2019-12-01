@@ -65,6 +65,7 @@ class DatabaseManager
                 connection: {
                     filename: './db/tome.db'
                 },
+                traceQueries: false,
                 useNullAsDefault: true
             }, configMan.get('database'));
 

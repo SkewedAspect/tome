@@ -9,7 +9,7 @@ const path = require('path');
 
 //----------------------------------------------------------------------------------------------------------------------
 
-const indexErrorPage = `<html>
+const indexErrorPage = `<html lang="en">
     <head>
         <title>Error</title>
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
@@ -79,7 +79,7 @@ function interceptHTML(response, jsonHandler, authenticated)
 {
     response.format({
         html: serveIndex,
-        json: (request, response) => 
+        json: (request, response) =>
         {
             if(!authenticated || request.isAuthenticated())
             {
@@ -129,7 +129,7 @@ function promisify(handler)
             {
                 console.error(error.stack || error.message);
 
-                let errorJSON = {};
+                let errorJSON;
                 if(_.isFunction(error.toJSON))
                 {
                     errorJSON = error.toJSON();

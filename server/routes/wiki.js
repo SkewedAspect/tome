@@ -171,6 +171,7 @@ router.post('*', ensureAuthenticated, promisify((req, resp) =>
             if(page && page.body === null)
             {
                 // The page was deleted previously
+                // eslint-disable-next-line camelcase
                 req.body.revision_id = page.revision_id;
                 return editPage(req, resp, page);
             }
@@ -179,7 +180,7 @@ router.post('*', ensureAuthenticated, promisify((req, resp) =>
                 resp.status(409).json({
                     name: 'Page Already Exists',
                     code: 'ERR_PAGE_EXISTS',
-                    message: `A page already exists at path '${path}'.`,
+                    message: `A page already exists at path '${ path }'.`,
                     page
                 });
             } // end if
