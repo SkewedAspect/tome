@@ -105,7 +105,8 @@
         },
         props: {
             comment: {
-                type: Object
+                type: Object,
+                default: undefined
             }
         },
         data()
